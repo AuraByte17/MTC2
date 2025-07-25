@@ -12,6 +12,7 @@ Inspirada na estética da caligrafia e pintura tradicional chinesa.
     --color-seal: #9E2B25;          /* Vermelho cinábrio para selos e destaques */
     --color-seal-light: #d4a373;    /* Dourado suave para hover e acentos */
     --color-border: #EAE2D6;        /* Borda subtil cor de papel */
+    --color-surface: #ffffff;       /* Superfície branca para os cards */
 
     /* Cores dos Elementos (Paleta harmonizada) */
     --el-wood: #6A994E;
@@ -19,6 +20,7 @@ Inspirada na estética da caligrafia e pintura tradicional chinesa.
     --el-earth: #E58A4E;
     --el-metal: #A9A9A9;
     --el-water: #3A86FF;
+    --el-primary: #6A994E; /* Cor primária para elementos sem cor definida */
 
     /* Tipografia */
     --font-sans: 'Inter', sans-serif;
@@ -169,6 +171,11 @@ aside {
     background-color: transparent;
 }
 .accordion-button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    text-align: left;
     padding: 1rem 0.5rem;
     font-weight: 600;
     color: var(--color-ink);
@@ -191,28 +198,31 @@ aside {
     padding: 0 0.5rem 1.5rem;
     opacity: 1;
 }
+.accordion-button .chevron { transition: transform 0.3s ease; }
+.accordion-button[aria-expanded="true"] .chevron { transform: rotate(180deg); }
+
 
 .tab-button {
     padding: 0.5rem 0;
-    margin: 0 1.5rem;
+    margin: 0 1rem;
     font-weight: 600;
     font-size: 1.1rem;
     color: var(--color-ink-muted);
-    border-bottom: 2px solid transparent;
+    border-bottom: 3px solid transparent;
     transition: color 0.3s, border-color 0.3s;
 }
 .tab-button.active, .tab-button:hover { color: var(--color-ink); }
 .tab-button.active { border-bottom-color: var(--color-seal); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
 
 /* --- 7. Pesquisa Global --- */
 #search-modal-container {
     transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+#search-modal-container.hidden {
     visibility: hidden;
     opacity: 0;
-}
-#search-modal-container:not(.hidden) {
-    visibility: visible;
-    opacity: 1;
 }
 #search-overlay {
     background-color: rgba(253, 251, 245, 0.5);
@@ -243,7 +253,91 @@ aside {
     overflow: hidden;
 }
 
-/* --- 8. Preferências de Movimento Reduzido --- */
+/* --- 8. Componentes Específicos --- */
+
+/* Timeline */
+.timeline-container {
+    position: relative;
+    padding-left: 2rem;
+}
+.timeline-container:before {
+    content: '';
+    position: absolute;
+    left: 1rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: var(--color-border);
+}
+.timeline-item {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+.timeline-marker {
+    position: absolute;
+    left: -2rem;
+    top: 0;
+    transform: translateX(50%);
+}
+
+/* Diagramas */
+.diagram-area-svg {
+    fill: rgba(255, 255, 255, 0.2);
+    stroke: rgba(0, 0, 0, 0.5);
+    stroke-width: 1;
+    cursor: pointer;
+    transition: fill 0.3s ease;
+}
+.diagram-area-svg:hover, .diagram-area-svg:focus {
+    fill: rgba(158, 43, 37, 0.3); /* --color-seal com opacidade */
+}
+
+/* NOVO: Estilos para o diagrama dos 5 Elementos */
+.element-diagram { position: relative; }
+.element {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    padding: 0.75rem 1rem;
+    border-radius: 50%;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.element:hover { transform: translate(-50%, -50%) scale(1.1); }
+.element.active {
+    transform: translate(-50%, -50%) scale(1.15);
+    border-color: var(--color-seal);
+    color: var(--color-seal) !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.element.wood { background-color: var(--el-wood); color: white; }
+.element.fire { background-color: var(--el-fire); color: white; }
+.element.earth { background-color: var(--el-earth); color: white; }
+.element.metal { background-color: var(--el-metal); color: white; }
+.element.water { background-color: var(--el-water); color: white; }
+
+.element-lines {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+}
+.cycle-path {
+    transition: opacity 0.3s ease;
+}
+.geracao-path { color: var(--el-wood); }
+.controlo-path { color: var(--el-fire); }
+.arrow-marker { transition: fill 0.3s ease; }
+#element-details-container table td:first-child { font-weight: 600; padding-right: 1rem; color: var(--color-ink-muted); }
+#element-details-container table tr { border-bottom: 1px solid var(--color-border); }
+#element-details-container table tr:last-child { border-bottom: none; }
+#element-details-container table td { padding: 0.5rem 0; }
+
+
+/* --- 9. Preferências de Movimento Reduzido --- */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
         animation-duration: 0.01ms !important;
