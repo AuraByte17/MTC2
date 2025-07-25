@@ -1224,7 +1224,7 @@ taichi: {
             { name: "Kao (靠)", translation: "Ombrada", description: "Golpe com o ombro ou com o corpo." }
         ]
     }
-}
+};
 // --- ADD THIS CODE TO THE END OF YOUR data.js FILE ---
 
 // Exporta os dados sobre Moxabustão (placeholder)
