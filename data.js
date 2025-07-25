@@ -1183,6 +1183,48 @@ export const philosophyAndPracticeData = {
     }
 };
 
+// This is the end of the qigong object
+        yi_jin_jing: {
+            // ... all the yi_jin_jing movements
+        }
+    }
+}, // <-- ADD THIS COMMA
+
+// --- PASTE THE CODE BELOW ---
+taichi: {
+    title: "Tai Chi Chuan (太極拳)",
+    introduction: "Tai Chi Chuan, a 'Grande Pugna Suprema', é uma arte marcial interna conhecida pelos seus movimentos lentos, fluidos e conscientes. É praticada em todo o mundo como uma forma de meditação em movimento que promove a saúde, o equilíbrio e a longevidade, integrando corpo, mente e espírito.",
+    philosophy_and_principles: {
+        title: "Filosofia e Princípios Fundamentais",
+        principles: [
+            { name: "Suavidade Supera a Dureza (以柔克剛)", content: "O princípio central do Tai Chi. Em vez de encontrar a força com força, o praticante cede, redireciona e neutraliza a energia do oponente, usando o mínimo de esforço." },
+            { name: "Mover-se a Partir do Centro (丹田)", content: "Todos os movimentos originam-se do Dan Tian Inferior, o centro de gravidade e reservatório de Qi do corpo. A cintura guia os membros, garantindo um movimento unificado e poderoso." },
+            { name: "A Mente Guia o Qi (以意領氣)", content: "A intenção (Yi) é usada para guiar o fluxo de Qi. Onde a mente vai, o Qi segue. Onde o Qi vai, a força (Jin) manifesta-se." },
+            { name: "Continuidade Ininterrupta (連綿不斷)", content: "Os movimentos fluem de um para o outro sem paragens, como um rio sem fim ou o desenrolar de um fio de seda. Esta continuidade cultiva um fluxo suave de Qi." }
+        ]
+    },
+    advanced_concepts: {
+        title: "Conceitos Avançados",
+        concepts: [
+            { name: "Peng Jin (掤勁) - Energia Expansiva", content: "A energia fundamental do Tai Chi. É uma força elástica, expansiva e tridimensional que preenche todo o corpo, semelhante a uma bola cheia de ar. Peng Jin neutraliza a pressão e mantém a estrutura." },
+            { name: "Ting Jin (聽勁) - Energia de Escuta", content: "A habilidade de sentir a intenção e o movimento de um oponente através do toque. É uma sensibilidade aguçada que permite antecipar e responder instantaneamente." }
+        ]
+    },
+    eight_forces: {
+        title: "As Oito Forças (八勁)",
+        description: "As oito energias fundamentais que formam a base das técnicas do Tai Chi.",
+        forces: [
+            { name: "Peng (掤)", translation: "Aparar", description: "Energia expansiva, para cima e para fora." },
+            { name: "Lü (捋)", translation: "Recuar/Puxar", description: "Ceder e redirecionar a força para o lado." },
+            { name: "Ji (擠)", translation: "Pressionar", description: "Energia concentrada, para a frente." },
+            { name: "An (按)", translation: "Empurrar para Baixo", description: "Pressionar para baixo para enraizar ou desequilibrar." },
+            { name: "Cai (採)", translation: "Colher/Agarrar", description: "Puxar para baixo subitamente." },
+            { name: "Lie (挒)", translation: "Dividir", description: "Energia em espiral para separar ou desequilibrar." },
+            { name: "Zhou (肘)", translation: "Cotovelada", description: "Golpe curto com o cotovelo." },
+            { name: "Kao (靠)", translation: "Ombrada", description: "Golpe com o ombro ou com o corpo." }
+        ]
+    }
+}
 // --- ADD THIS CODE TO THE END OF YOUR data.js FILE ---
 
 // Exporta os dados sobre Moxabustão (placeholder)
