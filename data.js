@@ -1182,3 +1182,63 @@ export const philosophyAndPracticeData = {
         }
     }
 };
+
+// --- ADD THIS CODE TO THE END OF YOUR data.js FILE ---
+
+// Exporta os dados sobre Moxabustão (placeholder)
+export const moxibustionData = {
+    introduction: "A moxabustão é uma terapia que utiliza a queima da erva Artemisia vulgaris para aquecer os pontos de acupuntura. O calor penetra profundamente, movendo o Qi e o Sangue, dispersando o Frio e fortalecendo o Yang.",
+    types: [
+        { name: "Moxa Direta", description: "O cone de moxa é colocado diretamente na pele (com ou sem uma base protetora como gengibre ou alho)." },
+        { name: "Moxa Indireta", description: "A moxa é queimada sem tocar diretamente na pele. É a forma mais comum.", methods: [
+            "<li>Utilizando um bastão de moxa que é aproximado da pele.</li>",
+            "<li>Utilizando uma caixa de moxa que é colocada sobre uma área do corpo.</li>",
+            "<li>Colocando moxa no cabo de uma agulha de acupuntura já inserida.</li>"
+        ]}
+    ],
+    functions: [
+        { title: "Aquecer os Meridianos e Dispersar o Frio", content: "Excelente para dores articulares que pioram com o frio (artrite por Frio)." },
+        { title: "Fortalecer o Yang e Prevenir o Colapso", content: "Usada para condições de deficiência de Yang, como fadiga crónica e diarreia." },
+        { title: "Mover o Qi e o Sangue", content: "Ajuda a aliviar a dor causada por estagnação, como cólicas menstruais." }
+    ],
+    contraindications: [
+        "Síndromes de excesso de Calor ou deficiência de Yin com sinais de Calor.",
+        "Em áreas perto de grandes vasos sanguíneos, na face ou em áreas com pouca sensibilidade.",
+        "Durante a gravidez, evitar a zona abdominal e lombar."
+    ]
+};
+
+// Exporta os dados sobre Fitoterapia (placeholder)
+export const phytotherapyData = {
+    introduction: "A fitoterapia chinesa é um dos pilares da MTC. Utiliza plantas, minerais e, por vezes, substâncias animais para criar fórmulas complexas e equilibradas que visam restaurar a harmonia no corpo.",
+    principles: [
+        { name: "As Quatro Naturezas (四氣)", description: "As ervas são classificadas como Quentes, Mornas, Frescas ou Frias." },
+        { name: "Os Cinco Sabores (五味)", description: "Picante (dispersa), Doce (tonifica), Azedo (adstringe), Amargo (drena) e Salgado (amolece)." }
+    ],
+    formula_structure: {
+        title: "Estrutura de uma Fórmula Clássica",
+        description: "Uma fórmula chinesa é como uma equipa, onde cada erva tem uma função específica:",
+        roles: [
+            "<strong>Imperador (君):</strong> A erva principal, que trata a queixa primária.",
+            "<strong>Ministro (臣):</strong> Ajuda o Imperador e trata os sintomas secundários.",
+            "<strong>Assistente (佐):</strong> Modera a toxicidade ou o efeito das outras ervas.",
+            "<strong>Mensageiro (使):</strong> Guia a ação da fórmula para uma área específica do corpo."
+        ]
+    },
+    examples: [
+        { 
+            type: "Ervas para Tonificar o Qi", 
+            items: [
+                { name: "Ren Shen (Ginseng)", functions: "Tonifica potentemente o Qi Original." },
+                { name: "Huang Qi (Astragalus)", functions: "Tonifica o Qi do Baço e do Pulmão, eleva o Yang." }
+            ]
+        },
+        { 
+            type: "Ervas para Mover o Sangue", 
+            items: [
+                { name: "Dan Shen (Salvia)", functions: "Move o Sangue, arrefece o Sangue e acalma a irritabilidade." },
+                { name: "Chuan Xiong (Ligusticum)", functions: "Move o Sangue e o Qi, expele o Vento e pára a dor (especialmente dores de cabeça)." }
+            ]
+        }
+    ]
+};
