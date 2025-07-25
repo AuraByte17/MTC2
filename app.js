@@ -456,6 +456,41 @@ function setupDietetics() {
     }
 }
 
+// NOVO: Função para o glossário (estava em falta)
+function setupGlossary() {
+    const container = document.getElementById('glossary-container');
+    if (!container) return;
+
+    // Agrupar termos por categoria
+    const groupedGlossary = Object.values(glossaryData).reduce((acc, item) => {
+        const category = item.category || 'Outros';
+        if (!acc[category]) {
+            acc[category] = [];
+        }
+        acc[category].push(item);
+        return acc;
+    }, {});
+
+    const categories = Object.keys(groupedGlossary).sort();
+
+    container.innerHTML = categories.map(category => `
+        <div class="visual-card mb-6">
+            <div class="card-header">
+                <h3>${category}</h3>
+            </div>
+            <div class="card-content card-prose divide-y" style="border-color: var(--color-border)">
+                ${groupedGlossary[category].sort((a, b) => a.term.localeCompare(b.term)).map(item => `
+                    <div class="py-4">
+                        <h4 class="!text-lg !font-semibold !mt-0 !mb-1" style="color: var(--color-seal);">${item.term}</h4>
+                        <p class="!mt-0" style="color: var(--color-ink-muted);">${item.definition}</p>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `).join('');
+}
+
+
 function setupDiagnosisDiagrams() {
     // Diagrama da Face
     document.querySelectorAll('#panel-observacao .diagram-container').forEach(container => {
@@ -649,6 +684,134 @@ function setupPhilosophyAndPractice() {
     setupTabs('internal-arts-tabs', 'internal-arts-tab-content');
 }
 
+// NOVO: Função para o diagrama dos 5 Elementos
+function setupFiveElements() {
+    const container = document.getElementById('cinco-elementos');
+    if (!container) return;
+
+    const elements = {
+        madeira: container.querySelector('#madeira'),
+        fogo: container.querySelector('#fogo'),
+        terra: container.querySelector('#terra'),
+        metal: container.querySelector('#metal'),
+        agua: container.querySelector('#agua'),
+    };
+
+    const btnGeracao = container.querySelector('#btn-geracao');
+    const btnControlo = container.querySelector('#btn-controlo');
+    const detailsContainer = container.querySelector('#element-details-container');
+    const infoBox = container.querySelector('#cycle-info-box');
+    const svgContainer = container.querySelector('#cycle-paths-container');
+
+    if (!btnGeracao || !btnControlo || !detailsContainer || !infoBox || !svgContainer || !Object.values(elements).every(el => el)) {
+        console.error("Five Elements section is missing some required elements.");
+        return;
+    }
+
+    let currentCycle = 'geracao';
+
+    function getElementCoords(elementId) {
+        const el = elements[elementId];
+        return {
+            x: el.offsetLeft + el.offsetWidth / 2,
+            y: el.offsetTop + el.offsetHeight / 2,
+        };
+    }
+
+    function drawLine(from, to, cycle) {
+        const start = getElementCoords(from);
+        const end = getElementCoords(to);
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        
+        const dx = end.x - start.x;
+        const dy = end.y - start.y;
+        
+        // For control cycle, use a straight line (or slight curve)
+        if (cycle === 'controlo') {
+            const midX = start.x + dx * 0.5;
+            const midY = start.y + dy * 0.5;
+            const normalX = -dy;
+            const normalY = dx;
+            const controlX = midX + normalX * 0.15; // Adjust curve amount
+            const controlY = midY + normalY * 0.15;
+            path.setAttribute('d', `M ${start.x} ${start.y} Q ${controlX} ${controlY} ${end.x} ${end.y}`);
+        } else { // For generation cycle, use a curve along the circle's edge
+             const midX = 150 + (start.x + end.x - 300) * 0.4;
+             const midY = 150 + (start.y + end.y - 300) * 0.4;
+             path.setAttribute('d', `M ${start.x} ${start.y} Q ${midX} ${midY} ${end.x} ${end.y}`);
+        }
+        
+        path.setAttribute('stroke', 'currentColor');
+        path.setAttribute('stroke-width', '2');
+        path.setAttribute('fill', 'none');
+        path.setAttribute('class', `cycle-path ${cycle}-path`);
+        path.setAttribute('marker-end', 'url(#arrow)');
+        return path;
+    }
+
+    function updateCycleView() {
+        svgContainer.innerHTML = ''; // Clear previous lines
+        btnGeracao.classList.toggle('active', currentCycle === 'geracao');
+        btnControlo.classList.toggle('active', currentCycle === 'controlo');
+
+        const cycleOrder = ['madeira', 'fogo', 'terra', 'metal', 'agua'];
+        
+        if (currentCycle === 'geracao') {
+            infoBox.innerHTML = `<p class="text-center text-gray-600">O <strong>Ciclo de Geração (Sheng)</strong> descreve uma relação de nutrição e promoção, como uma mãe que nutre um filho.</p>`;
+            for (let i = 0; i < cycleOrder.length; i++) {
+                const from = cycleOrder[i];
+                const to = cycleOrder[(i + 1) % cycleOrder.length];
+                svgContainer.appendChild(drawLine(from, to, 'geracao'));
+            }
+        } else {
+            infoBox.innerHTML = `<p class="text-center text-gray-600">O <strong>Ciclo de Controlo (Ke)</strong> descreve uma relação de restrição e equilíbrio, para que nenhum elemento se torne excessivo.</p>`;
+            for (let i = 0; i < cycleOrder.length; i++) {
+                const from = cycleOrder[i];
+                const to = cycleOrder[(i + 2) % cycleOrder.length];
+                svgContainer.appendChild(drawLine(from, to, 'controlo'));
+            }
+        }
+    }
+
+    function showElementDetails(elementId) {
+        const data = fiveElementsData[elementId];
+        if (!data) return;
+
+        Object.values(elements).forEach(el => el.classList.remove('active'));
+        elements[elementId].classList.add('active');
+
+        detailsContainer.innerHTML = `
+            <div class="p-4 border-l-4" style="border-color: var(--el-${data.color});">
+                <h3 class="text-2xl font-bold mb-2" style="color: var(--el-${data.color});">${data.name}</h3>
+                <p class="text-sm font-semibold text-gray-500 mb-4"><strong>Geração:</strong> <span class="text-gray-700 font-normal">${data.relations.geracao}</span></p>
+                <p class="text-sm font-semibold text-gray-500 mb-4"><strong>Controlo:</strong> <span class="text-gray-700 font-normal">${data.relations.controlo}</span></p>
+                <table class="w-full text-sm">
+                    <tbody>
+                        ${data.table}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    btnGeracao.addEventListener('click', () => {
+        currentCycle = 'geracao';
+        updateCycleView();
+    });
+
+    btnControlo.addEventListener('click', () => {
+        currentCycle = 'controlo';
+        updateCycleView();
+    });
+
+    Object.keys(elements).forEach(id => {
+        elements[id].addEventListener('click', () => showElementDetails(id));
+    });
+
+    updateCycleView();
+    showElementDetails('madeira');
+}
+
 
 // ATUALIZADO: Função para gerar os links de navegação
 function generateNavLinks() {
@@ -720,11 +883,12 @@ document.addEventListener('DOMContentLoaded', () => {
     createLifeCycleTimeline('male-cycles-timeline', lifeCyclesMaleData, 'bg-blue-500');
     createAccordion('perguntas-accordion', dezPerguntasData);
     createAccordion('pulse-list-container', pulseData);
-    setupGlossary();
+    setupGlossary(); // CORRIGIDO: Função agora existe
     setupDietetics();
     setupTherapeutics('moxabustao-content-area', moxibustionData);
     setupPhytotherapy('fitoterapia-content-area', phytotherapyData);
-    setupPhilosophyAndPractice(); // NOVO: Gera a secção de Filosofia
+    setupPhilosophyAndPractice(); 
+    setupFiveElements(); // NOVO: Adicionada a lógica dos 5 elementos
     
     // Configuração de componentes interativos
     setupTabs('diagnosis-tabs', 'diagnosis-tab-content');
