@@ -456,33 +456,35 @@ function setupDietetics() {
     }
 }
 
-// NOVO: Função para renderizar o glossário (estava em falta)
+// *** FIX: Added the missing setupGlossary function ***
 function setupGlossary() {
     const container = document.getElementById('glossary-container');
     if (!container) return;
 
-    // Agrupa os termos por categoria
-    const groupedGlossary = Object.values(glossaryData).reduce((acc, item) => {
-        const category = item.category || 'Outros';
+    // Group terms by category
+    const groupedTerms = Object.values(glossaryData).reduce((acc, term) => {
+        const category = term.category || 'Outros';
         if (!acc[category]) {
             acc[category] = [];
         }
-        acc[category].push(item);
+        acc[category].push(term);
         return acc;
     }, {});
 
-    const categories = Object.keys(groupedGlossary).sort();
+    // Sort categories
+    const sortedCategories = Object.keys(groupedTerms).sort();
 
-    container.innerHTML = categories.map(category => `
-        <div class="visual-card mb-8">
+    // Generate HTML
+    container.innerHTML = sortedCategories.map(category => `
+        <div class="visual-card mb-6">
             <div class="card-header">
-                <h3 class="text-xl">${category}</h3>
+                <h3>${category}</h3>
             </div>
             <div class="card-content divide-y divide-gray-200">
-                ${groupedGlossary[category].map(item => `
+                ${groupedTerms[category].sort((a, b) => a.term.localeCompare(b.term)).map(term => `
                     <div class="py-4">
-                        <h4 class="font-bold text-lg text-seal-dark !mt-0">${item.term}</h4>
-                        <p class="text-gray-600 mb-0">${item.definition}</p>
+                        <h4 class="text-lg font-semibold text-gray-800">${term.term}</h4>
+                        <p class="text-gray-600 mt-1">${term.definition}</p>
                     </div>
                 `).join('')}
             </div>
@@ -547,14 +549,11 @@ function setupDiagnosisDiagrams() {
 
 function setupTherapeutics(containerId, data) {
     const container = document.getElementById(containerId);
-    if (!container || !data || Object.keys(data).length === 0) { // Check if data is empty
-        if (container) container.innerHTML = "<p>Conteúdo sobre moxabustão indisponível de momento.</p>";
-        return;
-    }
+    if (!container || !data) return;
 
     let methodsHtml = '';
     if (data.types && data.types[1] && data.types[1].methods) {
-        methodsHtml = `<ul class="list-disc list-inside ml-4">${data.types[1].methods.map(m => `<li>${m}</li>`).join('')}</ul>`;
+        methodsHtml = `<ul class="list-disc list-inside ml-4">${data.types[1].methods.join('')}</ul>`;
     }
 
     container.innerHTML = `
@@ -572,10 +571,7 @@ function setupTherapeutics(containerId, data) {
 
 function setupPhytotherapy(containerId, data) {
     const container = document.getElementById(containerId);
-    if (!container || !data || Object.keys(data).length === 0) { // Check if data is empty
-        if (container) container.innerHTML = "<p>Conteúdo sobre fitoterapia indisponível de momento.</p>";
-        return;
-    }
+    if (!container || !data) return;
 
     container.innerHTML = `
         <p>${data.introduction}</p>
@@ -593,7 +589,6 @@ function setupPhytotherapy(containerId, data) {
         <ul>${data.examples[1].items.map(i => `<li><strong>${i.name}:</strong> ${i.functions}</li>`).join('')}</ul>
     `;
 }
-
 
 // NOVO: Função para construir toda a secção de Filosofia e Prática
 function setupPhilosophyAndPractice() {
@@ -647,9 +642,11 @@ function setupPhilosophyAndPractice() {
                     </div>
                     <div id="internal-arts-tab-content">
                         <div class="tab-content active" id="panel-qigong" role="tabpanel" aria-labelledby="tab-qigong">
-                            </div>
+                            <!-- Conteúdo do Qi Gong -->
+                        </div>
                         <div class="tab-content" id="panel-taichi" role="tabpanel" aria-labelledby="tab-taichi">
-                            </div>
+                            <!-- Conteúdo do Tai Chi -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -675,9 +672,15 @@ function setupPhilosophyAndPractice() {
     }
 
     if (taichiPanel) {
-        // NOTE: The data.js provided does not contain a "taichi" object.
-        // This will be left blank to avoid errors, assuming it might be added later.
-        taichiPanel.innerHTML = `<p>Conteúdo sobre Tai Chi indisponível de momento.</p>`;
+        const { taichi } = internal_arts;
+        taichiPanel.innerHTML = `
+            <div class="card-prose">
+                <h3 class="!text-2xl">${taichi.title}</h3>
+                <p>${taichi.introduction}</p>
+                <div class="visual-card my-6"><div class="card-header"><h4>${taichi.philosophy_and_principles.title}</h4></div><div class="card-content">${taichi.philosophy_and_principles.principles.map(p => `<h5>${p.name}</h5><div>${p.content}</div>`).join('')}</div></div>
+                <div class="visual-card my-6"><div class="card-header"><h4>${taichi.advanced_concepts.title}</h4></div><div class="card-content">${taichi.advanced_concepts.concepts.map(c => `<h5>${c.name}</h5><div>${c.content}</div>`).join('')}</div></div>
+                <div class="visual-card my-6"><div class="card-header"><h4>${taichi.eight_forces.title}</h4></div><div class="card-content"><p>${taichi.eight_forces.description}</p><div class="space-y-4 mt-4">${taichi.eight_forces.forces.map(f => `<div><strong>${f.name} (${f.translation}):</strong> ${f.description}</div>`).join('')}</div></div></div>
+            </div>`;
     }
     
     setupTabs('internal-arts-tabs', 'internal-arts-tab-content');
@@ -754,7 +757,7 @@ document.addEventListener('DOMContentLoaded', () => {
     createLifeCycleTimeline('male-cycles-timeline', lifeCyclesMaleData, 'bg-blue-500');
     createAccordion('perguntas-accordion', dezPerguntasData);
     createAccordion('pulse-list-container', pulseData);
-    setupGlossary(); // FIX: Call the now-defined function
+    setupGlossary();
     setupDietetics();
     setupTherapeutics('moxabustao-content-area', moxibustionData);
     setupPhytotherapy('fitoterapia-content-area', phytotherapyData);
