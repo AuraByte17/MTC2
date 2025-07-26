@@ -14,7 +14,7 @@ import {
     tongueDiagnosisData,
     moxibustionData,
     phytotherapyData,
-    philosophyAndPracticeData // NOVO: Importa os dados consolidados
+    philosophyAndPracticeData
 } from './data.js';
 
 // --- Seleção de Elementos DOM ---
@@ -26,7 +26,7 @@ const desktopNavHub = document.getElementById('desktop-navigation-hub');
 const currentSectionTitle = document.getElementById('current-section-title');
 const contentArea = document.getElementById('main-content-area');
 const mainContent = document.getElementById('main-content');
-let contentSections = []; // Será preenchido dinamicamente
+let contentSections = [];
 
 const allNavHubs = [mobileNavHub, desktopNavHub];
 
@@ -38,7 +38,42 @@ const searchOverlay = document.getElementById('search-overlay');
 const closeSearchBtn = document.getElementById('close-search-btn');
 const globalSearchInput = document.getElementById('global-search-input');
 const searchResultsContainer = document.getElementById('search-results-container');
-let searchIndex = []; // Onde todos os dados pesquisáveis serão guardados
+let searchIndex = [];
+
+// --- Lógica para o Seletor de Tema ---
+const themeToggleBtn = document.getElementById('theme-toggle-btn');
+const themeIconLight = document.getElementById('theme-icon-light');
+const themeIconDark = document.getElementById('theme-icon-dark');
+const themeText = document.getElementById('theme-text');
+
+function applyTheme(theme) {
+    document.body.dataset.theme = theme;
+    if (theme === 'dark') {
+        themeIconLight.classList.add('hidden');
+        themeIconDark.classList.remove('hidden');
+        if (themeText) themeText.textContent = 'Tema Escuro';
+    } else {
+        themeIconLight.classList.remove('hidden');
+        themeIconDark.classList.add('hidden');
+        if (themeText) themeText.textContent = 'Tema Claro';
+    }
+    localStorage.setItem('mtc-theme', theme);
+}
+
+function toggleTheme() {
+    const currentTheme = document.body.dataset.theme;
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    applyTheme(newTheme);
+}
+
+if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', toggleTheme);
+}
+
+// Aplicar tema guardado ao carregar a página
+const savedTheme = localStorage.getItem('mtc-theme') || 'light';
+applyTheme(savedTheme);
+
 
 // --- FUNÇÃO DE UTILIDADE: DEBOUNCE ---
 function debounce(func, delay) {
@@ -53,28 +88,28 @@ function debounce(func, delay) {
 // --- LÓGICA DE NAVEGAÇÃO RESPONSIVA ---
 function openMobileMenu() { document.body.classList.add('mobile-menu-open'); }
 function closeMobileMenu() { document.body.classList.remove('mobile-menu-open'); }
-openMenuBtn.addEventListener('click', openMobileMenu);
-closeMenuBtn.addEventListener('click', closeMobileMenu);
-mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+if(openMenuBtn) openMenuBtn.addEventListener('click', openMobileMenu);
+if(closeMenuBtn) closeMenuBtn.addEventListener('click', closeMobileMenu);
+if(mobileMenuOverlay) mobileMenuOverlay.addEventListener('click', closeMobileMenu);
 
 // --- LÓGICA DA PESQUISA GLOBAL ---
-function openSearchModal() {
+function openSearchModal() { 
     document.body.classList.add('search-modal-open');
-    searchModalContainer.classList.remove('hidden');
-    setTimeout(() => globalSearchInput.focus(), 50); 
+    if(searchModalContainer) searchModalContainer.classList.remove('hidden');
+    setTimeout(() => globalSearchInput && globalSearchInput.focus(), 50); 
 }
 
-function closeSearchModal() {
+function closeSearchModal() { 
     document.body.classList.remove('search-modal-open');
-    searchModalContainer.classList.add('hidden');
-    globalSearchInput.value = ''; 
-    searchResultsContainer.innerHTML = '<p class="text-center text-gray-500">Comece a escrever para ver os resultados.</p>';
+    if(searchModalContainer) searchModalContainer.classList.add('hidden');
+    if(globalSearchInput) globalSearchInput.value = ''; 
+    if(searchResultsContainer) searchResultsContainer.innerHTML = '<p class="text-center text-gray-500">Comece a escrever para ver os resultados.</p>';
 }
 
-openSearchMobileBtn.addEventListener('click', openSearchModal);
-desktopSearchInput.addEventListener('focus', openSearchModal);
-closeSearchBtn.addEventListener('click', closeSearchModal);
-searchOverlay.addEventListener('click', closeSearchModal);
+if(openSearchMobileBtn) openSearchMobileBtn.addEventListener('click', openSearchModal);
+if(desktopSearchInput) desktopSearchInput.addEventListener('focus', openSearchModal);
+if(closeSearchBtn) closeSearchBtn.addEventListener('click', closeSearchModal);
+if(searchOverlay) searchOverlay.addEventListener('click', closeSearchModal);
 
 // --- LÓGICA DE NAVEGAÇÃO PRINCIPAL ---
 function showSection(targetId, linkText) {
@@ -87,32 +122,36 @@ function showSection(targetId, linkText) {
 
 function updateActiveLink(targetId) {
     allNavHubs.forEach(hub => {
-        hub.querySelectorAll('.sidebar-link').forEach(link => {
-            const href = link.getAttribute('href');
-            const isActive = href === `#${targetId}`;
-            link.classList.toggle('active', isActive);
-            link.setAttribute('aria-current', isActive ? 'page' : 'false');
-        });
+        if(hub) {
+            hub.querySelectorAll('.sidebar-link').forEach(link => {
+                const href = link.getAttribute('href');
+                const isActive = href === `#${targetId}`;
+                link.classList.toggle('active', isActive);
+                link.setAttribute('aria-current', isActive ? 'page' : 'false');
+            });
+        }
     });
 }
 
 allNavHubs.forEach(hub => {
-    hub.addEventListener('click', (e) => {
-        const link = e.target.closest('a.sidebar-link');
-        const groupHeader = e.target.closest('.nav-group-header');
-        if (link) {
-            e.preventDefault();
-            const targetId = link.getAttribute('href').substring(1);
-            const linkText = link.querySelector('span').textContent;
-            showSection(targetId, linkText);
-            updateActiveLink(targetId);
-            closeMobileMenu();
-        }
-        if (groupHeader) {
-            const isOpen = groupHeader.classList.toggle('open');
-            groupHeader.setAttribute('aria-expanded', isOpen);
-        }
-    });
+    if(hub) {
+        hub.addEventListener('click', (e) => {
+            const link = e.target.closest('a.sidebar-link');
+            const groupHeader = e.target.closest('.nav-group-header');
+            if (link) {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const linkText = link.querySelector('span').textContent;
+                showSection(targetId, linkText);
+                updateActiveLink(targetId);
+                closeMobileMenu();
+            }
+            if (groupHeader) {
+                const isOpen = groupHeader.classList.toggle('open');
+                groupHeader.setAttribute('aria-expanded', isOpen);
+            }
+        });
+    }
 });
 
 // --- CRIAÇÃO DO ÍNDICE DE PESQUISA ---
@@ -161,6 +200,7 @@ function createSearchIndex() {
 
 // --- LÓGICA DE EXECUÇÃO DA PESQUISA ---
 function performSearch(query) {
+    if (!searchResultsContainer) return;
     if (query.length < 2) {
         searchResultsContainer.innerHTML = '<p class="text-center text-gray-500">Escreva pelo menos 2 letras para pesquisar.</p>';
         return;
@@ -174,6 +214,7 @@ function performSearch(query) {
 }
 
 function renderSearchResults(results) {
+    if (!searchResultsContainer) return;
     if (results.length === 0) {
         searchResultsContainer.innerHTML = '<p class="text-center text-gray-500">Nenhum resultado encontrado.</p>';
         return;
@@ -187,23 +228,26 @@ function renderSearchResults(results) {
     `).join('');
 }
 
-globalSearchInput.addEventListener('input', debounce((e) => performSearch(e.target.value), 300));
-searchResultsContainer.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') e.target.click();
-});
-searchResultsContainer.addEventListener('click', (e) => {
-    const resultItem = e.target.closest('.search-result-item');
-    if (resultItem) {
-        const sectionId = resultItem.dataset.sectionId;
-        const link = document.querySelector(`#desktop-navigation-hub a[href="#${sectionId}"]`);
-        if (link) {
-            const linkText = link.querySelector('span').textContent;
-            showSection(sectionId, linkText);
-            updateActiveLink(sectionId);
-            closeSearchModal();
+if(globalSearchInput) globalSearchInput.addEventListener('input', debounce((e) => performSearch(e.target.value), 300));
+if(searchResultsContainer) {
+    searchResultsContainer.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') e.target.click();
+    });
+    searchResultsContainer.addEventListener('click', (e) => {
+        const resultItem = e.target.closest('.search-result-item');
+        if (resultItem) {
+            const sectionId = resultItem.dataset.sectionId;
+            const link = document.querySelector(`#desktop-navigation-hub a[href="#${sectionId}"]`);
+            if (link) {
+                const linkText = link.querySelector('span').textContent;
+                showSection(sectionId, linkText);
+                updateActiveLink(sectionId);
+                closeSearchModal();
+            }
         }
-    }
-});
+    });
+}
+
 
 // --- FUNÇÕES DE GERAÇÃO DE CONTEÚDO ---
 function createAccordion(containerId, data) {
@@ -213,7 +257,7 @@ function createAccordion(containerId, data) {
         const uniqueId = `${containerId}-item-${index}`;
         return `
         <div class="accordion-item">
-            <button class="accordion-button" aria-expanded="false" aria-controls="${uniqueId}-content" id="${uniqueId}-button">
+            <button class="accordion-button flex items-center justify-between w-full text-left" aria-expanded="false" aria-controls="${uniqueId}-content" id="${uniqueId}-button">
                 <span class="flex items-center">
                     ${item.color ? `<span class="w-3 h-3 rounded-full mr-3" style="background-color: var(--el-${item.color});"></span>` : ''}
                     ${item.name || item.title}
@@ -456,12 +500,10 @@ function setupDietetics() {
     }
 }
 
-// *** FIX: Added the missing setupGlossary function ***
 function setupGlossary() {
     const container = document.getElementById('glossary-container');
     if (!container) return;
 
-    // Group terms by category
     const groupedTerms = Object.values(glossaryData).reduce((acc, term) => {
         const category = term.category || 'Outros';
         if (!acc[category]) {
@@ -471,10 +513,8 @@ function setupGlossary() {
         return acc;
     }, {});
 
-    // Sort categories
     const sortedCategories = Object.keys(groupedTerms).sort();
 
-    // Generate HTML
     container.innerHTML = sortedCategories.map(category => `
         <div class="visual-card mb-6">
             <div class="card-header">
@@ -492,9 +532,90 @@ function setupGlossary() {
     `).join('');
 }
 
+function setupFiveElements() {
+    const elements = {
+        madeira: { x: 150, y: 60 },
+        fogo: { x: 240, y: 105 },
+        terra: { x: 202, y: 225 },
+        metal: { x: 98, y: 225 },
+        agua: { x: 60, y: 105 }
+    };
+    const svgContainer = document.getElementById('cycle-paths-container');
+    const detailsContainer = document.getElementById('element-details-container');
+    const infoBox = document.getElementById('cycle-info-box');
+    const btnGeracao = document.getElementById('btn-geracao');
+    const btnControlo = document.getElementById('btn-controlo');
+    const elementButtons = document.querySelectorAll('.element-diagram .element');
+
+    if (!svgContainer || !detailsContainer || !btnGeracao || !btnControlo) return;
+
+    let currentCycle = 'geracao';
+
+    function drawPath(startId, endId, cycleType) {
+        const start = elements[startId];
+        const end = elements[endId];
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const d = cycleType === 'geracao' 
+            ? `M ${start.x},${start.y} Q ${(start.x + end.x) / 2 + (start.y - end.y) / 4},${(start.y + end.y) / 2 - (start.x - end.x) / 4} ${end.x},${end.y}`
+            : `M ${start.x},${start.y} L ${end.x},${end.y}`;
+        
+        path.setAttribute('d', d);
+        path.setAttribute('class', `cycle-path ${cycleType}`);
+        path.setAttribute('marker-end', 'url(#arrow)');
+        svgContainer.appendChild(path);
+    }
+
+    function updateCycleView(cycleType) {
+        currentCycle = cycleType;
+        svgContainer.innerHTML = ''; // Limpa os caminhos existentes
+        btnGeracao.classList.toggle('active', cycleType === 'geracao');
+        btnControlo.classList.toggle('active', cycleType === 'controlo');
+        infoBox.innerHTML = `<p class="text-center font-semibold text-lg">${cycleType === 'geracao' ? 'Ciclo de Geração (Sheng)' : 'Ciclo de Controlo (Ke)'}</p><p class="text-center text-gray-500">Clique num elemento para ver os detalhes.</p>`;
+        
+        const cycleOrder = ['madeira', 'fogo', 'terra', 'metal', 'agua'];
+        for (let i = 0; i < cycleOrder.length; i++) {
+            const startId = cycleOrder[i];
+            const targetData = fiveElementsData[startId];
+            if (targetData) {
+                const endId = targetData.target[cycleType];
+                if (endId) {
+                    drawPath(startId, endId, cycleType);
+                }
+            }
+        }
+    }
+
+    function showElementDetails(elementId) {
+        const data = fiveElementsData[elementId];
+        if (!data) return;
+
+        elementButtons.forEach(btn => btn.classList.remove('active'));
+        document.getElementById(elementId).classList.add('active');
+
+        detailsContainer.innerHTML = `
+            <div class="p-4 rounded-lg" style="border: 2px solid var(--el-${data.color}); background-color: var(--el-${data.color}20);">
+                <h3 class="text-2xl font-bold mb-3" style="color: var(--el-${data.color});">${data.name}</h3>
+                <p class="font-semibold">${data.relations.geracao}</p>
+                <p class="font-semibold mb-4">${data.relations.controlo}</p>
+                <table class="w-full text-sm">
+                    <tbody>${data.table}</tbody>
+                </table>
+            </div>`;
+        
+        infoBox.innerHTML = `<p class="text-center font-semibold text-lg" style="color: var(--el-${data.color});">${data.name}</p><p class="text-center text-gray-500">${data.relations[currentCycle]}</p>`;
+    }
+
+    btnGeracao.addEventListener('click', () => updateCycleView('geracao'));
+    btnControlo.addEventListener('click', () => updateCycleView('controlo'));
+    elementButtons.forEach(button => {
+        button.addEventListener('click', () => showElementDetails(button.id));
+    });
+
+    updateCycleView('geracao');
+    showElementDetails('madeira');
+}
 
 function setupDiagnosisDiagrams() {
-    // Diagrama da Face
     document.querySelectorAll('#panel-observacao .diagram-container').forEach(container => {
         const infoBox = container.previousElementSibling;
         if (!infoBox || !infoBox.classList.contains('info-box-placeholder')) return;
@@ -510,7 +631,6 @@ function setupDiagnosisDiagrams() {
         });
     });
 
-    // Diagrama da Língua
     const tongueContainer = document.querySelector('#tongue-details-container');
     const tongueDiagramAreas = document.querySelectorAll('#panel-observacao .diagram-area-svg[data-area]');
     if (tongueContainer && tongueDiagramAreas.length > 0) {
@@ -544,8 +664,6 @@ function setupDiagnosisDiagrams() {
         });
     }
 }
-
-// --- FUNÇÕES DE GERAÇÃO PARA CONTEÚDO EXPANDIDO ---
 
 function setupTherapeutics(containerId, data) {
     const container = document.getElementById(containerId);
@@ -590,7 +708,6 @@ function setupPhytotherapy(containerId, data) {
     `;
 }
 
-// NOVO: Função para construir toda a secção de Filosofia e Prática
 function setupPhilosophyAndPractice() {
     const container = document.getElementById('philosophy-content-area');
     if (!container || !philosophyAndPracticeData) return;
@@ -641,12 +758,8 @@ function setupPhilosophyAndPractice() {
                         </nav>
                     </div>
                     <div id="internal-arts-tab-content">
-                        <div class="tab-content active" id="panel-qigong" role="tabpanel" aria-labelledby="tab-qigong">
-                            <!-- Conteúdo do Qi Gong -->
-                        </div>
-                        <div class="tab-content" id="panel-taichi" role="tabpanel" aria-labelledby="tab-taichi">
-                            <!-- Conteúdo do Tai Chi -->
-                        </div>
+                        <div class="tab-content active" id="panel-qigong" role="tabpanel" aria-labelledby="tab-qigong"></div>
+                        <div class="tab-content" id="panel-taichi" role="tabpanel" aria-labelledby="tab-taichi"></div>
                     </div>
                 </div>
             </div>
@@ -655,7 +768,6 @@ function setupPhilosophyAndPractice() {
 
     container.innerHTML = mastersHtml + internalArtsHtml;
 
-    // Preencher conteúdo do Qi Gong e Tai Chi
     const qigongPanel = document.getElementById('panel-qigong');
     const taichiPanel = document.getElementById('panel-taichi');
 
@@ -687,7 +799,6 @@ function setupPhilosophyAndPractice() {
 }
 
 
-// ATUALIZADO: Função para gerar os links de navegação
 function generateNavLinks() {
     const navStructure = [
         { id: 'inicio', title: 'Início', icon: 'icon-home' },
@@ -712,7 +823,7 @@ function generateNavLinks() {
                 { id: 'moxabustao', title: 'Moxabustão', icon: 'icon-moxibustion' }
             ]
         },
-        { id: 'filosofia-e-pratica', title: 'Filosofia e Prática', icon: 'icon-scroll' }, // NOVO LINK
+        { id: 'filosofia-e-pratica', title: 'Filosofia e Prática', icon: 'icon-scroll' },
         { id: 'glossario', title: 'Glossário', icon: 'icon-glossary' },
     ];
 
@@ -720,33 +831,39 @@ function generateNavLinks() {
         if (item.links) {
             return `
                 <div class="nav-group">
-                    <button class="nav-group-header flex items-center justify-between w-full p-2 rounded-lg" aria-expanded="false">
-                        <span class="flex items-center">
-                            <svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${item.icon}"></use></svg>
+                    <button class="nav-group-header flex items-center justify-between w-full" aria-expanded="false">
+                        <span>
+                            <svg><use href="#${item.icon}"></use></svg>
                             <span class="font-semibold">${item.title}</span>
                         </span>
-                        <svg class="w-5 h-5 shrink-0 text-gray-400 chevron"><use href="#icon-chevron-down"></use></svg>
+                        <svg class="w-5 h-5 shrink-0 chevron"><use href="#icon-chevron-down"></use></svg>
                     </button>
-                    <div class="nav-group-content pl-4 pt-1 space-y-1">
+                    <div class="nav-group-content space-y-1">
                         ${item.links.map(link => `
-                            <a href="#${link.id}" class="sidebar-link flex items-center p-2 rounded-lg">
-                                <svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${link.icon}"></use></svg>
-                                <span>${link.title}</span>
+                            <a href="#${link.id}" class="sidebar-link flex items-center">
+                                <span>
+                                    <svg><use href="#${link.icon}"></use></svg>
+                                    <span>${link.title}</span>
+                                </span>
                             </a>
                         `).join('')}
                     </div>
                 </div>`;
         } else {
             return `
-                <a href="#${item.id}" class="sidebar-link flex items-center p-2 rounded-lg">
-                    <svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${item.icon}"></use></svg>
-                    <span>${item.title}</span>
+                <a href="#${item.id}" class="sidebar-link flex items-center">
+                    <span>
+                        <svg><use href="#${item.icon}"></use></svg>
+                        <span>${item.title}</span>
+                    </span>
                 </a>`;
         }
     };
     
     const navHtml = navStructure.map(generateHtml).join('');
-    allNavHubs.forEach(hub => hub.innerHTML = navHtml);
+    allNavHubs.forEach(hub => {
+        if(hub) hub.innerHTML = navHtml;
+    });
 }
 
 // --- PONTO DE ENTRADA DA APLICAÇÃO ---
@@ -761,22 +878,19 @@ document.addEventListener('DOMContentLoaded', () => {
     setupDietetics();
     setupTherapeutics('moxabustao-content-area', moxibustionData);
     setupPhytotherapy('fitoterapia-content-area', phytotherapyData);
-    setupPhilosophyAndPractice(); // NOVO: Gera a secção de Filosofia
+    setupPhilosophyAndPractice();
     
-    // Configuração de componentes interativos
     setupTabs('diagnosis-tabs', 'diagnosis-tab-content');
+    setupFiveElements();
     setupSidebarLayout('meridian-navigation', 'meridian-content-area', meridianData, 'meridian-content-');
     setupSidebarLayout('anatomy-navigation', 'anatomy-content-area', anatomyData, 'anatomy-content-');
     setupSidebarLayout('zangfu-navigation', 'zangfu-content-area', zangFuPatternsData, 'zangfu-content-');
     setupDiagnosisDiagrams();
 
-    // Animação da barra lateral
-    document.querySelectorAll('aside .sidebar-link, aside .nav-group').forEach((el, index) => {
-        el.style.animationDelay = `${index * 0.07}s`;
-    });
-
     createSearchIndex();
-    contentSections = mainContent.querySelectorAll('.content-section');
+    if(mainContent) {
+        contentSections = mainContent.querySelectorAll('.content-section');
+    }
     showSection('inicio', 'Início');
     updateActiveLink('inicio');
 });
