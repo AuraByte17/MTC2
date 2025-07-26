@@ -70,6 +70,7 @@ if (themeToggleBtn) {
     themeToggleBtn.addEventListener('click', toggleTheme);
 }
 
+// Aplicar tema guardado ao carregar a página
 const savedTheme = localStorage.getItem('mtc-theme') || 'light';
 applyTheme(savedTheme);
 
@@ -110,7 +111,7 @@ if(desktopSearchInput) desktopSearchInput.addEventListener('focus', openSearchMo
 if(closeSearchBtn) closeSearchBtn.addEventListener('click', closeSearchModal);
 if(searchOverlay) searchOverlay.addEventListener('click', closeSearchModal);
 
-// --- LÓGICA DE NAVEGAÇÃO PRINCIPAL E ROTEAMENTO ---
+// --- LÓGICA DE NAVEGAÇÃO PRINCIPAL ---
 function showSection(targetId, linkText) {
     contentSections.forEach(section => {
         section.classList.toggle('active', section.id === targetId);
@@ -132,16 +133,6 @@ function updateActiveLink(targetId) {
     });
 }
 
-// MELHORIA: Função central de roteamento
-function handleRouting() {
-    const targetId = window.location.hash.substring(1) || 'inicio';
-    const link = document.querySelector(`.sidebar-link[href="#${targetId}"]`);
-    const linkText = link ? link.querySelector('span').textContent : 'Início';
-    
-    showSection(targetId, linkText);
-    updateActiveLink(targetId);
-}
-
 allNavHubs.forEach(hub => {
     if(hub) {
         hub.addEventListener('click', (e) => {
@@ -149,9 +140,10 @@ allNavHubs.forEach(hub => {
             const groupHeader = e.target.closest('.nav-group-header');
             if (link) {
                 e.preventDefault();
-                // MELHORIA: Atualiza o hash em vez de chamar showSection diretamente
                 const targetId = link.getAttribute('href').substring(1);
-                window.location.hash = targetId;
+                const linkText = link.querySelector('span').textContent;
+                showSection(targetId, linkText);
+                updateActiveLink(targetId);
                 closeMobileMenu();
             }
             if (groupHeader) {
@@ -161,9 +153,6 @@ allNavHubs.forEach(hub => {
         });
     }
 });
-
-// MELHORIA: Ouve as mudanças no hash da URL
-window.addEventListener('hashchange', handleRouting);
 
 // --- CRIAÇÃO DO ÍNDICE DE PESQUISA ---
 function createSearchIndex() {
@@ -212,35 +201,28 @@ function createSearchIndex() {
 // --- LÓGICA DE EXECUÇÃO DA PESQUISA ---
 function performSearch(query) {
     if (!searchResultsContainer) return;
-    const lowerCaseQuery = query.toLowerCase();
-    if (lowerCaseQuery.length < 2) {
+    if (query.length < 2) {
         searchResultsContainer.innerHTML = '<p class="text-center text-gray-500">Escreva pelo menos 2 letras para pesquisar.</p>';
         return;
     }
-    
+    const lowerCaseQuery = query.toLowerCase();
     const results = searchIndex.filter(item => 
         item.title.toLowerCase().includes(lowerCaseQuery) || 
         item.content.toLowerCase().includes(lowerCaseQuery)
     );
-    // MELHORIA: Passa a query para a função de renderização para destacar
-    renderSearchResults(results, lowerCaseQuery);
+    renderSearchResults(results);
 }
 
-// MELHORIA: Função de renderização agora destaca os termos da pesquisa
-function renderSearchResults(results, query) {
+function renderSearchResults(results) {
     if (!searchResultsContainer) return;
     if (results.length === 0) {
         searchResultsContainer.innerHTML = '<p class="text-center text-gray-500">Nenhum resultado encontrado.</p>';
         return;
     }
-
-    const regex = new RegExp(query, 'gi');
-    const highlight = (text) => text.replace(regex, (match) => `<mark class="bg-yellow-200 px-1 rounded">${match}</mark>`);
-
     searchResultsContainer.innerHTML = results.map(item => `
         <div class="search-result-item" data-section-id="${item.sectionId}" tabindex="0">
-            <h4>${highlight(item.title)}</h4>
-            <p>${highlight(item.content)}</p>
+            <h4>${item.title}</h4>
+            <p>${item.content}</p>
             <span class="result-type-badge" style="background-color: var(--el-${item.color}, var(--color-primary))">${item.type}</span>
         </div>
     `).join('');
@@ -255,12 +237,17 @@ if(searchResultsContainer) {
         const resultItem = e.target.closest('.search-result-item');
         if (resultItem) {
             const sectionId = resultItem.dataset.sectionId;
-            // MELHORIA: Usa o roteamento por hash para navegar
-            window.location.hash = sectionId;
-            closeSearchModal();
+            const link = document.querySelector(`#desktop-navigation-hub a[href="#${sectionId}"]`);
+            if (link) {
+                const linkText = link.querySelector('span').textContent;
+                showSection(sectionId, linkText);
+                updateActiveLink(sectionId);
+                closeSearchModal();
+            }
         }
     });
 }
+
 
 // --- FUNÇÕES DE GERAÇÃO DE CONTEÚDO ---
 function createAccordion(containerId, data) {
@@ -340,16 +327,12 @@ function setupSidebarLayout(navId, contentId, data, idPrefix = 'content-') {
         </button>
     `).join('');
     
-    // MELHORIA: Seleciona a função de renderização correta com base no ID da navegação
-    let renderFunction;
     if (navId === 'meridian-navigation') {
-        renderFunction = (item) => setupMeridianLayout(item, idPrefix);
+        contentContainer.innerHTML = data.map(item => setupMeridianLayout(item, idPrefix)).join('');
     } else if (navId === 'zangfu-navigation') {
-        renderFunction = setupZangFuLayout; // Esta função já lida com o array inteiro
-    } else if (navId === 'anatomy-navigation') {
-        renderFunction = setupAnatomyLayout; // Nova função para anatomia
+        contentContainer.innerHTML = setupZangFuLayout(data);
     } else {
-        renderFunction = (item) => `
+        contentContainer.innerHTML = data.map(item => `
             <div class="content-card" id="${idPrefix}${item.id}">
                 <div class="pb-4 mb-4 border-b-2" style="border-color: var(--el-${item.color || 'gray'});">
                     <h3 class="text-2xl font-playfair font-bold" style="color: var(--el-${item.color || 'gray'});">${item.name || item.title}</h3>
@@ -357,14 +340,7 @@ function setupSidebarLayout(navId, contentId, data, idPrefix = 'content-') {
                 <div class="card-prose">
                     ${item.content ? `<div class="text-gray-600">${item.content}</div>` : ''}
                 </div>
-            </div>`;
-    }
-
-    // Aplica a função de renderização
-    if (navId === 'zangfu-navigation') {
-        contentContainer.innerHTML = renderFunction(data);
-    } else {
-        contentContainer.innerHTML = data.map(renderFunction).join('');
+            </div>`).join('');
     }
     
     const navItems = navContainer.querySelectorAll('.sidebar-nav-item');
@@ -387,42 +363,6 @@ function setupSidebarLayout(navId, contentId, data, idPrefix = 'content-') {
         }
     });
     if (navItems.length > 0) navItems[0].click();
-}
-
-// MELHORIA: Nova função para renderizar o layout de anatomia a partir dos dados estruturados
-function setupAnatomyLayout(item) {
-    const renderSubsections = (subsections) => {
-        return subsections.map(sub => `
-            <h5 class="font-semibold mt-3 mb-1">${sub.title}</h5>
-            <ul class="list-disc list-inside text-sm space-y-1">
-                ${sub.items.map(i => `<li>${i}</li>`).join('')}
-            </ul>
-        `).join('');
-    };
-
-    const renderSections = (sections) => {
-        return sections.map(sec => `
-            <h4 class="font-bold text-lg mt-4 mb-2">${sec.title}</h4>
-            ${sec.subsections ? renderSubsections(sec.subsections) : ''}
-        `).join('');
-    };
-
-    return `
-    <div class="content-card" id="anatomy-content-${item.id}">
-        <div class="pb-4 mb-4 border-b-2" style="border-color: var(--el-gray);">
-            <h3 class="text-2xl font-playfair font-bold" style="color: var(--el-gray);">${item.title}</h3>
-        </div>
-        <div class="card-prose">
-            <p class="mb-4"><strong>Visão MTC:</strong> ${item.content.mtc_vision}</p>
-            ${item.content.sections ? renderSections(item.content.sections) : ''}
-            ${item.content.components ? `
-                <h4 class="font-bold text-lg mb-2">${item.content.components.title}</h4>
-                <ul class="list-disc list-inside text-sm">
-                    ${item.content.components.items.map(c => `<li><strong>${c.name}:</strong> ${c.description}</li>`).join('')}
-                </ul>
-            ` : ''}
-        </div>
-    </div>`;
 }
 
 function setupMeridianLayout(item, idPrefix) {
@@ -658,7 +598,7 @@ function setupFiveElements() {
                 <p class="font-semibold">${data.relations.geracao}</p>
                 <p class="font-semibold mb-4">${data.relations.controlo}</p>
                 <table class="w-full text-sm">
-                    <tbody>${data.table.map(row => `<tr><td>${row.label}</td><td>${row.value}</td></tr>`).join('')}</tbody>
+                    <tbody>${data.table}</tbody>
                 </table>
             </div>`;
         
@@ -729,13 +669,17 @@ function setupTherapeutics(containerId, data) {
     const container = document.getElementById(containerId);
     if (!container || !data) return;
 
+    let methodsHtml = '';
+    if (data.types && data.types[1] && data.types[1].methods) {
+        methodsHtml = `<ul class="list-disc list-inside ml-4">${data.types[1].methods.join('')}</ul>`;
+    }
+
     container.innerHTML = `
         <p>${data.introduction}</p>
         <h4>Tipos de Moxabustão</h4>
-        ${data.types.map(type => `
-            <p><strong>${type.name}:</strong> ${type.description}</p>
-            ${type.methods ? `<ul class="list-disc list-inside ml-4">${type.methods.map(m => `<li>${m}</li>`).join('')}</ul>` : ''}
-        `).join('')}
+        <p><strong>${data.types[0].name}:</strong> ${data.types[0].description}</p>
+        <p><strong>${data.types[1].name}:</strong> ${data.types[1].description}</p>
+        ${methodsHtml}
         <h4>Funções Terapêuticas</h4>
         ${data.functions.map(f => `<p><strong>${f.title}:</strong> ${f.content}</p>`).join('')}
         <h4>Contraindicações</h4>
@@ -754,13 +698,13 @@ function setupPhytotherapy(containerId, data) {
         <h4>${data.formula_structure.title}</h4>
         <p>${data.formula_structure.description}</p>
         <ul class="list-disc list-inside ml-4">
-            ${data.formula_structure.roles.map(r => `<li><strong>${r.role}:</strong> ${r.description}</li>`).join('')}
+            ${data.formula_structure.roles.map(r => `<li>${r}</li>`).join('')}
         </ul>
         <h4>Exemplos Comuns</h4>
-        ${data.examples.map(ex => `
-            <h5>${ex.type}</h5>
-            <ul>${ex.items.map(i => `<li><strong>${i.name}:</strong> ${i.functions}</li>`).join('')}</ul>
-        `).join('')}
+        <h5>${data.examples[0].type}</h5>
+        <ul>${data.examples[0].items.map(i => `<li><strong>${i.name}:</strong> ${i.functions}</li>`).join('')}</ul>
+        <h5>${data.examples[1].type}</h5>
+        <ul>${data.examples[1].items.map(i => `<li><strong>${i.name}:</strong> ${i.functions}</li>`).join('')}</ul>
     `;
 }
 
@@ -854,6 +798,7 @@ function setupPhilosophyAndPractice() {
     setupTabs('internal-arts-tabs', 'internal-arts-tab-content');
 }
 
+
 function generateNavLinks() {
     const navStructure = [
         { id: 'inicio', title: 'Início', icon: 'icon-home' },
@@ -946,7 +891,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if(mainContent) {
         contentSections = mainContent.querySelectorAll('.content-section');
     }
-    
-    // MELHORIA: Inicia o roteamento ao carregar a página
-    handleRouting();
+    showSection('inicio', 'Início');
+    updateActiveLink('inicio');
 });
