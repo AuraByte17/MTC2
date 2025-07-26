@@ -110,9 +110,9 @@ h1, h2, h3, h4, h5, h6, .font-playfair {
 #sidebar {
     background-color: var(--color-sidebar);
     border-right: 1px solid var(--color-border);
-    width: 260px; /* Um pouco mais larga */
+    width: 260px;
     flex-shrink: 0;
-    transition: background-color var(--transition-medium), border-color var(--transition-medium);
+    transition: background-color var(--transition-medium), border-color var(--transition-medium), transform var(--transition-medium);
     display: flex;
     flex-direction: column;
 }
@@ -132,6 +132,9 @@ h1, h2, h3, h4, h5, h6, .font-playfair {
 }
 
 #desktop-search-input {
+    width: 100%;
+    padding: 0.5rem 0.75rem 0.5rem 2.25rem;
+    border-radius: 8px;
     background-color: var(--color-bg);
     border: 1px solid var(--color-border);
     color: var(--color-text-base);
@@ -141,6 +144,7 @@ h1, h2, h3, h4, h5, h6, .font-playfair {
 #desktop-search-input:focus {
     background-color: var(--color-surface);
     border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-hover);
 }
 
 #desktop-navigation-hub {
@@ -200,7 +204,6 @@ h1, h2, h3, h4, h5, h6, .font-playfair {
 /* Theme Switcher */
 .theme-switcher {
     margin: 1.5rem;
-    padding: 0.5rem;
     border-top: 1px solid var(--color-border);
     padding-top: 1.5rem;
 }
@@ -258,7 +261,6 @@ body.mobile-menu-open #sidebar {
 }
 #mobile-menu-container #sidebar {
     transform: translateX(-100%);
-    transition: transform var(--transition-medium);
 }
 
 /* --- 10. Estilo dos Cards e Conteúdo --- */
@@ -297,9 +299,7 @@ body.mobile-menu-open #sidebar {
 
 /* --- 11. Componentes Interativos --- */
 /* Acordeão */
-.accordion-item {
-    border-bottom: 1px solid var(--color-border);
-}
+.accordion-item:last-child { border-bottom: none; }
 .accordion-button {
     padding: 1rem 0.5rem;
     font-weight: 600;
@@ -335,39 +335,83 @@ body.mobile-menu-open #sidebar {
 
 /* --- 12. Componentes Específicos --- */
 /* Timeline */
-.timeline-container { padding-left: 25px; }
+.timeline-container { position: relative; }
 .timeline-container:before {
-    left: 12px;
+    content: '';
+    position: absolute;
+    left: 16px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
     background-color: var(--color-border);
 }
-.timeline-marker { left: -25px; }
+.timeline-marker {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
 
-/* Diagramas */
+/* Diagrama da Língua */
 .diagram-area-svg {
     fill: rgba(127, 140, 141, 0.1);
     stroke: var(--color-primary);
     stroke-width: 1.5;
     stroke-opacity: 0.5;
+    cursor: pointer;
+    transition: var(--transition-fast);
 }
-.diagram-area-svg:hover, .diagram-area-svg:focus {
-    fill: rgba(45, 106, 79, 0.3);
+.diagram-area-svg:hover {
+    fill: hsla(var(--color-primary-hsl), 0.3);
 }
-[data-theme="dark"] .diagram-area-svg:hover, [data-theme="dark"] .diagram-area-svg:focus {
-    fill: rgba(247, 183, 49, 0.3);
+.diagram-area-svg.active {
+    fill: hsla(var(--color-primary-hsl), 0.4);
+    stroke-width: 2.5;
+}
+[data-theme="dark"] .diagram-area-svg:hover {
+    fill: hsla(var(--color-primary-hsl), 0.3);
+}
+[data-theme="dark"] .diagram-area-svg.active {
+    fill: hsla(var(--color-primary-hsl), 0.4);
 }
 
-/* 5 Elementos */
-.element {
-    border: none;
+/* 5 Elementos - PENTAGRAMA */
+.element-diagram {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    margin: 0 auto;
+}
+.element-sphere {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
     color: white;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    border: 3px solid rgba(255,255,255,0);
+    box-shadow: var(--color-shadow) 0px 5px 15px;
+    transform: translate(-50%, -50%); /* Centraliza a esfera */
 }
-.element.active {
-    border: 3px solid white;
-    box-shadow: 0 0 15px rgba(255,255,255,0.5);
+.element-sphere:hover {
+    transform: translate(-50%, -50%) scale(1.1);
 }
-.cycle-path.geracao { color: var(--el-wood); }
-.cycle-path.controlo { color: var(--el-fire); }
-#element-details-container table td { padding: 0.6rem 0; }
+.element-sphere.active {
+    transform: translate(-50%, -50%) scale(1.1);
+    border-color: var(--color-primary);
+    box-shadow: var(--color-primary-hover) 0px 0px 0px 3px;
+}
+.cycle-path {
+    fill: none;
+    stroke-width: 2.5;
+    transition: opacity 0.4s ease;
+}
+.cycle-path.geracao { stroke: var(--color-primary); }
+.cycle-path.controlo { stroke: var(--color-seal); stroke-dasharray: 5 5; }
 
 /* Dietética */
 #food-alpha-nav {
