@@ -1,5 +1,70 @@
 // --- DATA (Conteúdo completo com anatomia expandida) ---
 
+// Exporta os dados sobre a Teoria do Yin-Yang
+export const yinYangData = {
+    id: 'yin-yang',
+    title: 'A Teoria do Yin-Yang (阴阳)',
+    svg: `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" class="w-full max-w-xs mx-auto">
+            <defs>
+                <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000" flood-opacity="0.1"/>
+                </filter>
+            </defs>
+            <g filter="url(#shadow)">
+                <path fill="#000" d="M100,0 A100,100 0 0,0 100,200 Z"/>
+                <path fill="#fff" d="M100,0 A100,100 0 0,1 100,200 A50,50 0 0,1 100,100 A50,50 0 0,0 100,0 Z"/>
+                <circle fill="#fff" cx="100" cy="50" r="15"/>
+                <circle fill="#000" cx="100" cy="150" r="15"/>
+            </g>
+        </svg>
+    `,
+    content: `
+        <p class="mb-6">O conceito de Yin-Yang é a base de todo o pensamento da Medicina Chinesa. É a observação de que todos os fenómenos no universo são compostos por duas forças opostas, mas complementares. A saúde é vista como o equilíbrio dinâmico entre estas duas forças, enquanto a doença surge do seu desequilíbrio.</p>
+        <div class="space-y-4">
+            <div>
+                <h4 class="font-bold text-lg text-primary">1. Oposição e Interdependência</h4>
+                <p>Yin e Yang são opostos, mas não podem existir um sem o outro. Não há dia (Yang) sem a noite (Yin), nem atividade (Yang) sem o descanso (Yin).</p>
+            </div>
+            <div>
+                <h4 class="font-bold text-lg text-primary">2. Consumo Mútuo</h4>
+                <p>As duas forças estão num estado de equilíbrio dinâmico. Um excesso de um consumirá o outro. Por exemplo, uma febre alta (excesso de Yang) pode consumir os fluidos corporais (Yin).</p>
+            </div>
+            <div>
+                <h4 class="font-bold text-lg text-primary">3. Intertransformação</h4>
+                <p>Na sua expressão máxima, um pode transformar-se no outro. O dia transforma-se em noite. Após um exercício extremo (Yang), segue-se a exaustão (Yin).</p>
+            </div>
+        </div>
+    `,
+    table: `
+        <div class="grid grid-cols-2 gap-4 mt-6">
+            <div class="bg-gray-800 text-white p-4 rounded-lg">
+                <h4 class="font-bold text-xl mb-2 text-center">YIN (阴)</h4>
+                <ul class="list-disc list-inside space-y-1 text-sm">
+                    <li>Noite</li>
+                    <li>Lua</li>
+                    <li>Feminino</li>
+                    <li>Escuro, Frio</li>
+                    <li>Repouso, Passivo</li>
+                    <li>Interior, Baixo</li>
+                    <li>Substância, Matéria</li>
+                </ul>
+            </div>
+            <div class="bg-white text-black p-4 rounded-lg border">
+                <h4 class="font-bold text-xl mb-2 text-center">YANG (阳)</h4>
+                <ul class="list-disc list-inside space-y-1 text-sm">
+                    <li>Dia</li>
+                    <li>Sol</li>
+                    <li>Masculino</li>
+                    <li>Luz, Calor</li>
+                    <li>Atividade, Ativo</li>
+                    <li>Exterior, Cima</li>
+                    <li>Função, Energia</li>
+                </ul>
+            </div>
+        </div>
+    `
+};
 
 
 // Exporta os dados sobre os tipos de Qi
