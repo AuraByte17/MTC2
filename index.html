@@ -5,15 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vida em Harmonia: MTC</title>
     
+    <!-- Scripts e Fontes Externas -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     
+    <!-- Ligação ao seu ficheiro CSS externo -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="text-gray-800">
 
+    <!-- Definições de Ícones SVG -->
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
         <symbol id="icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></symbol>
         <symbol id="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></symbol>
@@ -32,6 +35,9 @@
             </filter>
         </defs>
         
+        <!-- Ícones da Aplicação -->
+        <symbol id="icon-yin-yang" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a7.5 7.5 0 0 1 0 15v5A10 10 0 0 1 12 2Z"></path></symbol>
+        <symbol id="icon-tongue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-2.5-4-2.5-4h-3s-.5 2.5-2.5 4-3 3.5-3 5.5a7 7 0 0 0 7 7Z"></path></symbol>
         <symbol id="icon-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></symbol>
         <symbol id="icon-book-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></symbol>
         <symbol id="icon-atom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><path d="M20.2 20.2c2.04-2.03.02-5.91-2.8-8.7-2.82-2.82-6.67-4.84-8.7-2.8-2.04 2.03-.02 5.91 2.8 8.7 2.82 2.82 6.67 4.84 8.7 2.8Z"></path><path d="M3.8 20.2c-2.04-2.03-.02-5.91 2.8-8.7 2.82-2.82 6.67-4.84 8.7-2.8 2.04 2.03.02 5.91-2.8 8.7-2.82 2.82-6.67 4.84-8.7 2.8Z"></path></symbol>
@@ -43,15 +49,14 @@
         <symbol id="icon-heart-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 12.5c0-1.5-1-2.5-2.5-2.5s-2.5 1-2.5 2.5c0 1.5 1 2.5 2.5 2.5s2.5-1 2.5-2.5Z"></path><path d="M22 12.5h-2.5"></path><path d="M2 12.5H8"></path><path d="m16 7.5-2 2.5-2.5-5-2.5 5-2-2.5"></path></symbol>
         <symbol id="icon-stethoscope" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.8 2.3A.3.3 0 1 0 5.4 2l-1.6 6.4c-.3 1.2.5 2.5 1.7 2.8l1.2.3c1.2.3 2.5-.5 2.8-1.7L12 5.1s.5-.8 1.2-.3l1.2 1 1-1.2-1.2-1c-.5-.5.3-1.2.3-1.2l4.9-2.5s.8-.5-.3-1.7l-1.5-1.5c-1.2-1.2-1.7-.3-1.7-.3L12.5 8l-1.6-6.4C10.6 1 9.4.2 8.2.5L7 1.7c-1.2.3-2 1.5-1.7 2.8L4.8 2.3z"></path><path d="M7.8 12.3 5.4 20a.5.5 0 0 0 .9.4l1.4-2.9c.2-.4.8-.5 1.1-.2l2.6 2.6c.3.3.8.3 1.1 0l2.6-2.6c.3-.3.9-.2 1.1.2l1.4 2.9a.5.5 0 0 0 .9-.4l-2.4-7.7"></path></symbol>
         <symbol id="icon-clipboard-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H9a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z"></path><path d="M9.5 3v1.5a1.5 1.5 0 0 0 3 0V3"></path><path d="M11.99 16.03a2.5 2.5 0 0 0 4.02 0c.73-2.07-2.1-4.2-4.02-4.2-1.92 0-4.75 2.13-4.02 4.2a2.5 2.5 0 0 0 4.02 0Z"></path></symbol>
-        <symbol id="icon-mortar-pestle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 11.5 18 14l-2.5 2.5"></path><path d="m14 16-1.5 1.5"></path><path d="M22 2s-4.5 3.5-4 5c.5 1.5-1 3-1 3l-3.5-3.5"></path><path d="M10.4 12.6c-1.7 1.7-4.2 1.7-5.9 0s-1.7-4.2 0-5.9l5.9-5.9c1.7-1.7 4.2-1.7 5.9 0s1.7 4.2 0 5.9l-3 3"></path><path d="M18.2 8.8c.5-.5.5-1.3 0-1.8a1.27 1.27 0 0 0-1.8 0l-1.6 1.6"></path></symbol>
         <symbol id="icon-soup" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9Z"></path><path d="M7 21h10"></path><path d="M19.5 12 22 6"></path><path d="M16 6c0-1.5-1-4-4-4S8 4.5 8 6"></path></symbol>
-        <symbol id="icon-flame" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></symbol>
         <symbol id="icon-lotus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.83 16.14A2 2 0 0 1 10.24 18H13.8a2 2 0 0 1 1.44-1.86l-1.3-4.09a2 2 0 0 0-3.48 0Z"></path><path d="M12 2a2.83 2.83 0 0 0-2 5.17l-1.28 4.01a2 2 0 0 0 1.44 2.58h6.58a2 2 0 0 0 1.44-2.58L14 7.17A2.83 2.83 0 0 0 12 2Z"></path><path d="M4 18a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2"></path><path d="M12 18v4"></path></symbol>
         <symbol id="icon-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></symbol>
         <symbol id="icon-scroll" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h12a2 2 0 0 0 2-2v-2H10v2a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v3h10v2a2 2 0 0 0 2 2h2v-4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2Z"></path><path d="M8 12h13"></path></symbol>
     </svg>
 
     <div class="flex h-screen bg-gray-100">
+        <!-- Container para o menu móvel -->
         <div id="mobile-menu-container" class="fixed inset-0 z-40 md:hidden">
             <div id="mobile-menu-overlay" class="absolute inset-0 bg-black/50"></div>
             <aside id="sidebar" class="w-64 bg-white shadow-lg p-6 flex-shrink-0 flex flex-col h-full transition-transform duration-300 -translate-x-full">
@@ -70,6 +75,7 @@
             </aside>
         </div>
 
+        <!-- Sidebar para Desktop -->
         <aside class="w-64 bg-white shadow-lg p-6 flex-shrink-0 hidden md:flex flex-col">
             <h1 class="text-2xl font-playfair font-bold text-gray-800 mb-4 text-center">Vida em Harmonia</h1>
             <div class="relative mb-4">
@@ -83,6 +89,7 @@
             </div>
         </aside>
 
+        <!-- Área de Conteúdo Principal -->
         <div class="flex-1 flex flex-col h-screen">
             <header class="md:hidden bg-white shadow-md p-4 flex items-center justify-between sticky top-0 z-30">
                 <h2 id="current-section-title" class="text-lg font-playfair font-bold text-primary">Início</h2>
@@ -100,6 +107,8 @@
 
             <div id="main-content-area" class="flex-grow p-4 md:p-12 overflow-y-auto">
                 <main id="main-content">
+                    <!-- INÍCIO: Conteúdo das secções -->
+                    
                     <section id="inicio" class="content-section">
                         <div class="visual-card">
                             <div class="card-header"><h3>Bem-vindo ao Guia de Medicina Tradicional Chinesa</h3></div>
@@ -113,6 +122,13 @@
                                 </ul>
                                 <p>Explore, aprenda e encontre o caminho para uma vida em harmonia.</p>
                             </div>
+                        </div>
+                    </section>
+
+                    <!-- NOVA SECÇÃO YIN-YANG -->
+                    <section id="yin-yang" class="content-section">
+                        <div id="yin-yang-container" class="visual-card">
+                            <!-- Conteúdo gerado por JS -->
                         </div>
                     </section>
 
@@ -197,51 +213,87 @@
                         </div>
                     </section>
 
-                    <section id="diagnostico-geral" class="content-section">
-                         <div class="visual-card mb-8">
+                    <!-- SECÇÃO DE DIAGNÓSTICO REESTRUTURADA -->
+                    <section id="diagnostico" class="content-section">
+                        <div class="visual-card mb-8">
                             <div class="card-header"><h3>As 10+1 Perguntas</h3></div>
                             <div class="card-content">
                                 <div id="perguntas-accordion" class="space-y-3"></div>
                             </div>
                         </div>
-                    </section>
-
-                    <section id="pulsologia" class="content-section">
-                        <div class="grid md:grid-cols-2 gap-8">
-                            <div class="visual-card">
-                                <div class="card-header"><h3>Posições do Pulso</h3></div>
-                                <div class="card-content flex flex-col items-center">
-                                    <p class="card-prose text-sm text-center mb-4">Passe o rato sobre as posições para ver os órgãos correspondentes.</p>
-                                    <svg id="pulse-diagram-svg" class="w-48 h-auto mb-4" viewBox="0 0 100 120">
-                                        <path d="M20,110 C20,80 30,70 50,70 C70,70 80,80 80,110" stroke="#d1a377" stroke-width="12" fill="none" stroke-linecap="round"/>
-                                        <path d="M50,70 V0" stroke="#e6be99" stroke-width="20" fill="none" stroke-linecap="round"/>
-                                        <circle id="pulse-pos-cun" data-pos="cun" class="pulse-pos-circle" cx="50" cy="20" r="8"/>
-                                        <circle id="pulse-pos-guan" data-pos="guan" class="pulse-pos-circle" cx="50" cy="40" r="8"/>
-                                        <circle id="pulse-pos-chi" data-pos="chi" class="pulse-pos-circle" cx="50" cy="60" r="8"/>
-                                        <text x="62" y="24" class="pulse-pos-label">Cun</text>
-                                        <text x="62" y="44" class="pulse-pos-label">Guan</text>
-                                        <text x="62" y="64" class="pulse-pos-label">Chi</text>
-                                    </svg>
-                                    <div id="pulse-info-container" class="w-full max-w-sm grid grid-cols-2 gap-4 text-center">
-                                        <div>
-                                            <h5 class="font-bold text-gray-700">Pulso Esquerdo</h5>
-                                            <div class="pulse-info-box" data-pos="cun"><strong class="text-red-600">Coração</strong><br><span class="text-xs">(ID)</span></div>
-                                            <div class="pulse-info-box" data-pos="guan"><strong class="text-green-600">Fígado</strong><br><span class="text-xs">(VB)</span></div>
-                                            <div class="pulse-info-box" data-pos="chi"><strong class="text-blue-600">Rim Yin</strong><br><span class="text-xs">(B)</span></div>
+                        
+                        <div class="visual-card">
+                            <div id="diagnosis-tabs" class="border-b border-gray-200">
+                                <nav class="flex -mb-px" aria-label="Tabs">
+                                    <button role="tab" aria-controls="lingua-panel" aria-selected="true" class="tab-button active">
+                                        <svg class="w-5 h-5 mr-2"><use href="#icon-tongue"></use></svg> Diagnóstico da Língua
+                                    </button>
+                                    <button role="tab" aria-controls="pulso-panel" aria-selected="false" class="tab-button">
+                                        <svg class="w-5 h-5 mr-2"><use href="#icon-heart-pulse"></use></svg> Diagnóstico do Pulso
+                                    </button>
+                                </nav>
+                            </div>
+                            <div id="diagnosis-tab-content">
+                                <div id="lingua-panel" role="tabpanel" class="tab-content active">
+                                    <div class="card-content">
+                                        <p class="card-prose text-sm text-center mb-4">Passe o rato sobre as áreas para ver as correspondências.</p>
+                                        <div class="diagram-container relative max-w-xs mx-auto">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 200" class="rounded-lg bg-pink-50 shadow-inner">
+                                                <defs>
+                                                    <radialGradient id="tongueGradient" cx="50%" cy="80%" r="70%" fx="50%" fy="80%">
+                                                        <stop offset="0%" style="stop-color:#f8b4c4;" />
+                                                        <stop offset="100%" style="stop-color:#e18da0;" />
+                                                    </radialGradient>
+                                                </defs>
+                                                <path fill="url(#tongueGradient)" d="M75,198 C20,150 25,110 75,22 C125,110 130,150 75,198 Z" />
+                                                <path fill="#d17c90" d="M75,198 C73,180 73,150 75,110 C77,150 77,180 75,198 Z" opacity="0.4" />
+                                            </svg>
+                                            <svg class="absolute top-0 left-0 w-full h-full" viewBox="0 0 150 200">
+                                                <path class="diagram-area-svg" data-info="Ponta: Coração. Reflete o estado do Shen, ansiedade e insónia." d="M75 198 C 60 173, 60 163, 75 150 C 90 163, 90 173, 75 198 Z" />
+                                                <path class="diagram-area-svg" data-info="Área atrás da ponta: Pulmão. Mostra condições do sistema respiratório e do Wei Qi." d="M75 150 C 55 140, 55 115, 75 110 C 95 115, 95 140, 75 150 Z" />
+                                                <path class="diagram-area-svg" data-info="Laterais: Fígado e Vesícula Biliar. Indicam estagnação de Qi, irritabilidade e tensão." d="M56,115 C 35,115 28,80 45,45 L55,40 C 55,70 55,95 56,115Z" />
+                                                <path class="diagram-area-svg" data-info="Laterais: Fígado e Vesícula Biliar. Indicam estagnação de Qi, irritabilidade e tensão." d="M94,115 C 115,115 122,80 105,45 L95,40 C 95,70 95,95 94,115Z" />
+                                                <path class="diagram-area-svg" data-info="Centro: Baço e Estômago. Reflete o estado da digestão e da produção de Qi e Sangue." d="M75 110 C 60 115, 55 40, 75 40 C 95 40, 90 115, 75 110 Z" />
+                                                <path class="diagram-area-svg" data-info="Raiz: Rim, Bexiga, Intestinos. Mostra a constituição (Jing) e o estado do Aquecedor Inferior." d="M75 40 C 55 45, 55 22, 75 22 C 95 22, 95 45, 75 40 Z" />
+                                            </svg>
                                         </div>
-                                        <div>
-                                            <h5 class="font-bold text-gray-700">Pulso Direito</h5>
-                                            <div class="pulse-info-box" data-pos="cun"><strong class="text-gray-500">Pulmão</strong><br><span class="text-xs">(IG)</span></div>
-                                            <div class="pulse-info-box" data-pos="guan"><strong class="text-orange-500">Baço</strong><br><span class="text-xs">(E)</span></div>
-                                            <div class="pulse-info-box" data-pos="chi"><strong class="text-blue-800">Rim Yang</strong><br><span class="text-xs">(TA)</span></div>
+                                        <div class="p-4 bg-gray-100 rounded-lg mt-4 min-h-[60px] flex items-center justify-center text-center">
+                                            <p class="text-gray-500 text-sm">Passe o rato sobre uma área.</p>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="visual-card">
-                                <div class="card-header"><h3>Tipos de Pulso Comuns</h3></div>
-                                <div class="card-content">
-                                    <div id="pulse-list-container" class="space-y-3"></div>
+                                <div id="pulso-panel" role="tabpanel" class="tab-content">
+                                    <div class="card-content flex flex-col items-center">
+                                        <p class="card-prose text-sm text-center mb-4">Passe o rato sobre as posições para ver os órgãos correspondentes.</p>
+                                        <svg id="pulse-diagram-svg" class="w-48 h-auto mb-4" viewBox="0 0 100 120">
+                                            <path d="M20,110 C20,80 30,70 50,70 C70,70 80,80 80,110" stroke="#d1a377" stroke-width="12" fill="none" stroke-linecap="round"/>
+                                            <path d="M50,70 V0" stroke="#e6be99" stroke-width="20" fill="none" stroke-linecap="round"/>
+                                            <circle id="pulse-pos-cun" data-pos="cun" class="pulse-pos-circle" cx="50" cy="20" r="8"/>
+                                            <circle id="pulse-pos-guan" data-pos="guan" class="pulse-pos-circle" cx="50" cy="40" r="8"/>
+                                            <circle id="pulse-pos-chi" data-pos="chi" class="pulse-pos-circle" cx="50" cy="60" r="8"/>
+                                            <text x="62" y="24" class="pulse-pos-label">Cun</text>
+                                            <text x="62" y="44" class="pulse-pos-label">Guan</text>
+                                            <text x="62" y="64" class="pulse-pos-label">Chi</text>
+                                        </svg>
+                                        <div id="pulse-info-container" class="w-full max-w-sm grid grid-cols-2 gap-4 text-center">
+                                            <div>
+                                                <h5 class="font-bold text-gray-700">Pulso Esquerdo</h5>
+                                                <div class="pulse-info-box" data-pos="cun"><strong class="text-red-600">Coração</strong><br><span class="text-xs">(ID)</span></div>
+                                                <div class="pulse-info-box" data-pos="guan"><strong class="text-green-600">Fígado</strong><br><span class="text-xs">(VB)</span></div>
+                                                <div class="pulse-info-box" data-pos="chi"><strong class="text-blue-600">Rim Yin</strong><br><span class="text-xs">(B)</span></div>
+                                            </div>
+                                            <div>
+                                                <h5 class="font-bold text-gray-700">Pulso Direito</h5>
+                                                <div class="pulse-info-box" data-pos="cun"><strong class="text-gray-500">Pulmão</strong><br><span class="text-xs">(IG)</span></div>
+                                                <div class="pulse-info-box" data-pos="guan"><strong class="text-orange-500">Baço</strong><br><span class="text-xs">(E)</span></div>
+                                                <div class="pulse-info-box" data-pos="chi"><strong class="text-blue-800">Rim Yang</strong><br><span class="text-xs">(TA)</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-content border-t mt-4 pt-4">
+                                        <h4 class="text-center font-bold mb-2">Tipos de Pulso Comuns</h4>
+                                        <div id="pulse-list-container" class="space-y-3 max-h-64 overflow-y-auto"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -258,10 +310,10 @@
                         </div>
                     </section>
                     
+                    <!-- SECÇÃO DE TERAPIAS REESTRUTURADA -->
                     <section id="terapias" class="content-section">
-                        <div class="flex flex-col lg:flex-row gap-6">
-                            <nav id="therapies-navigation" class="w-full lg:w-1/4 space-y-2"></nav>
-                            <div id="therapies-content-area" class="flex-1 content-area"></div>
+                        <div id="therapies-grid-container">
+                            <!-- Conteúdo gerado por JS -->
                         </div>
                     </section>
                     
@@ -276,11 +328,13 @@
                         <div id="glossary-container"></div>
                     </section>
 
-                    </main>
+                    <!-- FIM: Conteúdo das secções -->
+                </main>
             </div>
         </div>
     </div>
 
+    <!-- Modal de Pesquisa Global -->
     <div id="search-modal-container" class="fixed inset-0 z-50 p-4 hidden">
         <div id="search-overlay" class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm"></div>
         <div class="relative bg-white w-full max-w-2xl mx-auto mt-[10vh] rounded-xl shadow-2xl flex flex-col max-h-[80vh]">

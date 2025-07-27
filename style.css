@@ -99,15 +99,7 @@ aside { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
 .card-prose > *:first-child { margin-top: 0; }
 .card-prose > *:last-child { margin-bottom: 0; }
 .text-primary-dark { color: var(--color-primary-dark); } 
-
-/* Estilo para imagens dentro dos cards (NOVO) */
-.card-prose img {
-    border-radius: 0.5rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-}
-
+.card-prose img { border-radius: 0.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-top: 1rem; margin-bottom: 1rem; }
 
 /* --- Accordion Styling --- */
 .accordion-item { border: 1px solid var(--color-subtle-gray); border-radius: 0.5rem; background-color: #fff; transition: box-shadow 0.2s, border-color 0.2s; }
@@ -128,7 +120,7 @@ aside { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
 .arrow-marker { transition: fill 0.4s ease-in-out; }
 
 /* --- Tabs, Timeline, etc. --- */
-.tab-button { padding: 0.75rem 0.25rem; margin: 0 0.75rem; font-weight: 600; color: var(--color-text-muted); border-bottom: 3px solid transparent; transition: color 0.3s, border-color 0.3s; }
+.tab-button { padding: 0.75rem 1rem; font-weight: 600; color: var(--color-text-muted); border-bottom: 3px solid transparent; transition: color 0.3s, border-color 0.3s; display: flex; align-items: center; }
 .tab-button.active, .tab-button:hover { color: var(--color-primary); }
 .tab-button.active { border-bottom-color: var(--color-accent); }
 .tab-content { display: none; }
@@ -166,6 +158,59 @@ aside { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
 .food-item { transition: opacity 0.4s ease-out, transform 0.4s ease-out, max-height 0.4s ease-out; transform-origin: top; border-left: 4px solid var(--color-secondary); }
 .food-item.hidden { opacity: 0; transform: scale(0.95); max-height: 0 !important; padding: 0; margin: 0; overflow: hidden; }
 
+/* --- NOVO: Estilos para a Grelha de Terapias --- */
+.therapies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+.therapy-card {
+    background-color: #fff;
+    border-radius: 0.75rem;
+    border: 1px solid var(--color-subtle-gray);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.4s ease;
+}
+.therapy-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+.therapy-card-title {
+    padding: 1.25rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    font-family: 'Playfair Display', serif;
+    color: var(--color-primary);
+    position: relative;
+}
+.therapy-card-title::after {
+    content: '+';
+    position: absolute;
+    right: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%) rotate(0deg);
+    font-size: 1.5rem;
+    color: var(--color-secondary);
+    transition: transform 0.4s ease;
+}
+.therapy-card.active .therapy-card-title::after {
+    transform: translateY(-50%) rotate(45deg);
+}
+.therapy-content-wrapper {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.6s ease-in-out, padding 0.6s ease-in-out;
+}
+.therapy-card.active .therapy-content-wrapper {
+    max-height: 2000px; /* Valor alto para permitir qualquer conteúdo */
+}
+.therapy-content-inner {
+    padding: 0 1.25rem 1.25rem;
+    border-top: 1px solid var(--color-subtle-gray);
+}
+
 /* --- Seletor de Tema --- */
 .theme-button { padding: 4px; border-radius: 9999px; border: 2px solid transparent; transition: border-color 0.3s; }
 .theme-button.active { border-color: var(--color-accent); }
@@ -189,25 +234,11 @@ body.mobile-menu-open #sidebar { transform: translateX(0); }
 
 /* --- MELHORIAS PARA ECRÃS PEQUENOS --- */
 @media (max-width: 767px) {
-    #main-content-area {
-        padding: 1rem;
-    }
-    .card-content {
-        padding: 1rem;
-    }
-    .card-header h3 {
-        font-size: 1.1rem;
-    }
-    #cinco-elementos .grid {
-        grid-template-columns: 1fr;
-    }
-    #diagnostico-geral .grid {
-        grid-template-columns: 1fr;
-    }
-    .tab-button {
-        font-size: 0.875rem;
-        margin: 0 0.5rem;
-    }
+    #main-content-area { padding: 1rem; }
+    .card-content { padding: 1rem; }
+    .card-header h3 { font-size: 1.1rem; }
+    #cinco-elementos .grid { grid-template-columns: 1fr; }
+    .tab-button { font-size: 0.875rem; padding: 0.75rem 0.5rem; }
 }
 
 /* --- Reduced Motion Preference --- */
