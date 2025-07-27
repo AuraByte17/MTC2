@@ -597,7 +597,7 @@ function setupDietetics() {
 
 function setupDiagnosisDiagrams() {
     document.querySelectorAll('.diagram-area-svg').forEach(area => {
-        const infoBox = area.closest('.visual-card, .grid').querySelector('.p-4.bg-gray-100');
+        const infoBox = area.closest('.diagram-container').nextElementSibling;
         if (!infoBox) return;
         const defaultText = infoBox.firstElementChild.textContent;
         const updateInfo = () => { if (infoBox) infoBox.innerHTML = `<p class="font-semibold">${area.dataset.info}</p>`; };
@@ -740,7 +740,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupDietetics();
     
     setupTabs('qigong-tabs', 'qigong-tab-content');
-    setupTabs('diagnosis-tabs', 'diagnosis-tab-content'); // Nova chamada para as abas de diagnóstico
+    setupTabs('diagnosis-tabs', 'diagnosis-tab-content');
     setupSidebarLayout('meridian-navigation', 'meridian-content-area', meridianData, 'meridian-content-');
     setupSidebarLayout('anatomy-navigation', 'anatomy-content-area', anatomyData, 'anatomy-content-');
     setupSidebarLayout('zangfu-navigation', 'zangfu-content-area', zangFuPatternsData, 'zangfu-content-');
@@ -753,7 +753,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     setupThemeSwitcher();
-    applyTheme('default'); // Aplica o tema padrão ao carregar
+    applyTheme('default');
 
     document.querySelectorAll('aside .sidebar-link, aside .nav-group').forEach((el, index) => {
         el.style.animationDelay = `${index * 0.07}s`;
