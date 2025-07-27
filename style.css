@@ -118,18 +118,25 @@ aside { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
 .accordion-button[aria-expanded="true"] + .accordion-content { max-height: 2500px; padding: 1rem 1.5rem 1.5rem; border-top: 1px solid var(--color-subtle-gray); opacity: 1; transform: translateY(0); }
 
 /* --- 5 Elementos --- */
-#element-buttons .element { 
-    transition: all 0.3s ease-in-out; 
-    z-index: 10; 
-    cursor: pointer; 
-    position: absolute;
-    transform: translate(-50%, -50%); /* Centraliza o botão */
+.element-sphere { 
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
-#element-buttons .element[aria-pressed="true"] { 
-    transform: translate(-50%, -50%) scale(1.15); 
-    box-shadow: 0 0 25px currentColor, 0 0 10px white; 
-    border: 3px solid white; 
+.element-sphere .sphere-text {
+    font-size: 14px;
+    font-weight: 600;
+    fill: white;
+    text-anchor: middle;
+    pointer-events: none;
+    text-shadow: 0 0 4px rgba(0,0,0,0.5);
 }
+.element-sphere.active .sphere-circle {
+    stroke: white;
+    stroke-width: 3px;
+    transform: scale(1.1);
+    transform-origin: center;
+}
+
 .cycle-path { 
     stroke-dasharray: 1000; 
     stroke-dashoffset: 1000; 

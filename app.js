@@ -393,7 +393,7 @@ function setupZangFuLayout(data) {
                     <div class="accordion-item">
                         <button class="accordion-button" aria-expanded="false" aria-controls="${uniqueId}-content" id="${uniqueId}-button">
                             <span class="flex items-center gap-2">
-                                <svg class="w-5 h-5 text-gray-400"><use href="#icon-zangfu-patterns"></use></svg>
+                                <svg class="w-5 h-5 text-gray-400"><use href="#icon-clipboard-heart"></use></svg>
                                 ${pattern.name}
                             </span>
                             <svg class="w-5 h-5 shrink-0 text-gray-400 chevron"><use href="#icon-chevron-down"></use></svg>
@@ -415,14 +415,15 @@ function setupZangFuLayout(data) {
     `).join('');
 }
 
-// --- LÓGICA DOS 5 ELEMENTOS (CORRIGIDA E MELHORADA) ---
-const elementButtonsContainer = document.getElementById('element-buttons');
+// --- LÓGICA DOS 5 ELEMENTOS (ATUALIZADA PARA ESFERAS SVG) ---
+const elementDiagramSVG = document.getElementById('element-diagram-svg');
 const elementDetailsContainer = document.getElementById('element-details-container');
 const pathsContainer = document.getElementById('cycle-paths-container');
+const spheresContainer = document.getElementById('element-spheres-container');
 const btnGeracao = document.getElementById('btn-geracao');
 const btnControlo = document.getElementById('btn-controlo');
 const cycleInfoBox = document.getElementById('cycle-info-box');
-const defaultColor = '#a8a29e'; // Cor neutra para caminhos inativos
+const defaultColor = '#a8a29e';
 let currentCycle = 'geracao';
 let selectedElementId = null;
 
@@ -431,7 +432,6 @@ const cycleInfo = {
     controlo: { title: 'Ciclo de Controlo (Ke)', description: 'Este ciclo representa o controlo e a restrição, garantindo que nenhum elemento se torna excessivo e mantendo o equilíbrio do sistema.', color: 'bg-red-100', textColor: 'text-red-800' }
 };
 
-// Coordenadas precisas para um pentágono regular num viewBox 300x300
 const elementCoords = {
     madeira: { x: 150, y: 45 },
     fogo: { x: 255, y: 125 },
@@ -440,7 +440,6 @@ const elementCoords = {
     agua: { x: 45, y: 125 }
 };
 
-// Caminhos SVG calculados com base nas coordenadas
 const cyclePaths = {
     geracao: [
         { id: 'madeira-fogo', d: `M ${elementCoords.madeira.x} ${elementCoords.madeira.y} C 210 65, 230 80, ${elementCoords.fogo.x} ${elementCoords.fogo.y}` },
@@ -458,14 +457,34 @@ const cyclePaths = {
     ]
 };
 
+function setup5ElementsDiagram() {
+    if (!spheresContainer) return;
+    spheresContainer.innerHTML = Object.keys(fiveElementsData).map(key => {
+        const el = fiveElementsData[key];
+        const { x, y } = elementCoords[key];
+        return `
+            <g id="${key}" class="element-sphere" style="--element-color: var(--el-${el.color});">
+                <defs>
+                    <radialGradient id="grad-${key}" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="white" stop-opacity="0.5" />
+                        <stop offset="100%" stop-color="var(--el-${el.color})" stop-opacity="1" />
+                    </radialGradient>
+                </defs>
+                <circle class="sphere-circle" cx="${x}" cy="${y}" r="30" fill="url(#grad-${key})" stroke="var(--el-${el.color})" stroke-width="1.5" filter="url(#sphere-glow)"/>
+                <text class="sphere-text" x="${x}" y="${y + 5}">${el.name}</text>
+            </g>
+        `;
+    }).join('');
+}
+
 function renderCyclePaths() {
     if(!pathsContainer) return;
     pathsContainer.innerHTML = cyclePaths[currentCycle].map(p => `<path id="${p.id}" class="cycle-path" d="${p.d}" stroke="${defaultColor}" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>`).join('');
 }
 
 function update5ElementsUI() {
-    if(!elementButtonsContainer) return;
-    elementButtonsContainer.querySelectorAll('.element').forEach(btn => btn.setAttribute('aria-pressed', 'false'));
+    if(!elementDiagramSVG) return;
+    elementDiagramSVG.querySelectorAll('.element-sphere').forEach(g => g.classList.remove('active'));
     document.querySelectorAll('.arrow-marker').forEach(marker => marker.style.fill = defaultColor);
     
     if (pathsContainer) {
@@ -478,8 +497,8 @@ function update5ElementsUI() {
     
     if (selectedElementId) {
         const elData = fiveElementsData[selectedElementId];
-        const selectedButton = document.getElementById(selectedElementId);
-        if (selectedButton) selectedButton.setAttribute('aria-pressed', 'true');
+        const selectedGroup = document.getElementById(selectedElementId);
+        if (selectedGroup) selectedGroup.classList.add('active');
 
         const targetElementId = elData.target[currentCycle];
         const activePathId = `${selectedElementId}-${targetElementId}`;
@@ -525,17 +544,15 @@ function switchCycle(cycle) {
 if(btnGeracao) btnGeracao.addEventListener('click', () => switchCycle('geracao'));
 if(btnControlo) btnControlo.addEventListener('click', () => switchCycle('controlo'));
 
-if (elementButtonsContainer) {
-    elementButtonsContainer.addEventListener('click', (e) => {
-        const button = e.target.closest('.element');
-        if (button) {
-            selectedElementId = button.id;
+if (elementDiagramSVG) {
+    elementDiagramSVG.addEventListener('click', (e) => {
+        const sphereGroup = e.target.closest('.element-sphere');
+        if (sphereGroup) {
+            selectedElementId = sphereGroup.id;
             update5ElementsUI();
         }
     });
 }
-
-// --- FIM DA LÓGICA DOS 5 ELEMENTOS ---
 
 function setupGlossary() {
     const glossaryContainer = document.getElementById('glossary-container');
@@ -641,35 +658,29 @@ function setupDietetics() {
     }
 }
 
-// --- LÓGICA DOS DIAGRAMAS DE DIAGNÓSTICO (MELHORADA) ---
 function setupDiagnosisDiagrams() {
-    // Interatividade do Diagrama da Língua
-    const tongueContainer = document.querySelector('.diagram-container');
-    if (tongueContainer) {
-        const tongueAreas = tongueContainer.querySelectorAll('.diagram-area-svg');
-        const tongueInfoBox = tongueContainer.parentElement.querySelector('.p-4.bg-gray-100');
-        if (tongueAreas.length > 0 && tongueInfoBox) {
-            const defaultText = tongueInfoBox.firstElementChild.textContent;
-            tongueAreas.forEach(area => {
-                const updateInfo = () => {
-                    if (tongueInfoBox) {
-                        tongueInfoBox.innerHTML = `<p class="font-semibold">${area.dataset.info}</p>`;
-                    }
-                };
-                const resetInfo = () => {
-                    if (tongueInfoBox) {
-                        tongueInfoBox.innerHTML = `<p class="text-center text-gray-500">${defaultText}</p>`;
-                    }
-                };
-                area.addEventListener('mouseover', updateInfo);
-                area.addEventListener('focus', updateInfo);
-                area.addEventListener('mouseout', resetInfo);
-                area.addEventListener('blur', resetInfo);
-            });
-        }
-    }
+    document.querySelectorAll('.diagram-area-svg').forEach(area => {
+        const infoBox = area.closest('.visual-card, .grid').querySelector('.p-4.bg-gray-100');
+        if (!infoBox) return;
+        
+        const defaultText = infoBox.firstElementChild.textContent;
+        const updateInfo = () => {
+            if (infoBox) {
+                infoBox.innerHTML = `<p class="font-semibold">${area.dataset.info}</p>`;
+            }
+        };
+        const resetInfo = () => {
+            if (infoBox) {
+                infoBox.innerHTML = `<p class="text-center text-gray-500">${defaultText}</p>`;
+            }
+        };
+        
+        area.addEventListener('mouseover', updateInfo);
+        area.addEventListener('focus', updateInfo);
+        area.addEventListener('mouseout', resetInfo);
+        area.addEventListener('blur', resetInfo);
+    });
 
-    // Interatividade do Novo Diagrama do Pulso
     const pulseSVG = document.getElementById('pulse-diagram-svg');
     if (pulseSVG) {
         const pulsePositions = pulseSVG.querySelectorAll('.pulse-pos-circle');
@@ -690,39 +701,39 @@ function setupDiagnosisDiagrams() {
     }
 }
 
-// --- Função para gerar os links de navegação ---
+// --- Função para gerar os links de navegação (COM NOVOS ÍCONES) ---
 function generateNavLinks() {
     const navStructure = [
         { id: 'inicio', title: 'Início', icon: 'icon-home' },
         {
-            title: 'Fundamentos', icon: 'icon-yin-yang',
+            title: 'Fundamentos', icon: 'icon-book-open',
             links: [
-                { id: 'substancias-fundamentais', title: 'Substâncias Fundamentais', icon: 'icon-3-treasures' },
-                { id: 'tipos-de-qi', title: 'Tipos de Qi', icon: 'icon-qi' },
-                { id: 'cinco-elementos', title: 'Os 5 Elementos', icon: 'icon-5-elements' },
-                { id: 'ciclos-de-vida', title: 'Ciclos de Vida', icon: 'icon-lifecycle' }
+                { id: 'substancias-fundamentais', title: 'Substâncias Fundamentais', icon: 'icon-atom' },
+                { id: 'tipos-de-qi', title: 'Tipos de Qi', icon: 'icon-wind' },
+                { id: 'cinco-elementos', title: 'Os 5 Elementos', icon: 'icon-star' },
+                { id: 'ciclos-de-vida', title: 'Ciclos de Vida', icon: 'icon-refresh-cw' }
             ]
         },
-        { id: 'meridianos', title: 'Meridianos e Pontos', icon: 'icon-meridian' },
-        { id: 'anatomia-energetica', title: 'Anatomia Energética', icon: 'icon-anatomy' },
-        { id: 'padroes-zang-fu', title: 'Padrões Zang-Fu', icon: 'icon-zangfu-patterns' },
+        { id: 'meridianos', title: 'Meridianos e Pontos', icon: 'icon-git-branch' },
+        { id: 'anatomia-energetica', title: 'Anatomia Energética', icon: 'icon-body' },
+        { id: 'padroes-zang-fu', title: 'Padrões Zang-Fu', icon: 'icon-clipboard-heart' },
         {
-            title: 'Diagnóstico', icon: 'icon-diagnosis',
+            title: 'Diagnóstico', icon: 'icon-stethoscope',
             links: [
-                { id: 'diagnostico-geral', title: 'Geral e Visual', icon: 'icon-diagnosis' },
-                { id: 'pulsologia', title: 'Pulsologia', icon: 'icon-diagnosis' }
+                { id: 'diagnostico-geral', title: 'Geral e Visual', icon: 'icon-stethoscope' },
+                { id: 'pulsologia', title: 'Pulsologia', icon: 'icon-heart-pulse' }
             ]
         },
         {
-            title: 'Terapêuticas', icon: 'icon-tuina',
+            title: 'Terapêuticas', icon: 'icon-lotus',
             links: [
-                { id: 'dietetica', title: 'Dietética', icon: 'icon-diet' },
-                { id: 'fitoterapia', title: 'Fitoterapia', icon: 'icon-fitoterapia' },
-                { id: 'moxabustao', title: 'Moxabustão', icon: 'icon-moxibustion' },
-                { id: 'qigong', title: 'Qi Gong & Tai Chi', icon: 'icon-qigong' }
+                { id: 'dietetica', title: 'Dietética', icon: 'icon-soup' },
+                { id: 'fitoterapia', title: 'Fitoterapia', icon: 'icon-mortar-pestle' },
+                { id: 'moxabustao', title: 'Moxabustão', icon: 'icon-flame' },
+                { id: 'qigong', title: 'Qi Gong & Tai Chi', icon: 'icon-lotus' }
             ]
         },
-        { id: 'glossario', title: 'Glossário', icon: 'icon-glossary' },
+        { id: 'glossario', title: 'Glossário', icon: 'icon-book-open' },
     ];
 
     const generateHtml = (item) => {
@@ -781,6 +792,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Inicializa o diagrama dos 5 Elementos
     if (document.getElementById('cinco-elementos')) {
+        setup5ElementsDiagram();
         switchCycle('geracao');
     }
 
