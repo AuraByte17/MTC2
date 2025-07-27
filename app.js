@@ -10,7 +10,9 @@ import {
     foodData, 
     zangFuPatternsData, 
     dezPerguntasData, 
-    pulseData 
+    pulseData,
+    greatMastersData, // NOVO
+    therapiesData     // NOVO
 } from './data.js';
 
 // --- Seleção de Elementos DOM ---
@@ -92,7 +94,7 @@ allNavHubs.forEach(hub => {
             const linkText = link.querySelector('span').textContent;
             showSection(targetId, linkText);
             updateActiveLink(targetId);
-            closeMobileMenu(); // Fecha o menu móvel ao clicar num link
+            closeMobileMenu();
         }
         if (groupHeader) {
             groupHeader.classList.toggle('open');
@@ -101,8 +103,9 @@ allNavHubs.forEach(hub => {
     });
 });
 
-// --- CRIAÇÃO DO ÍNDICE DE PESQUISA ---
+// --- CRIAÇÃO DO ÍNDICE DE PESQUISA (ATUALIZADO) ---
 function createSearchIndex() {
+    // Pontos de Acupuntura
     meridianData.forEach(meridian => {
         meridian.points.forEach(point => {
             searchIndex.push({
@@ -114,6 +117,7 @@ function createSearchIndex() {
             });
         });
     });
+    // Glossário
     Object.values(glossaryData).forEach(item => {
         searchIndex.push({
             title: item.term,
@@ -123,15 +127,17 @@ function createSearchIndex() {
             sectionId: 'glossario'
         });
     });
+    // Alimentos
     foodData.forEach(food => {
         searchIndex.push({
             title: food.name,
             content: `Ações: ${food.actions}`,
             type: 'Alimento',
-            color: 'wood',
+            color: 'earth',
             sectionId: 'dietetica'
         });
     });
+    // Padrões Zang-Fu
     zangFuPatternsData.forEach(organ => {
         organ.patterns.forEach(pattern => {
             searchIndex.push({
@@ -141,6 +147,26 @@ function createSearchIndex() {
                 color: organ.color,
                 sectionId: 'padroes-zang-fu'
             });
+        });
+    });
+    // Terapias (NOVO)
+    therapiesData.forEach(therapy => {
+        searchIndex.push({
+            title: therapy.title,
+            content: therapy.content.replace(/<[^>]*>/g, ' ').substring(0, 150) + '...', // Remove HTML para preview
+            type: 'Terapia',
+            color: 'secondary',
+            sectionId: 'terapias'
+        });
+    });
+    // Grandes Mestres (NOVO)
+    greatMastersData.forEach(master => {
+        searchIndex.push({
+            title: master.name,
+            content: master.content.replace(/<[^>]*>/g, ' ').substring(0, 150) + '...', // Remove HTML para preview
+            type: 'Mestre',
+            color: 'water',
+            sectionId: 'grandes-mestres'
         });
     });
 }
@@ -232,33 +258,6 @@ function createLifeCycleTimeline(containerId, data, colorClass) {
         </div>`).join('');
 }
 
-function setupTabs(tabsContainerId, tabContentContainerId) {
-    const tabsContainer = document.getElementById(tabsContainerId);
-    const tabContentContainer = document.getElementById(tabContentContainerId);
-    if (!tabsContainer || !tabContentContainer) return;
-
-    const tabs = tabsContainer.querySelectorAll('[role="tab"]');
-    const tabPanels = tabContentContainer.querySelectorAll('[role="tabpanel"]');
-
-    tabsContainer.addEventListener('click', (e) => {
-        const clickedTab = e.target.closest('[role="tab"]');
-        if (!clickedTab) return;
-
-        tabs.forEach(tab => {
-            tab.setAttribute('aria-selected', 'false');
-            tab.classList.remove('active');
-        });
-        clickedTab.setAttribute('aria-selected', 'true');
-        clickedTab.classList.add('active');
-
-        tabPanels.forEach(panel => panel.classList.remove('active'));
-        const targetPanel = document.getElementById(clickedTab.getAttribute('aria-controls'));
-        if (targetPanel) {
-            targetPanel.classList.add('active');
-        }
-    });
-}
-
 function setupSidebarLayout(navId, contentId, data, idPrefix = 'content-') {
     const navContainer = document.getElementById(navId);
     const contentContainer = document.getElementById(contentId);
@@ -275,15 +274,15 @@ function setupSidebarLayout(navId, contentId, data, idPrefix = 'content-') {
         contentContainer.innerHTML = data.map(item => setupMeridianLayout(item, idPrefix)).join('');
     } else if (navId === 'zangfu-navigation') {
         contentContainer.innerHTML = setupZangFuLayout(data);
-    } else {
+    } else if (navId === 'masters-navigation') {
+        contentContainer.innerHTML = data.map(item => setupMasterLayout(item, idPrefix)).join('');
+    } else { // Para Anatomia e Terapias
         contentContainer.innerHTML = data.map(item => `
             <div class="content-card" id="${idPrefix}${item.id}">
                 <div class="pb-4 mb-4 border-b-2" style="border-color: var(--el-${item.color || 'gray'});">
-                    <h3 class="text-2xl font-playfair font-bold" style="color: var(--el-${item.color || 'gray'});">${item.name || item.title}</h3>
+                    <h3 class="text-2xl font-playfair font-bold" style="color: var(--el-${item.color || 'primary'});">${item.name || item.title}</h3>
                 </div>
-                <div class="card-prose">
-                    ${item.content ? `<div class="text-gray-600">${item.content}</div>` : ''}
-                </div>
+                ${item.content ? `<div class="text-gray-600">${item.content}</div>` : ''}
             </div>`).join('');
     }
     
@@ -312,6 +311,19 @@ function setupSidebarLayout(navId, contentId, data, idPrefix = 'content-') {
     });
 
     if (navItems.length > 0) navItems[0].click();
+}
+
+function setupMasterLayout(item, idPrefix) {
+    // Nota: O conteúdo HTML vem diretamente do data.js
+    return `
+    <div class="content-card" id="${idPrefix}${item.id}">
+        <div class="pb-4 mb-4 border-b-2" style="border-color: var(--el-water);">
+            <img src="${item.image_placeholder}" alt="Retrato de ${item.name}" class="w-full h-48 object-cover rounded-lg mb-4 shadow-md">
+            <h3 class="text-2xl font-playfair font-bold" style="color: var(--el-water);">${item.name}</h3>
+            <p class="font-semibold text-gray-500 text-sm">${item.dynasty}</p>
+        </div>
+        ${item.content} 
+    </div>`;
 }
 
 function setupMeridianLayout(item, idPrefix) {
@@ -410,7 +422,7 @@ const cyclePaths = {
         { id: 'madeira-terra', d: `M ${elementCoords.madeira.x} ${elementCoords.madeira.y} L ${elementCoords.terra.x} ${elementCoords.terra.y}` },
         { id: 'fogo-metal', d: `M ${elementCoords.fogo.x} ${elementCoords.fogo.y} L ${elementCoords.metal.x} ${elementCoords.metal.y}` },
         { id: 'terra-agua', d: `M ${elementCoords.terra.x} ${elementCoords.terra.y} L ${elementCoords.agua.x} ${elementCoords.agua.y}` },
-        { id: 'metal-madeira', d: `M ${elementCoords.metal.x} ${elementCoords.metal.y} L ${elementCoords.madeira.x} ${elementCoords.madeira.y}` },
+        { id: 'metal-madeira', d: `M ${elementCoords.metal.x} ${elementCoords.metal.y} L ${elementCoords.madeira.x} ${elementCoords.madeadeiray}` },
         { id: 'agua-fogo', d: `M ${elementCoords.agua.x} ${elementCoords.agua.y} L ${elementCoords.fogo.x} ${elementCoords.fogo.y}` }
     ]
 };
@@ -596,17 +608,6 @@ function setupDietetics() {
 }
 
 function setupDiagnosisDiagrams() {
-    document.querySelectorAll('.diagram-area-svg').forEach(area => {
-        const infoBox = area.closest('.diagram-container').nextElementSibling;
-        if (!infoBox) return;
-        const defaultText = infoBox.firstElementChild.textContent;
-        const updateInfo = () => { if (infoBox) infoBox.innerHTML = `<p class="font-semibold">${area.dataset.info}</p>`; };
-        const resetInfo = () => { if (infoBox) infoBox.innerHTML = `<p class="text-center text-gray-500">${defaultText}</p>`; };
-        area.addEventListener('mouseover', updateInfo);
-        area.addEventListener('focus', updateInfo);
-        area.addEventListener('mouseout', resetInfo);
-        area.addEventListener('blur', resetInfo);
-    });
     const pulseSVG = document.getElementById('pulse-diagram-svg');
     if (pulseSVG) {
         const pulsePositions = pulseSVG.querySelectorAll('.pulse-pos-circle');
@@ -673,7 +674,7 @@ function setupThemeSwitcher() {
     });
 }
 
-// --- Função para gerar os links de navegação (ESTRUTURA ALTERADA) ---
+// --- Função para gerar os links de navegação (ESTRUTURA ATUALIZADA) ---
 function generateNavLinks() {
     const navStructure = [
         { id: 'inicio', title: 'Início', icon: 'icon-home' },
@@ -692,17 +693,21 @@ function generateNavLinks() {
         {
             title: 'Diagnóstico', icon: 'icon-stethoscope',
             links: [
-                { id: 'diagnostico-geral', title: 'Geral e Visual', icon: 'icon-stethoscope' },
+                { id: 'diagnostico-geral', title: 'As 10 Perguntas', icon: 'icon-clipboard-heart' },
                 { id: 'pulsologia', title: 'Pulsologia', icon: 'icon-heart-pulse' }
             ]
         },
         {
             title: 'Terapêuticas', icon: 'icon-lotus',
             links: [
+                { id: 'terapias', title: 'Visão Geral', icon: 'icon-lotus' },
                 { id: 'dietetica', title: 'Dietética', icon: 'icon-soup' },
-                { id: 'fitoterapia', title: 'Fitoterapia', icon: 'icon-mortar-pestle' },
-                { id: 'moxabustao', title: 'Moxabustão', icon: 'icon-flame' },
-                { id: 'qigong', title: 'Qi Gong & Tai Chi', icon: 'icon-lotus' }
+            ]
+        },
+        {
+            title: 'Sabedoria', icon: 'icon-users',
+            links: [
+                { id: 'grandes-mestres', title: 'Grandes Mestres', icon: 'icon-scroll' },
             ]
         },
         { id: 'glossario', title: 'Glossário', icon: 'icon-book-open' },
@@ -731,6 +736,8 @@ function generateNavLinks() {
 // --- PONTO DE ENTRADA DA APLICAÇÃO ---
 document.addEventListener('DOMContentLoaded', () => {
     generateNavLinks(); 
+    
+    // Geração de conteúdo dinâmico
     createAccordion('qi-accordion', qiData);
     createLifeCycleTimeline('female-cycles-timeline', lifeCyclesFemaleData, 'bg-pink-500');
     createLifeCycleTimeline('male-cycles-timeline', lifeCyclesMaleData, 'bg-blue-500');
@@ -739,11 +746,14 @@ document.addEventListener('DOMContentLoaded', () => {
     setupGlossary();
     setupDietetics();
     
-    setupTabs('qigong-tabs', 'qigong-tab-content');
-    setupTabs('diagnosis-tabs', 'diagnosis-tab-content');
+    // Configuração de layouts de abas e barras laterais
     setupSidebarLayout('meridian-navigation', 'meridian-content-area', meridianData, 'meridian-content-');
     setupSidebarLayout('anatomy-navigation', 'anatomy-content-area', anatomyData, 'anatomy-content-');
     setupSidebarLayout('zangfu-navigation', 'zangfu-content-area', zangFuPatternsData, 'zangfu-content-');
+    setupSidebarLayout('therapies-navigation', 'therapies-content-area', therapiesData, 'therapy-content-'); // NOVO
+    setupSidebarLayout('masters-navigation', 'masters-content-area', greatMastersData, 'master-content-'); // NOVO
+
+    // Configuração de elementos interativos
     activateTooltips();
     setupDiagnosisDiagrams();
     
@@ -752,13 +762,14 @@ document.addEventListener('DOMContentLoaded', () => {
         switchCycle('geracao');
     }
 
+    // Configuração do tema e animações
     setupThemeSwitcher();
     applyTheme('default');
-
     document.querySelectorAll('aside .sidebar-link, aside .nav-group').forEach((el, index) => {
         el.style.animationDelay = `${index * 0.07}s`;
     });
 
+    // Inicialização da pesquisa e estado inicial da UI
     createSearchIndex();
     contentSections = mainContent.querySelectorAll('.content-section');
     showSection('inicio', 'Início');

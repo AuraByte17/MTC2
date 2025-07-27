@@ -94,11 +94,20 @@ aside { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
 }
 .card-header h3 { margin: 0; font-size: 1.2rem; font-weight: 700; color: var(--color-primary); }
 .card-content { padding: 1.5rem; line-height: 1.7; }
-.card-prose p, .card-prose ul { margin-bottom: 1rem; color: var(--color-text-muted); }
+.card-prose p, .card-prose ul, .card-prose ol { margin-bottom: 1rem; color: var(--color-text-muted); }
 .card-prose h4 { margin-bottom: 0.5rem; margin-top: 1.25rem; font-size: 1.1rem; color: var(--color-primary); font-weight: 700; }
 .card-prose > *:first-child { margin-top: 0; }
 .card-prose > *:last-child { margin-bottom: 0; }
 .text-primary-dark { color: var(--color-primary-dark); } 
+
+/* Estilo para imagens dentro dos cards (NOVO) */
+.card-prose img {
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
 
 /* --- Accordion Styling --- */
 .accordion-item { border: 1px solid var(--color-subtle-gray); border-radius: 0.5rem; background-color: #fff; transition: box-shadow 0.2s, border-color 0.2s; }
