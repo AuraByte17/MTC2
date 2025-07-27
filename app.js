@@ -92,7 +92,7 @@ allNavHubs.forEach(hub => {
             const linkText = link.querySelector('span').textContent;
             showSection(targetId, linkText);
             updateActiveLink(targetId);
-            closeMobileMenu();
+            closeMobileMenu(); // Fecha o menu móvel ao clicar num link
         }
         if (groupHeader) {
             groupHeader.classList.toggle('open');
@@ -103,7 +103,6 @@ allNavHubs.forEach(hub => {
 
 // --- CRIAÇÃO DO ÍNDICE DE PESQUISA ---
 function createSearchIndex() {
-    // 1. Meridianos e Pontos
     meridianData.forEach(meridian => {
         meridian.points.forEach(point => {
             searchIndex.push({
@@ -115,8 +114,6 @@ function createSearchIndex() {
             });
         });
     });
-
-    // 2. Glossário
     Object.values(glossaryData).forEach(item => {
         searchIndex.push({
             title: item.term,
@@ -126,8 +123,6 @@ function createSearchIndex() {
             sectionId: 'glossario'
         });
     });
-
-    // 3. Alimentos
     foodData.forEach(food => {
         searchIndex.push({
             title: food.name,
@@ -137,8 +132,6 @@ function createSearchIndex() {
             sectionId: 'dietetica'
         });
     });
-
-    // 4. Padrões Zang-Fu
     zangFuPatternsData.forEach(organ => {
         organ.patterns.forEach(pattern => {
             searchIndex.push({
@@ -152,20 +145,17 @@ function createSearchIndex() {
     });
 }
 
-
 // --- LÓGICA DE EXECUÇÃO DA PESQUISA ---
 function performSearch(query) {
     if (query.length < 2) {
         searchResultsContainer.innerHTML = '<p class="text-center text-gray-500">Escreva pelo menos 2 letras para pesquisar.</p>';
         return;
     }
-
     const lowerCaseQuery = query.toLowerCase();
     const results = searchIndex.filter(item => 
         item.title.toLowerCase().includes(lowerCaseQuery) || 
         item.content.toLowerCase().includes(lowerCaseQuery)
     );
-
     renderSearchResults(results);
 }
 
@@ -174,7 +164,6 @@ function renderSearchResults(results) {
         searchResultsContainer.innerHTML = '<p class="text-center text-gray-500">Nenhum resultado encontrado.</p>';
         return;
     }
-
     searchResultsContainer.innerHTML = results.map(item => `
         <div class="search-result-item" data-section-id="${item.sectionId}">
             <h4>${item.title}</h4>
@@ -185,7 +174,6 @@ function renderSearchResults(results) {
 }
 
 globalSearchInput.addEventListener('input', (e) => performSearch(e.target.value));
-
 searchResultsContainer.addEventListener('click', (e) => {
     const resultItem = e.target.closest('.search-result-item');
     if (resultItem) {
@@ -200,12 +188,10 @@ searchResultsContainer.addEventListener('click', (e) => {
     }
 });
 
-
 // --- FUNÇÕES DE GERAÇÃO DE CONTEÚDO ---
 function createAccordion(containerId, data) {
     const container = document.getElementById(containerId);
     if (!container) return;
-
     container.innerHTML = data.map((item, index) => {
         const uniqueId = `${containerId}-item-${index}`;
         return `
@@ -222,7 +208,6 @@ function createAccordion(containerId, data) {
             </div>
         </div>`;
     }).join('');
-
     container.addEventListener('click', (e) => {
         const button = e.target.closest('.accordion-button');
         if (button) {
@@ -338,44 +323,24 @@ function setupMeridianLayout(item, idPrefix) {
         </div>
         <div class="card-prose text-sm">
             <div class="grid md:grid-cols-2 gap-x-8">
-                <div>
-                    <h4 class="font-bold !text-base !mb-2 !mt-0">Funções Principais</h4>
-                    <p class="text-gray-600">${item.functions}</p>
-                </div>
-                <div>
-                    <h4 class="font-bold !text-base !mb-2 !mt-0">Sinais de Desequilíbrio</h4>
-                    <p class="text-gray-600">${item.imbalances}</p>
-                </div>
+                <div><h4 class="font-bold !text-base !mb-2 !mt-0">Funções Principais</h4><p class="text-gray-600">${item.functions}</p></div>
+                <div><h4 class="font-bold !text-base !mb-2 !mt-0">Sinais de Desequilíbrio</h4><p class="text-gray-600">${item.imbalances}</p></div>
             </div>
-            
             <h4 class="font-bold !text-base !mb-2">Pontos Especiais</h4>
             <div class="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-2 text-xs p-3 bg-gray-50 rounded-md">
                 <div><strong>Fonte (Yuan):</strong> ${item.yuan_source}</div>
                 <div><strong>Conexão (Luo):</strong> ${item.luo_connecting}</div>
                 <div><strong>Fenda (Xi):</strong> ${item.xi_cleft}</div>
             </div>
-
             <h4 class="font-bold !text-base !mb-2">Pontos Shu Antigos</h4>
             <div class="overflow-x-auto">
                 <table class="w-full text-left !text-xs">
-                    <thead class="bg-gray-100"><tr>
-                        <th class="p-2 font-semibold">Tipo</th><th class="p-2 font-semibold">Elemento</th><th class="p-2 font-semibold">Ponto</th><th class="p-2 font-semibold">Funções</th>
-                    </tr></thead>
-                    <tbody>
-                        ${item.five_shu.map(p => `<tr class="border-b">
-                            <td class="p-2">${p.type}</td><td class="p-2">${p.element}</td><td class="p-2 font-bold">${p.point}</td><td class="p-2">${p.functions}</td>
-                        </tr>`).join('')}
-                    </tbody>
+                    <thead class="bg-gray-100"><tr><th class="p-2 font-semibold">Tipo</th><th class="p-2 font-semibold">Elemento</th><th class="p-2 font-semibold">Ponto</th><th class="p-2 font-semibold">Funções</th></tr></thead>
+                    <tbody>${item.five_shu.map(p => `<tr class="border-b"><td class="p-2">${p.type}</td><td class="p-2">${p.element}</td><td class="p-2 font-bold">${p.point}</td><td class="p-2">${p.functions}</td></tr>`).join('')}</tbody>
                 </table>
             </div>
-            
             <h4 class="font-bold !text-base !mb-2">Lista Completa de Pontos</h4>
-            <div class="space-y-3 max-h-80 overflow-y-auto pr-2">
-                ${item.points.map(p => `<div class="p-2 border-l-2 border-gray-200 hover:bg-gray-50">
-                    <strong class="text-primary-dark">${p.id} - ${p.name} (${p.character}) - ${p.pt_name}</strong>
-                    <p class="text-gray-600 !mb-0">${p.functions}</p>
-                </div>`).join('')}
-            </div>
+            <div class="space-y-3 max-h-80 overflow-y-auto pr-2">${item.points.map(p => `<div class="p-2 border-l-2 border-gray-200 hover:bg-gray-50"><strong class="text-primary-dark">${p.id} - ${p.name} (${p.character}) - ${p.pt_name}</strong><p class="text-gray-600 !mb-0">${p.functions}</p></div>`).join('')}</div>
         </div>
     </div>`;
 }
@@ -392,21 +357,14 @@ function setupZangFuLayout(data) {
                     return `
                     <div class="accordion-item">
                         <button class="accordion-button" aria-expanded="false" aria-controls="${uniqueId}-content" id="${uniqueId}-button">
-                            <span class="flex items-center gap-2">
-                                <svg class="w-5 h-5 text-gray-400"><use href="#icon-clipboard-heart"></use></svg>
-                                ${pattern.name}
-                            </span>
+                            <span class="flex items-center gap-2"><svg class="w-5 h-5 text-gray-400"><use href="#icon-clipboard-heart"></use></svg>${pattern.name}</span>
                             <svg class="w-5 h-5 shrink-0 text-gray-400 chevron"><use href="#icon-chevron-down"></use></svg>
                         </button>
                         <div class="accordion-content card-prose text-sm" id="${uniqueId}-content" role="region" aria-labelledby="${uniqueId}-button">
-                            <h4 class="font-bold text-gray-700">Manifestações Clínicas:</h4>
-                            <p>${pattern.symptoms}</p>
-                            <h4 class="font-bold text-gray-700">Língua:</h4>
-                            <p>${pattern.tongue}</p>
-                            <h4 class="font-bold text-gray-700">Pulso:</h4>
-                            <p>${pattern.pulse}</p>
-                            <h4 class="font-bold text-gray-700">Princípio de Tratamento:</h4>
-                            <p class="text-green-800 font-semibold">${pattern.treatmentPrinciple}</p>
+                            <h4 class="font-bold text-gray-700">Manifestações Clínicas:</h4><p>${pattern.symptoms}</p>
+                            <h4 class="font-bold text-gray-700">Língua:</h4><p>${pattern.tongue}</p>
+                            <h4 class="font-bold text-gray-700">Pulso:</h4><p>${pattern.pulse}</p>
+                            <h4 class="font-bold text-gray-700">Princípio de Tratamento:</h4><p class="text-green-800 font-semibold">${pattern.treatmentPrinciple}</p>
                         </div>
                     </div>`;
                 }).join('')}
@@ -464,12 +422,7 @@ function setup5ElementsDiagram() {
         const { x, y } = elementCoords[key];
         return `
             <g id="${key}" class="element-sphere">
-                <defs>
-                    <radialGradient id="grad-${key}" cx="30%" cy="30%" r="70%">
-                        <stop offset="0%" stop-color="white" stop-opacity="0.5" />
-                        <stop offset="100%" stop-color="var(--el-${el.color})" stop-opacity="1" />
-                    </radialGradient>
-                </defs>
+                <defs><radialGradient id="grad-${key}" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="white" stop-opacity="0.5" /><stop offset="100%" stop-color="var(--el-${el.color})" stop-opacity="1" /></radialGradient></defs>
                 <circle class="sphere-circle" cx="${x}" cy="${y}" r="30" fill="url(#grad-${key})" stroke="var(--el-${el.color})" stroke-width="1.5" filter="url(#sphere-glow)"/>
                 <text class="sphere-text" x="${x}" y="${y + 5}">${el.name}</text>
             </g>
@@ -543,7 +496,6 @@ function switchCycle(cycle) {
 
 if(btnGeracao) btnGeracao.addEventListener('click', () => switchCycle('geracao'));
 if(btnControlo) btnControlo.addEventListener('click', () => switchCycle('controlo'));
-
 if (elementDiagramSVG) {
     elementDiagramSVG.addEventListener('click', (e) => {
         const sphereGroup = e.target.closest('.element-sphere');
@@ -557,22 +509,17 @@ if (elementDiagramSVG) {
 function setupGlossary() {
     const glossaryContainer = document.getElementById('glossary-container');
     if (!glossaryContainer) return;
-
     const categories = Object.values(glossaryData).reduce((acc, item) => {
         (acc[item.category] = acc[item.category] || []).push(item);
         return acc;
     }, {});
     const sortedCategories = Object.keys(categories).sort();
-    
     glossaryContainer.innerHTML = sortedCategories.map(category => `
         <div class="visual-card mb-8">
             <div class="card-header"><h3 class="text-gray-700">${category}</h3></div>
             <div class="card-content grid md:grid-cols-2 gap-x-8 gap-y-6">
                 ${categories[category].sort((a, b) => a.term.localeCompare(b.term)).map(item => `
-                    <div>
-                        <h4 class="font-bold text-lg">${item.term}</h4>
-                        <p class="text-gray-600">${item.definition}</p>
-                    </div>`).join('')}
+                    <div><h4 class="font-bold text-lg">${item.term}</h4><p class="text-gray-600">${item.definition}</p></div>`).join('')}
             </div>
         </div>`).join('');
 }
@@ -599,7 +546,6 @@ function setupDietetics() {
     const foodSearchInput = document.getElementById('food-search-input');
     const foodResultsContainer = document.getElementById('food-results-container');
     const foodAlphaNav = document.getElementById('food-alpha-nav');
-
     function renderFoodList(foods) {
         const groupedFoods = foods.reduce((acc, food) => {
             const firstLetter = food.name.charAt(0).toUpperCase();
@@ -608,9 +554,7 @@ function setupDietetics() {
             return acc;
         }, {});
         const letters = Object.keys(groupedFoods).sort();
-        
         if (foodAlphaNav) foodAlphaNav.innerHTML = letters.map(letter => `<a href="#food-letter-${letter}">${letter}</a>`).join('');
-
         if (foodResultsContainer) {
             foodResultsContainer.innerHTML = letters.map(letter => `
                 <h3 id="food-letter-${letter}" class="food-group-header" tabindex="-1">${letter}</h3>
@@ -628,29 +572,22 @@ function setupDietetics() {
                 </div>`).join('');
         }
     }
-
     if (foodSearchInput) {
         renderFoodList(foodData);
         foodSearchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase().trim();
             const headers = foodResultsContainer.querySelectorAll('.food-group-header');
-            
             headers.forEach(header => {
                 const groupWrapper = header.nextElementSibling;
                 if (!groupWrapper) return;
-
                 const items = groupWrapper.querySelectorAll('.food-item');
                 let groupHasVisibleItems = false;
-                
                 items.forEach(item => {
                     const foodName = item.querySelector('h4').textContent.toLowerCase();
                     const isVisible = foodName.includes(searchTerm);
                     item.classList.toggle('hidden', !isVisible);
-                    if (isVisible) {
-                        groupHasVisibleItems = true;
-                    }
+                    if (isVisible) groupHasVisibleItems = true;
                 });
-
                 header.style.display = groupHasVisibleItems ? 'block' : 'none';
                 groupWrapper.style.display = groupHasVisibleItems ? 'block' : 'none';
             });
@@ -662,43 +599,78 @@ function setupDiagnosisDiagrams() {
     document.querySelectorAll('.diagram-area-svg').forEach(area => {
         const infoBox = area.closest('.visual-card, .grid').querySelector('.p-4.bg-gray-100');
         if (!infoBox) return;
-        
         const defaultText = infoBox.firstElementChild.textContent;
-        const updateInfo = () => {
-            if (infoBox) {
-                infoBox.innerHTML = `<p class="font-semibold">${area.dataset.info}</p>`;
-            }
-        };
-        const resetInfo = () => {
-            if (infoBox) {
-                infoBox.innerHTML = `<p class="text-center text-gray-500">${defaultText}</p>`;
-            }
-        };
-        
+        const updateInfo = () => { if (infoBox) infoBox.innerHTML = `<p class="font-semibold">${area.dataset.info}</p>`; };
+        const resetInfo = () => { if (infoBox) infoBox.innerHTML = `<p class="text-center text-gray-500">${defaultText}</p>`; };
         area.addEventListener('mouseover', updateInfo);
         area.addEventListener('focus', updateInfo);
         area.addEventListener('mouseout', resetInfo);
         area.addEventListener('blur', resetInfo);
     });
-
     const pulseSVG = document.getElementById('pulse-diagram-svg');
     if (pulseSVG) {
         const pulsePositions = pulseSVG.querySelectorAll('.pulse-pos-circle');
         const pulseInfoBoxes = document.querySelectorAll('.pulse-info-box');
-
         pulsePositions.forEach(pos => {
             pos.addEventListener('mouseover', () => {
                 const positionName = pos.dataset.pos;
                 pulsePositions.forEach(p => p.classList.toggle('active', p.dataset.pos === positionName));
                 pulseInfoBoxes.forEach(box => box.classList.toggle('active', box.dataset.pos === positionName));
             });
-
             pos.addEventListener('mouseout', () => {
                 pulsePositions.forEach(p => p.classList.remove('active'));
                 pulseInfoBoxes.forEach(box => box.classList.remove('active'));
             });
         });
     }
+}
+
+// --- LÓGICA DO SELETOR DE TEMA ---
+const themes = {
+    default: {
+        '--color-primary': '#1a746b', '--color-primary-dark': '#0b3d38', '--color-secondary': '#00a896',
+        '--color-background-start': '#f0fdfa', '--color-background-end': '#dcfce7', '--color-text': '#0b3d38',
+        '--color-text-muted': '#3f6662', '--color-accent': '#f7b801', '--color-accent-light': '#fef3c7'
+    },
+    ocean: {
+        '--color-primary': '#005f73', '--color-primary-dark': '#0a3a44', '--color-secondary': '#0a9396',
+        '--color-background-start': '#e0fbfc', '--color-background-end': '#c2f0f4', '--color-text': '#001219',
+        '--color-text-muted': '#003e4d', '--color-accent': '#ee9b00', '--color-accent-light': '#fef3d5'
+    },
+    sunset: {
+        '--color-primary': '#7c2d12', '--color-primary-dark': '#431407', '--color-secondary': '#c2410c',
+        '--color-background-start': '#fff7ed', '--color-background-end': '#ffedd5', '--color-text': '#431407',
+        '--color-text-muted': '#7c2d12', '--color-accent': '#f59e0b', '--color-accent-light': '#fef3c7'
+    }
+};
+
+function applyTheme(themeName) {
+    const theme = themes[themeName];
+    for (const key in theme) {
+        document.body.style.setProperty(key, theme[key]);
+    }
+    document.querySelectorAll('.theme-button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.theme === themeName);
+    });
+}
+
+function setupThemeSwitcher() {
+    const switcherContainers = [document.getElementById('theme-switcher'), document.getElementById('theme-switcher-mobile')];
+    switcherContainers.forEach(container => {
+        if (container) {
+            container.innerHTML = Object.keys(themes).map(themeName => `
+                <button class="theme-button" data-theme="${themeName}" aria-label="Tema ${themeName}">
+                    <span class="w-4 h-4 rounded-full" style="background-color: ${themes[themeName]['--color-primary']};"></span>
+                </button>
+            `).join('');
+            container.addEventListener('click', (e) => {
+                const button = e.target.closest('.theme-button');
+                if (button) {
+                    applyTheme(button.dataset.theme);
+                }
+            });
+        }
+    });
 }
 
 // --- Função para gerar os links de navegação (ESTRUTURA ALTERADA) ---
@@ -741,38 +713,23 @@ function generateNavLinks() {
             return `
                 <div class="nav-group">
                     <button class="nav-group-header flex items-center justify-between w-full p-2 rounded-lg" aria-expanded="false">
-                        <span class="flex items-center">
-                            <svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${item.icon}"></use></svg>
-                            <span class="font-semibold">${item.title}</span>
-                        </span>
+                        <span class="flex items-center"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${item.icon}"></use></svg><span class="font-semibold">${item.title}</span></span>
                         <svg class="w-5 h-5 shrink-0 text-gray-400 chevron"><use href="#icon-chevron-down"></use></svg>
                     </button>
                     <div class="nav-group-content pl-4 pt-1 space-y-1">
-                        ${item.links.map(link => `
-                            <a href="#${link.id}" class="sidebar-link flex items-center p-2 rounded-lg">
-                                <svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${link.icon}"></use></svg>
-                                <span>${link.title}</span>
-                            </a>
-                        `).join('')}
+                        ${item.links.map(link => `<a href="#${link.id}" class="sidebar-link flex items-center p-2 rounded-lg"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${link.icon}"></use></svg><span>${link.title}</span></a>`).join('')}
                     </div>
                 </div>`;
         } else {
-            return `
-                <a href="#${item.id}" class="sidebar-link flex items-center p-2 rounded-lg">
-                    <svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${item.icon}"></use></svg>
-                    <span>${item.title}</span>
-                </a>`;
+            return `<a href="#${item.id}" class="sidebar-link flex items-center p-2 rounded-lg"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${item.icon}"></use></svg><span>${item.title}</span></a>`;
         }
     };
-    
     const navHtml = navStructure.map(generateHtml).join('');
     allNavHubs.forEach(hub => hub.innerHTML = navHtml);
 }
 
-
 // --- PONTO DE ENTRADA DA APLICAÇÃO ---
 document.addEventListener('DOMContentLoaded', () => {
-    // Geração de conteúdo principal
     generateNavLinks(); 
     createAccordion('qi-accordion', qiData);
     createLifeCycleTimeline('female-cycles-timeline', lifeCyclesFemaleData, 'bg-pink-500');
@@ -782,32 +739,28 @@ document.addEventListener('DOMContentLoaded', () => {
     setupGlossary();
     setupDietetics();
     
-    // Configuração de componentes interativos
     setupTabs('qigong-tabs', 'qigong-tab-content');
+    setupTabs('diagnosis-tabs', 'diagnosis-tab-content'); // Nova chamada para as abas de diagnóstico
     setupSidebarLayout('meridian-navigation', 'meridian-content-area', meridianData, 'meridian-content-');
     setupSidebarLayout('anatomy-navigation', 'anatomy-content-area', anatomyData, 'anatomy-content-');
     setupSidebarLayout('zangfu-navigation', 'zangfu-content-area', zangFuPatternsData, 'zangfu-content-');
     activateTooltips();
     setupDiagnosisDiagrams();
     
-    // Inicializa o diagrama dos 5 Elementos
     if (document.getElementById('cinco-elementos')) {
         setup5ElementsDiagram();
         switchCycle('geracao');
     }
 
-    // Animação da barra lateral
+    setupThemeSwitcher();
+    applyTheme('default'); // Aplica o tema padrão ao carregar
+
     document.querySelectorAll('aside .sidebar-link, aside .nav-group').forEach((el, index) => {
         el.style.animationDelay = `${index * 0.07}s`;
     });
 
-    // Construção do índice de pesquisa
     createSearchIndex();
-    
-    // Seleciona as secções de conteúdo DEPOIS de serem criadas
     contentSections = mainContent.querySelectorAll('.content-section');
-    
-    // Mostra a secção inicial
     showSection('inicio', 'Início');
     updateActiveLink('inicio');
 });

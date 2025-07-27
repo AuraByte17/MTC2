@@ -65,7 +65,14 @@
                         <span class="sr-only">Fechar Menu</span>
                     </button>
                 </div>
-                <nav id="navigation-hub" class="space-y-1 overflow-y-auto"></nav>
+                <nav id="navigation-hub" class="space-y-1 overflow-y-auto flex-grow"></nav>
+                <!-- Seletor de Tema (Mobile) - A lógica será adicionada depois -->
+                <div class="mt-auto pt-4 border-t">
+                     <h4 class="text-sm font-semibold text-gray-500 mb-2 px-2">Tema</h4>
+                     <div id="theme-switcher-mobile" class="flex justify-around">
+                        <!-- Botões de Tema -->
+                     </div>
+                </div>
             </aside>
         </div>
 
@@ -76,7 +83,14 @@
                 <input type="search" id="desktop-search-input" placeholder="Pesquisa global..." class="w-full p-2 pl-8 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent transition">
                 <svg class="w-4 h-4 absolute top-1/2 left-2.5 -translate-y-1/2 text-gray-400"><use href="#icon-search"></use></svg>
             </div>
-            <nav id="desktop-navigation-hub" class="space-y-1 overflow-y-auto"></nav>
+            <nav id="desktop-navigation-hub" class="space-y-1 overflow-y-auto flex-grow"></nav>
+            <!-- Seletor de Tema -->
+            <div class="mt-auto pt-4 border-t">
+                 <h4 class="text-sm font-semibold text-gray-500 mb-2 px-2">Tema</h4>
+                 <div id="theme-switcher" class="flex justify-around">
+                    <!-- Botões de Tema serão inseridos aqui pelo JS -->
+                 </div>
+            </div>
         </aside>
 
         <!-- Área de Conteúdo Principal -->
@@ -150,7 +164,6 @@
                                   <button id="btn-controlo" class="tab-button">Controlo (Ke)</button>
                                </div>
                                <div class="grid md:grid-cols-2 gap-8 items-center">
-                                  <!-- Container do Diagrama dos 5 Elementos com Esferas SVG -->
                                   <div id="element-diagram-container" class="relative w-full max-w-xs mx-auto aspect-square">
                                       <svg id="element-diagram-svg" class="absolute inset-0 w-full h-full" viewBox="0 0 300 300">
                                           <g id="cycle-paths-container"></g>
@@ -205,14 +218,22 @@
                             </div>
                         </div>
                         
+                        <!-- Nova Estrutura de Abas para Diagnóstico Visual -->
                         <div class="visual-card">
-                            <div class="card-header"><h3>Diagnóstico Visual Interativo</h3></div>
-                            <div class="card-content">
-                                <p class="card-prose mb-6">Passe o rato sobre as diferentes áreas dos diagramas para ver as correspondências de diagnóstico na Medicina Tradicional Chinesa.</p>
-                                <div class="grid md:grid-cols-1 lg:grid-cols-2 gap-8">
-                                    <!-- Diagrama da Língua (Melhorado) -->
-                                    <div class="visual-card p-4">
-                                        <h4 class="text-center font-bold text-lg mb-2 text-primary">Diagnóstico da Língua</h4>
+                            <div id="diagnosis-tabs" class="border-b border-gray-200">
+                                <nav class="flex -mb-px" aria-label="Tabs">
+                                    <button role="tab" aria-controls="lingua-panel" aria-selected="true" class="tab-button active">
+                                        Diagnóstico da Língua
+                                    </button>
+                                    <button role="tab" aria-controls="pulso-panel" aria-selected="false" class="tab-button">
+                                        Diagnóstico do Pulso
+                                    </button>
+                                </nav>
+                            </div>
+                            <div id="diagnosis-tab-content">
+                                <div id="lingua-panel" role="tabpanel" class="tab-content active">
+                                    <div class="card-content">
+                                        <p class="card-prose text-sm text-center mb-4">Passe o rato sobre as áreas para ver as correspondências.</p>
                                         <div class="diagram-container relative max-w-xs mx-auto">
                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 200" class="rounded-lg bg-pink-50 shadow-inner">
                                                 <defs>
@@ -224,11 +245,11 @@
                                                 <path fill="url(#tongueGradient)" d="M75,198 C20,150 25,110 75,22 C125,110 130,150 75,198 Z" />
                                                 <path fill="#d17c90" d="M75,198 C73,180 73,150 75,110 C77,150 77,180 75,198 Z" opacity="0.4" />
                                             </svg>
-                                            <!-- SVG de sobreposição para interatividade (Melhorado) -->
                                             <svg class="absolute top-0 left-0 w-full h-full" viewBox="0 0 150 200">
                                                 <path class="diagram-area-svg" data-info="Ponta: Coração. Reflete o estado do Shen, ansiedade e insónia." d="M75 198 C 60 173, 60 163, 75 150 C 90 163, 90 173, 75 198 Z" />
                                                 <path class="diagram-area-svg" data-info="Área atrás da ponta: Pulmão. Mostra condições do sistema respiratório e do Wei Qi." d="M75 150 C 55 140, 55 115, 75 110 C 95 115, 95 140, 75 150 Z" />
-                                                <path class="diagram-area-svg" data-info="Laterais: Fígado e Vesícula Biliar. Indicam estagnação de Qi, irritabilidade e tensão." d="M55 115 C 35 110, 30 45, 55 40 V 115 Z M95 115 C 115 110, 120 45, 95 40 V 115 Z" />
+                                                <path class="diagram-area-svg" data-info="Laterais: Fígado e Vesícula Biliar. Indicam estagnação de Qi, irritabilidade e tensão." d="M56,115 C 35,115 28,80 45,45 L55,40 C 55,70 55,95 56,115Z" />
+                                                <path class="diagram-area-svg" data-info="Laterais: Fígado e Vesícula Biliar. Indicam estagnação de Qi, irritabilidade e tensão." d="M94,115 C 115,115 122,80 105,45 L95,40 C 95,70 95,95 94,115Z" />
                                                 <path class="diagram-area-svg" data-info="Centro: Baço e Estômago. Reflete o estado da digestão e da produção de Qi e Sangue." d="M75 110 C 60 115, 55 40, 75 40 C 95 40, 90 115, 75 110 Z" />
                                                 <path class="diagram-area-svg" data-info="Raiz: Rim, Bexiga, Intestinos. Mostra a constituição (Jing) e o estado do Aquecedor Inferior." d="M75 40 C 55 45, 55 22, 75 22 C 95 22, 95 45, 75 40 Z" />
                                             </svg>
@@ -237,33 +258,32 @@
                                             <p class="text-gray-500 text-sm">Passe o rato sobre uma área.</p>
                                         </div>
                                     </div>
-                                    <!-- Diagrama do Pulso -->
-                                    <div class="visual-card p-4">
-                                        <h4 class="text-center font-bold text-lg mb-4 text-primary">Diagnóstico do Pulso</h4>
-                                        <div class="flex flex-col items-center">
-                                            <svg id="pulse-diagram-svg" class="w-48 h-auto mb-4" viewBox="0 0 100 120">
-                                                <path d="M20,110 C20,80 30,70 50,70 C70,70 80,80 80,110" stroke="#d1a377" stroke-width="12" fill="none" stroke-linecap="round"/>
-                                                <path d="M50,70 V0" stroke="#e6be99" stroke-width="20" fill="none" stroke-linecap="round"/>
-                                                <circle id="pulse-pos-cun" data-pos="cun" class="pulse-pos-circle" cx="50" cy="20" r="8"/>
-                                                <circle id="pulse-pos-guan" data-pos="guan" class="pulse-pos-circle" cx="50" cy="40" r="8"/>
-                                                <circle id="pulse-pos-chi" data-pos="chi" class="pulse-pos-circle" cx="50" cy="60" r="8"/>
-                                                <text x="62" y="24" class="pulse-pos-label">Cun</text>
-                                                <text x="62" y="44" class="pulse-pos-label">Guan</text>
-                                                <text x="62" y="64" class="pulse-pos-label">Chi</text>
-                                            </svg>
-                                            <div id="pulse-info-container" class="w-full grid grid-cols-2 gap-4 text-center">
-                                                <div>
-                                                    <h5 class="font-bold text-gray-700">Pulso Esquerdo</h5>
-                                                    <div id="pulse-info-left-cun" class="pulse-info-box" data-pos="cun"><strong class="text-red-600">Coração</strong><br><span class="text-xs">(ID)</span></div>
-                                                    <div id="pulse-info-left-guan" class="pulse-info-box" data-pos="guan"><strong class="text-green-600">Fígado</strong><br><span class="text-xs">(VB)</span></div>
-                                                    <div id="pulse-info-left-chi" class="pulse-info-box" data-pos="chi"><strong class="text-blue-600">Rim Yin</strong><br><span class="text-xs">(B)</span></div>
-                                                </div>
-                                                <div>
-                                                    <h5 class="font-bold text-gray-700">Pulso Direito</h5>
-                                                    <div id="pulse-info-right-cun" class="pulse-info-box" data-pos="cun"><strong class="text-gray-500">Pulmão</strong><br><span class="text-xs">(IG)</span></div>
-                                                    <div id="pulse-info-right-guan" class="pulse-info-box" data-pos="guan"><strong class="text-orange-500">Baço</strong><br><span class="text-xs">(E)</span></div>
-                                                    <div id="pulse-info-right-chi" class="pulse-info-box" data-pos="chi"><strong class="text-blue-800">Rim Yang</strong><br><span class="text-xs">(TA)</span></div>
-                                                </div>
+                                </div>
+                                <div id="pulso-panel" role="tabpanel" class="tab-content">
+                                    <div class="card-content flex flex-col items-center">
+                                        <p class="card-prose text-sm text-center mb-4">Passe o rato sobre as posições para ver os órgãos correspondentes.</p>
+                                        <svg id="pulse-diagram-svg" class="w-48 h-auto mb-4" viewBox="0 0 100 120">
+                                            <path d="M20,110 C20,80 30,70 50,70 C70,70 80,80 80,110" stroke="#d1a377" stroke-width="12" fill="none" stroke-linecap="round"/>
+                                            <path d="M50,70 V0" stroke="#e6be99" stroke-width="20" fill="none" stroke-linecap="round"/>
+                                            <circle id="pulse-pos-cun" data-pos="cun" class="pulse-pos-circle" cx="50" cy="20" r="8"/>
+                                            <circle id="pulse-pos-guan" data-pos="guan" class="pulse-pos-circle" cx="50" cy="40" r="8"/>
+                                            <circle id="pulse-pos-chi" data-pos="chi" class="pulse-pos-circle" cx="50" cy="60" r="8"/>
+                                            <text x="62" y="24" class="pulse-pos-label">Cun</text>
+                                            <text x="62" y="44" class="pulse-pos-label">Guan</text>
+                                            <text x="62" y="64" class="pulse-pos-label">Chi</text>
+                                        </svg>
+                                        <div id="pulse-info-container" class="w-full max-w-sm grid grid-cols-2 gap-4 text-center">
+                                            <div>
+                                                <h5 class="font-bold text-gray-700">Pulso Esquerdo</h5>
+                                                <div id="pulse-info-left-cun" class="pulse-info-box" data-pos="cun"><strong class="text-red-600">Coração</strong><br><span class="text-xs">(ID)</span></div>
+                                                <div id="pulse-info-left-guan" class="pulse-info-box" data-pos="guan"><strong class="text-green-600">Fígado</strong><br><span class="text-xs">(VB)</span></div>
+                                                <div id="pulse-info-left-chi" class="pulse-info-box" data-pos="chi"><strong class="text-blue-600">Rim Yin</strong><br><span class="text-xs">(B)</span></div>
+                                            </div>
+                                            <div>
+                                                <h5 class="font-bold text-gray-700">Pulso Direito</h5>
+                                                <div id="pulse-info-right-cun" class="pulse-info-box" data-pos="cun"><strong class="text-gray-500">Pulmão</strong><br><span class="text-xs">(IG)</span></div>
+                                                <div id="pulse-info-right-guan" class="pulse-info-box" data-pos="guan"><strong class="text-orange-500">Baço</strong><br><span class="text-xs">(E)</span></div>
+                                                <div id="pulse-info-right-chi" class="pulse-info-box" data-pos="chi"><strong class="text-blue-800">Rim Yang</strong><br><span class="text-xs">(TA)</span></div>
                                             </div>
                                         </div>
                                     </div>
