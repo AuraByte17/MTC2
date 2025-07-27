@@ -117,24 +117,28 @@ aside { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
 .accordion-button { padding: 0.75rem 1.5rem; width: 100%; display: flex; justify-content: space-between; align-items: center; text-align: left; font-weight: 600; color: var(--color-text); }
 .accordion-button[aria-expanded="true"] + .accordion-content { max-height: 2500px; padding: 1rem 1.5rem 1.5rem; border-top: 1px solid var(--color-subtle-gray); opacity: 1; transform: translateY(0); }
 
-/* --- 5 Elementos --- */
+/* --- 5 Elementos (Alterado) --- */
 .element-sphere { 
     cursor: pointer;
+    transition: transform 0.3s ease;
+}
+.element-sphere .sphere-circle {
     transition: all 0.3s ease;
 }
 .element-sphere .sphere-text {
     font-size: 14px;
     font-weight: 600;
-    fill: white;
+    fill: black; /* Alterado para preto */
     text-anchor: middle;
     pointer-events: none;
-    text-shadow: 0 0 4px rgba(0,0,0,0.5);
+}
+.element-sphere.active {
+    transform: scale(1.1); /* Aumenta o tamanho do grupo todo */
+    transform-origin: center;
 }
 .element-sphere.active .sphere-circle {
     stroke: white;
     stroke-width: 3px;
-    transform: scale(1.1);
-    transform-origin: center;
 }
 
 .cycle-path { 

@@ -415,7 +415,7 @@ function setupZangFuLayout(data) {
     `).join('');
 }
 
-// --- LÓGICA DOS 5 ELEMENTOS (ATUALIZADA PARA ESFERAS SVG) ---
+// --- LÓGICA DOS 5 ELEMENTOS ---
 const elementDiagramSVG = document.getElementById('element-diagram-svg');
 const elementDetailsContainer = document.getElementById('element-details-container');
 const pathsContainer = document.getElementById('cycle-paths-container');
@@ -463,7 +463,7 @@ function setup5ElementsDiagram() {
         const el = fiveElementsData[key];
         const { x, y } = elementCoords[key];
         return `
-            <g id="${key}" class="element-sphere" style="--element-color: var(--el-${el.color});">
+            <g id="${key}" class="element-sphere">
                 <defs>
                     <radialGradient id="grad-${key}" cx="30%" cy="30%" r="70%">
                         <stop offset="0%" stop-color="white" stop-opacity="0.5" />
@@ -701,7 +701,7 @@ function setupDiagnosisDiagrams() {
     }
 }
 
-// --- Função para gerar os links de navegação (COM NOVOS ÍCONES) ---
+// --- Função para gerar os links de navegação (ESTRUTURA ALTERADA) ---
 function generateNavLinks() {
     const navStructure = [
         { id: 'inicio', title: 'Início', icon: 'icon-home' },
@@ -711,12 +711,12 @@ function generateNavLinks() {
                 { id: 'substancias-fundamentais', title: 'Substâncias Fundamentais', icon: 'icon-atom' },
                 { id: 'tipos-de-qi', title: 'Tipos de Qi', icon: 'icon-wind' },
                 { id: 'cinco-elementos', title: 'Os 5 Elementos', icon: 'icon-star' },
-                { id: 'ciclos-de-vida', title: 'Ciclos de Vida', icon: 'icon-refresh-cw' }
+                { id: 'ciclos-de-vida', title: 'Ciclos de Vida', icon: 'icon-refresh-cw' },
+                { id: 'meridianos', title: 'Meridianos e Pontos', icon: 'icon-git-branch' },
+                { id: 'anatomia-energetica', title: 'Anatomia Energética', icon: 'icon-body' },
+                { id: 'padroes-zang-fu', title: 'Padrões Zang-Fu', icon: 'icon-clipboard-heart' },
             ]
         },
-        { id: 'meridianos', title: 'Meridianos e Pontos', icon: 'icon-git-branch' },
-        { id: 'anatomia-energetica', title: 'Anatomia Energética', icon: 'icon-body' },
-        { id: 'padroes-zang-fu', title: 'Padrões Zang-Fu', icon: 'icon-clipboard-heart' },
         {
             title: 'Diagnóstico', icon: 'icon-stethoscope',
             links: [
