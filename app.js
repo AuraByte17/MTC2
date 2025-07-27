@@ -150,33 +150,84 @@ searchResultsContainer.addEventListener('click', (e) => {
 
 // --- FUNÇÕES DE GERAÇÃO DE CONTEÚDO ---
 
+/**
+ * [MODIFIED] Sets up the Yin-Yang section with an improved SVG and a clearer card layout.
+ */
 function setupYinYangSection() {
     const container = document.getElementById('yin-yang-container');
     if (!container) return;
+
+    // New, more attractive SVG with gradients and animation
+    const newSvg = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" class="w-full max-w-xs mx-auto yin-yang-svg">
+        <defs>
+            <linearGradient id="yin-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#4a5568" />
+                <stop offset="100%" stop-color="#1a202c" />
+            </linearGradient>
+            <linearGradient id="yang-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#ffffff" />
+                <stop offset="100%" stop-color="#e2e8f0" />
+            </linearGradient>
+            <filter id="soft-glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feDropShadow dx="0" dy="5" stdDeviation="8" flood-color="#000" flood-opacity="0.15"/>
+            </filter>
+        </defs>
+        <g filter="url(#soft-glow)">
+            <circle cx="100" cy="100" r="98" fill="url(#yang-grad)" stroke="#e2e8f0" stroke-width="2"/>
+            <path fill="url(#yin-grad)" d="M100,2 a98,98 0 0,0 0,196 a49,49 0 0,1 0,-98 a49,49 0 0,0 0,-98 Z"/>
+            <circle fill="url(#yin-grad)" cx="100" cy="149" r="18"/>
+            <circle fill="url(#yang-grad)" cx="100" cy="51" r="18"/>
+        </g>
+    </svg>`;
+
     container.innerHTML = `
         <div class="card-header"><h3>${yinYangData.title}</h3></div>
         <div class="card-content">
-            <div class="grid md:grid-cols-2 gap-8 items-center">
-                <div>${yinYangData.svg}</div>
+            <div class="grid lg:grid-cols-2 gap-8 items-center">
+                <div class="p-4">${newSvg}</div>
                 <div class="card-prose">${yinYangData.content}</div>
             </div>
-            <div class="card-prose mt-6">${yinYangData.table}</div>
+            <div class="mt-8 grid md:grid-cols-2 gap-6">
+                <div class="yin-card">
+                    <h4 class="font-bold text-xl mb-3 text-center text-gray-100">YIN (阴)</h4>
+                    <ul class="list-disc list-inside space-y-2 text-gray-300">
+                        <li>Noite, Lua, Escuro, Frio</li>
+                        <li>Repouso, Passivo, Interior, Baixo</li>
+                        <li>Substância, Matéria, Estrutura</li>
+                    </ul>
+                </div>
+                <div class="yang-card">
+                    <h4 class="font-bold text-xl mb-3 text-center text-gray-800">YANG (阳)</h4>
+                    <ul class="list-disc list-inside space-y-2 text-gray-600">
+                        <li>Dia, Sol, Luz, Calor</li>
+                        <li>Atividade, Ativo, Exterior, Cima</li>
+                        <li>Função, Energia, Movimento</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     `;
 }
 
+/**
+ * [MODIFIED] Handles the expanding/collapsing logic for the therapies grid.
+ */
 function setupTherapiesGrid() {
     const container = document.getElementById('therapies-grid-container');
     if (!container) return;
+    
     container.innerHTML = `
         <div class="text-center mb-8">
             <h2 class="text-3xl font-playfair font-bold text-primary">Terapêuticas da MTC</h2>
-            <p class="text-gray-600 mt-2 max-w-2xl mx-auto">Explore as principais modalidades de tratamento. Clique em cada cartão para aprender mais sobre os seus mecanismos, indicações e contraindicações.</p>
+            <p class="text-gray-600 mt-2 max-w-2xl mx-auto">Explore as principais modalidades de tratamento. Clique em cada cartão para aprender mais.</p>
         </div>
         <div class="therapies-grid">
             ${therapiesData.map(therapy => `
                 <div class="therapy-card" data-id="${therapy.id}">
-                    <h3 class="therapy-card-title">${therapy.title}</h3>
+                    <div class="therapy-card-title-wrapper">
+                        <h3 class="therapy-card-title">${therapy.title}</h3>
+                    </div>
                     <div class="therapy-content-wrapper">
                         <div class="therapy-content-inner">
                             ${therapy.content}
@@ -186,23 +237,43 @@ function setupTherapiesGrid() {
             `).join('')}
         </div>
     `;
-    container.addEventListener('click', (e) => {
+
+    const grid = container.querySelector('.therapies-grid');
+    if (!grid) return;
+
+    grid.addEventListener('click', (e) => {
         const card = e.target.closest('.therapy-card');
-        if (card) {
-            card.classList.toggle('active');
+        if (!card) return;
+
+        const isExpanded = card.classList.contains('expanded');
+
+        if (isExpanded) {
+            card.classList.remove('expanded');
+            grid.classList.remove('has-expanded');
+        } else {
+            const alreadyExpandedCard = grid.querySelector('.expanded');
+            if (alreadyExpandedCard) return; // Prevent opening another while one is open
+
+            card.classList.add('expanded');
+            grid.classList.add('has-expanded');
+            setTimeout(() => {
+                 card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300); // Delay scroll to allow for layout shift
         }
     });
 }
+
 
 function createAccordion(containerId, data) {
     const container = document.getElementById(containerId);
     if (!container) return;
     container.innerHTML = data.map((item, index) => {
         const uniqueId = `${containerId}-item-${index}`;
+        // MODIFICATION: Added item.id as a data attribute for potential future use
         return `
-        <div class="accordion-item">
+        <div class="accordion-item" data-id="${item.id || ''}">
             <button class="accordion-button" aria-expanded="false" aria-controls="${uniqueId}-content" id="${uniqueId}-button">
-                <span class="flex items-center">
+                <span class="flex items-center text-left">
                     ${item.color ? `<span class="w-3 h-3 rounded-full mr-3" style="background-color: var(--el-${item.color});"></span>` : ''}
                     ${item.name || item.title}
                 </span>
@@ -237,32 +308,8 @@ function createLifeCycleTimeline(containerId, data, colorClass) {
         </div>`).join('');
 }
 
-function setupTabs(tabsContainerId, tabContentContainerId) {
-    const tabsContainer = document.getElementById(tabsContainerId);
-    const tabContentContainer = document.getElementById(tabContentContainerId);
-    if (!tabsContainer || !tabContentContainer) return;
-
-    const tabs = tabsContainer.querySelectorAll('[role="tab"]');
-    const tabPanels = tabContentContainer.querySelectorAll('[role="tabpanel"]');
-
-    tabsContainer.addEventListener('click', (e) => {
-        const clickedTab = e.target.closest('[role="tab"]');
-        if (!clickedTab) return;
-
-        tabs.forEach(tab => {
-            tab.setAttribute('aria-selected', 'false');
-            tab.classList.remove('active');
-        });
-        clickedTab.setAttribute('aria-selected', 'true');
-        clickedTab.classList.add('active');
-
-        tabPanels.forEach(panel => panel.classList.remove('active'));
-        const targetPanel = document.getElementById(clickedTab.getAttribute('aria-controls'));
-        if (targetPanel) {
-            targetPanel.classList.add('active');
-        }
-    });
-}
+// [REMOVED] setupTabs function is no longer needed for Diagnosis.
+// The generic createAccordion function is used instead.
 
 function setupSidebarLayout(navId, contentId, data, idPrefix = 'content-') {
     const navContainer = document.getElementById(navId);
@@ -276,19 +323,18 @@ function setupSidebarLayout(navId, contentId, data, idPrefix = 'content-') {
         </button>
     `).join('');
     
-    if (navId === 'meridian-navigation') {
-        contentContainer.innerHTML = data.map(item => setupMeridianLayout(item, idPrefix)).join('');
-    } else if (navId === 'zangfu-navigation') {
+    // [MODIFIED] Removed meridian-navigation logic as it now uses an accordion
+    if (navId === 'zangfu-navigation') {
         contentContainer.innerHTML = setupZangFuLayout(data);
     } else if (navId === 'masters-navigation') {
         contentContainer.innerHTML = data.map(item => setupMasterLayout(item, idPrefix)).join('');
-    } else {
+    } else { // This now only applies to 'anatomy-navigation'
         contentContainer.innerHTML = data.map(item => `
             <div class="content-card" id="${idPrefix}${item.id}">
                 <div class="pb-4 mb-4 border-b-2" style="border-color: var(--el-${item.color || 'primary'});">
                     <h3 class="text-2xl font-playfair font-bold" style="color: var(--el-${item.color || 'primary'});">${item.name || item.title}</h3>
                 </div>
-                ${item.content ? `<div class="text-gray-600">${item.content}</div>` : ''}
+                ${item.content ? `<div class="card-prose">${item.content}</div>` : ''}
             </div>`).join('');
     }
     
@@ -319,9 +365,28 @@ function setupSidebarLayout(navId, contentId, data, idPrefix = 'content-') {
     if (navItems.length > 0) navItems[0].click();
 }
 
-function setupMeridianLayout(item, idPrefix) { return `<div class="content-card" id="${idPrefix}${item.id}"><div class="pb-4 mb-4 border-b-2" style="border-color: var(--el-${item.color || 'gray'});"><h3 class="text-2xl font-playfair font-bold" style="color: var(--el-${item.color || 'gray'});">${item.name}</h3><p class="font-semibold text-gray-500">${item.element} / ${item.time}</p></div><div class="card-prose text-sm"><div class="grid md:grid-cols-2 gap-x-8"><div><h4 class="font-bold !text-base !mb-2 !mt-0">Funções Principais</h4><p class="text-gray-600">${item.functions}</p></div><div><h4 class="font-bold !text-base !mb-2 !mt-0">Sinais de Desequilíbrio</h4><p class="text-gray-600">${item.imbalances}</p></div></div><h4 class="font-bold !text-base !mb-2">Pontos Especiais</h4><div class="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-2 text-xs p-3 bg-gray-50 rounded-md"><div><strong>Fonte (Yuan):</strong> ${item.yuan_source}</div><div><strong>Conexão (Luo):</strong> ${item.luo_connecting}</div><div><strong>Fenda (Xi):</strong> ${item.xi_cleft}</div></div><h4 class="font-bold !text-base !mb-2">Pontos Shu Antigos</h4><div class="overflow-x-auto"><table class="w-full text-left !text-xs"><thead class="bg-gray-100"><tr><th class="p-2 font-semibold">Tipo</th><th class="p-2 font-semibold">Elemento</th><th class="p-2 font-semibold">Ponto</th><th class="p-2 font-semibold">Funções</th></tr></thead><tbody>${item.five_shu.map(p => `<tr class="border-b"><td class="p-2">${p.type}</td><td class="p-2">${p.element}</td><td class="p-2 font-bold">${p.point}</td><td class="p-2">${p.functions}</td></tr>`).join('')}</tbody></table></div><h4 class="font-bold !text-base !mb-2">Lista Completa de Pontos</h4><div class="space-y-3 max-h-80 overflow-y-auto pr-2">${item.points.map(p => `<div class="p-2 border-l-2 border-gray-200 hover:bg-gray-50"><strong class="text-primary-dark">${p.id} - ${p.name} (${p.character}) - ${p.pt_name}</strong><p class="text-gray-600 !mb-0">${p.functions}</p></div>`).join('')}</div></div></div>`; }
+/**
+ * [MODIFIED] This function now just returns the content for a meridian panel, to be used inside an accordion.
+ */
+function getMeridianPanelContent(item) { 
+    return `<div class="card-prose text-sm"><div class="grid md:grid-cols-2 gap-x-8"><div><h4 class="font-bold !text-base !mb-2 !mt-0">Funções Principais</h4><p class="text-gray-600">${item.functions}</p></div><div><h4 class="font-bold !text-base !mb-2 !mt-0">Sinais de Desequilíbrio</h4><p class="text-gray-600">${item.imbalances}</p></div></div><h4 class="font-bold !text-base !mb-2">Pontos Especiais</h4><div class="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-2 text-xs p-3 bg-gray-50 rounded-md"><div><strong>Fonte (Yuan):</strong> ${item.yuan_source}</div><div><strong>Conexão (Luo):</strong> ${item.luo_connecting}</div><div><strong>Fenda (Xi):</strong> ${item.xi_cleft}</div></div><h4 class="font-bold !text-base !mb-2">Pontos Shu Antigos</h4><div class="overflow-x-auto"><table class="w-full text-left !text-xs"><thead class="bg-gray-100"><tr><th class="p-2 font-semibold">Tipo</th><th class="p-2 font-semibold">Elemento</th><th class="p-2 font-semibold">Ponto</th><th class="p-2 font-semibold">Funções</th></tr></thead><tbody>${item.five_shu.map(p => `<tr class="border-b"><td class="p-2">${p.type}</td><td class="p-2">${p.element}</td><td class="p-2 font-bold">${p.point}</td><td class="p-2">${p.functions}</td></tr>`).join('')}</tbody></table></div><h4 class="font-bold !text-base !mb-2">Lista Completa de Pontos</h4><div class="space-y-3 max-h-80 overflow-y-auto pr-2">${item.points.map(p => `<div class="p-2 border-l-2 border-gray-200 hover:bg-gray-50"><strong class="text-primary-dark">${p.id} - ${p.name} (${p.character}) - ${p.pt_name}</strong><p class="text-gray-600 !mb-0">${p.functions}</p></div>`).join('')}</div></div>`; 
+}
+
+/**
+ * [NEW] Sets up the Meridians section as an accordion.
+ */
+function setupMeridianAccordion() {
+    const accordionData = meridianData.map(meridian => ({
+        title: meridian.name,
+        content: getMeridianPanelContent(meridian),
+        color: meridian.color,
+        id: meridian.id
+    }));
+    createAccordion('meridian-accordion-container', accordionData);
+}
+
 function setupZangFuLayout(data) { return data.map((organ, organIndex) => `<div class="content-card" id="zangfu-content-${organ.id}"><div class="pb-4 mb-4 border-b-2" style="border-color: var(--el-${organ.color});"><h3 class="text-2xl font-playfair font-bold" style="color: var(--el-${organ.color});">Padrões do ${organ.name}</h3></div><div class="space-y-4" id="zangfu-accordion-${organ.id}">${organ.patterns.map((pattern, patternIndex) => { const uniqueId = `zangfu-${organIndex}-pattern-${patternIndex}`; return `<div class="accordion-item"><button class="accordion-button" aria-expanded="false" aria-controls="${uniqueId}-content" id="${uniqueId}-button"><span class="flex items-center gap-2"><svg class="w-5 h-5 text-gray-400"><use href="#icon-clipboard-heart"></use></svg>${pattern.name}</span><svg class="w-5 h-5 shrink-0 text-gray-400 chevron"><use href="#icon-chevron-down"></use></svg></button><div class="accordion-content card-prose text-sm" id="${uniqueId}-content" role="region" aria-labelledby="${uniqueId}-button"><h4 class="font-bold text-gray-700">Manifestações Clínicas:</h4><p>${pattern.symptoms}</p><h4 class="font-bold text-gray-700">Língua:</h4><p>${pattern.tongue}</p><h4 class="font-bold text-gray-700">Pulso:</h4><p>${pattern.pulse}</p><h4 class="font-bold text-gray-700">Princípio de Tratamento:</h4><p class="text-green-800 font-semibold">${pattern.treatmentPrinciple}</p></div></div>`; }).join('')}</div></div>`).join(''); }
-function setupMasterLayout(item, idPrefix) { return `<div class="content-card" id="${idPrefix}${item.id}"><div class="pb-4 mb-4 border-b-2" style="border-color: var(--el-water);"><img src="${item.image_placeholder}" alt="Retrato de ${item.name}" class="w-full h-48 object-cover rounded-lg mb-4 shadow-md"><h3 class="text-2xl font-playfair font-bold" style="color: var(--el-water);">${item.name}</h3><p class="font-semibold text-gray-500 text-sm">${item.dynasty}</p></div>${item.content}</div>`; }
+function setupMasterLayout(item, idPrefix) { return `<div class="content-card" id="${idPrefix}${item.id}"><div class="pb-4 mb-4 border-b-2" style="border-color: var(--el-water);"><img src="${item.image_placeholder}" alt="Retrato de ${item.name}" class="w-full h-48 object-cover rounded-lg mb-4 shadow-md"><h3 class="text-2xl font-playfair font-bold" style="color: var(--el-water);">${item.name}</h3><p class="font-semibold text-gray-500 text-sm">${item.dynasty}</p></div><div class="card-prose">${item.content}</div></div>`; }
 
 // --- LÓGICA DOS 5 ELEMENTOS ---
 const elementDiagramSVG = document.getElementById('element-diagram-svg');
@@ -348,7 +413,7 @@ const cyclePaths = {
         { id: 'madeira-terra', d: `M ${elementCoords.madeira.x} ${elementCoords.madeira.y} L ${elementCoords.terra.x} ${elementCoords.terra.y}` }, 
         { id: 'fogo-metal', d: `M ${elementCoords.fogo.x} ${elementCoords.fogo.y} L ${elementCoords.metal.x} ${elementCoords.metal.y}` }, 
         { id: 'terra-agua', d: `M ${elementCoords.terra.x} ${elementCoords.terra.y} L ${elementCoords.agua.x} ${elementCoords.agua.y}` }, 
-        { id: 'metal-madeira', d: `M ${elementCoords.metal.x} ${elementCoords.metal.y} L ${elementCoords.madeira.x} ${elementCoords.madeira.y}` }, // CORRIGIDO AQUI
+        { id: 'metal-madeira', d: `M ${elementCoords.metal.x} ${elementCoords.metal.y} L ${elementCoords.madeira.x} ${elementCoords.madeira.y}` },
         { id: 'agua-fogo', d: `M ${elementCoords.agua.x} ${elementCoords.agua.y} L ${elementCoords.fogo.x} ${elementCoords.fogo.y}` } 
     ] 
 };
@@ -364,6 +429,89 @@ function setupGlossary() { const glossaryContainer = document.getElementById('gl
 function activateTooltips() { document.body.addEventListener('mouseover', e => { const term = e.target.closest('.tooltip-term'); if(term) { const existingTooltip = term.querySelector('.tooltip-box'); if (!existingTooltip) { const termKey = term.dataset.term.toLowerCase(); if (glossaryData[termKey]) { const tooltipBox = document.createElement('div'); tooltipBox.className = 'tooltip-box'; tooltipBox.textContent = glossaryData[termKey].definition; term.appendChild(tooltipBox); } } } }); }
 function setupDietetics() { const foodSearchInput = document.getElementById('food-search-input'); const foodResultsContainer = document.getElementById('food-results-container'); const foodAlphaNav = document.getElementById('food-alpha-nav'); function renderFoodList(foods) { const groupedFoods = foods.reduce((acc, food) => { const firstLetter = food.name.charAt(0).toUpperCase(); if (!acc[firstLetter]) acc[firstLetter] = []; acc[firstLetter].push(food); return acc; }, {}); const letters = Object.keys(groupedFoods).sort(); if (foodAlphaNav) foodAlphaNav.innerHTML = letters.map(letter => `<a href="#food-letter-${letter}">${letter}</a>`).join(''); if (foodResultsContainer) { foodResultsContainer.innerHTML = letters.map(letter => `<h3 id="food-letter-${letter}" class="food-group-header" tabindex="-1">${letter}</h3><div class="food-group-items">${groupedFoods[letter].map(food => `<div class="food-item visual-card p-4 mb-3"><h4 class="font-bold text-lg text-green-800">${food.name}</h4><div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm mt-2"><div><strong>Temp:</strong> <span class="font-semibold">${food.temp}</span></div><div><strong>Sabor:</strong> <span class="font-semibold">${food.flavor}</span></div><div class="col-span-2"><strong>Órgãos:</strong> <span class="font-semibold">${food.organs}</span></div></div><p class="text-sm mt-2"><strong>Ações:</strong> ${food.actions}</p></div>`).join('')}</div>`).join(''); } } if (foodSearchInput) { renderFoodList(foodData); foodSearchInput.addEventListener('input', (e) => { const searchTerm = e.target.value.toLowerCase().trim(); const headers = foodResultsContainer.querySelectorAll('.food-group-header'); headers.forEach(header => { const groupWrapper = header.nextElementSibling; if (!groupWrapper) return; const items = groupWrapper.querySelectorAll('.food-item'); let groupHasVisibleItems = false; items.forEach(item => { const foodName = item.querySelector('h4').textContent.toLowerCase(); const isVisible = foodName.includes(searchTerm); item.classList.toggle('hidden', !isVisible); if (isVisible) groupHasVisibleItems = true; }); header.style.display = groupHasVisibleItems ? 'block' : 'none'; groupWrapper.style.display = groupHasVisibleItems ? 'block' : 'none'; }); }); } }
 function setupDiagnosisDiagrams() { document.querySelectorAll('.diagram-area-svg').forEach(area => { const infoBox = area.closest('.diagram-container').nextElementSibling; if (!infoBox) return; const defaultText = infoBox.firstElementChild.textContent; const updateInfo = () => { if (infoBox) infoBox.innerHTML = `<p class="font-semibold">${area.dataset.info}</p>`; }; const resetInfo = () => { if (infoBox) infoBox.innerHTML = `<p class="text-center text-gray-500">${defaultText}</p>`; }; area.addEventListener('mouseover', updateInfo); area.addEventListener('focus', updateInfo); area.addEventListener('mouseout', resetInfo); area.addEventListener('blur', resetInfo); }); const pulseSVG = document.getElementById('pulse-diagram-svg'); if (pulseSVG) { const pulsePositions = pulseSVG.querySelectorAll('.pulse-pos-circle'); const pulseInfoBoxes = document.querySelectorAll('.pulse-info-box'); pulsePositions.forEach(pos => { pos.addEventListener('mouseover', () => { const positionName = pos.dataset.pos; pulsePositions.forEach(p => p.classList.toggle('active', p.dataset.pos === positionName)); pulseInfoBoxes.forEach(box => box.classList.toggle('active', box.dataset.pos === positionName)); }); pos.addEventListener('mouseout', () => { pulsePositions.forEach(p => p.classList.remove('active')); pulseInfoBoxes.forEach(box => box.classList.remove('active')); }); }); } }
+
+/**
+ * [NEW] Sets up the entire Diagnosis section as a single accordion.
+ */
+function setupDiagnosisAccordion() {
+    const perguntasContent = `<div id="perguntas-accordion-inner" class="space-y-3"></div>`;
+    
+    const linguaContent = `
+        <div class="card-content">
+            <p class="card-prose text-sm text-center mb-4">Passe o rato sobre as áreas para ver as correspondências.</p>
+            <div class="diagram-container relative max-w-xs mx-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 200" class="rounded-lg bg-pink-50 shadow-inner">
+                    <defs>
+                        <radialGradient id="tongueGradient" cx="50%" cy="80%" r="70%" fx="50%" fy="80%">
+                            <stop offset="0%" style="stop-color:#f8b4c4;" />
+                            <stop offset="100%" style="stop-color:#e18da0;" />
+                        </radialGradient>
+                    </defs>
+                    <path fill="url(#tongueGradient)" d="M75,198 C20,150 25,110 75,22 C125,110 130,150 75,198 Z" />
+                    <path fill="#d17c90" d="M75,198 C73,180 73,150 75,110 C77,150 77,180 75,198 Z" opacity="0.4" />
+                </svg>
+                <svg class="absolute top-0 left-0 w-full h-full" viewBox="0 0 150 200">
+                    <path class="diagram-area-svg" data-info="Ponta: Coração. Reflete o estado do Shen, ansiedade e insónia." d="M75 198 C 60 173, 60 163, 75 150 C 90 163, 90 173, 75 198 Z" />
+                    <path class="diagram-area-svg" data-info="Área atrás da ponta: Pulmão. Mostra condições do sistema respiratório e do Wei Qi." d="M75 150 C 55 140, 55 115, 75 110 C 95 115, 95 140, 75 150 Z" />
+                    <path class="diagram-area-svg" data-info="Laterais: Fígado e Vesícula Biliar. Indicam estagnação de Qi, irritabilidade e tensão." d="M56,115 C 35,115 28,80 45,45 L55,40 C 55,70 55,95 56,115Z" />
+                    <path class="diagram-area-svg" data-info="Laterais: Fígado e Vesícula Biliar. Indicam estagnação de Qi, irritabilidade e tensão." d="M94,115 C 115,115 122,80 105,45 L95,40 C 95,70 95,95 94,115Z" />
+                    <path class="diagram-area-svg" data-info="Centro: Baço e Estômago. Reflete o estado da digestão e da produção de Qi e Sangue." d="M75 110 C 60 115, 55 40, 75 40 C 95 40, 90 115, 75 110 Z" />
+                    <path class="diagram-area-svg" data-info="Raiz: Rim, Bexiga, Intestinos. Mostra a constituição (Jing) e o estado do Aquecedor Inferior." d="M75 40 C 55 45, 55 22, 75 22 C 95 22, 95 45, 75 40 Z" />
+                </svg>
+            </div>
+            <div class="p-4 bg-gray-100 rounded-lg mt-4 min-h-[60px] flex items-center justify-center text-center">
+                <p class="text-gray-500 text-sm">Passe o rato sobre uma área.</p>
+            </div>
+        </div>
+    `;
+
+    const pulsoContent = `
+        <div class="card-content flex flex-col items-center">
+            <p class="card-prose text-sm text-center mb-4">Passe o rato sobre as posições para ver os órgãos correspondentes.</p>
+            <svg id="pulse-diagram-svg" class="w-48 h-auto mb-4" viewBox="0 0 100 120">
+                <path d="M20,110 C20,80 30,70 50,70 C70,70 80,80 80,110" stroke="#d1a377" stroke-width="12" fill="none" stroke-linecap="round"/>
+                <path d="M50,70 V0" stroke="#e6be99" stroke-width="20" fill="none" stroke-linecap="round"/>
+                <circle id="pulse-pos-cun" data-pos="cun" class="pulse-pos-circle" cx="50" cy="20" r="8"/>
+                <circle id="pulse-pos-guan" data-pos="guan" class="pulse-pos-circle" cx="50" cy="40" r="8"/>
+                <circle id="pulse-pos-chi" data-pos="chi" class="pulse-pos-circle" cx="50" cy="60" r="8"/>
+                <text x="62" y="24" class="pulse-pos-label">Cun</text>
+                <text x="62" y="44" class="pulse-pos-label">Guan</text>
+                <text x="62" y="64" class="pulse-pos-label">Chi</text>
+            </svg>
+            <div id="pulse-info-container" class="w-full max-w-sm grid grid-cols-2 gap-4 text-center">
+                <div>
+                    <h5 class="font-bold text-gray-700">Pulso Esquerdo</h5>
+                    <div class="pulse-info-box" data-pos="cun"><strong class="text-red-600">Coração</strong><br><span class="text-xs">(ID)</span></div>
+                    <div class="pulse-info-box" data-pos="guan"><strong class="text-green-600">Fígado</strong><br><span class="text-xs">(VB)</span></div>
+                    <div class="pulse-info-box" data-pos="chi"><strong class="text-blue-600">Rim Yin</strong><br><span class="text-xs">(B)</span></div>
+                </div>
+                <div>
+                    <h5 class="font-bold text-gray-700">Pulso Direito</h5>
+                    <div class="pulse-info-box" data-pos="cun"><strong class="text-gray-500">Pulmão</strong><br><span class="text-xs">(IG)</span></div>
+                    <div class="pulse-info-box" data-pos="guan"><strong class="text-orange-500">Baço</strong><br><span class="text-xs">(E)</span></div>
+                    <div class="pulse-info-box" data-pos="chi"><strong class="text-blue-800">Rim Yang</strong><br><span class="text-xs">(TA)</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="card-content border-t mt-4 pt-4">
+            <h4 class="text-center font-bold mb-2">Tipos de Pulso Comuns</h4>
+            <div id="pulse-list-container-inner" class="space-y-3 max-h-64 overflow-y-auto"></div>
+        </div>
+    `;
+
+    const diagnosisData = [
+        { title: 'As 10+1 Perguntas', content: perguntasContent },
+        { title: 'Diagnóstico da Língua', content: linguaContent },
+        { title: 'Diagnóstico do Pulso', content: pulsoContent }
+    ];
+
+    createAccordion('diagnosis-accordion-container', diagnosisData);
+    // We need to populate the inner accordions after the main one is created
+    createAccordion('perguntas-accordion-inner', dezPerguntasData);
+    createAccordion('pulse-list-container-inner', pulseData);
+}
+
+
 const themes = { default: { '--color-primary': '#1a746b', '--color-primary-dark': '#0b3d38', '--color-secondary': '#00a896', '--color-background-start': '#f0fdfa', '--color-background-end': '#dcfce7', '--color-text': '#0b3d38', '--color-text-muted': '#3f6662', '--color-accent': '#f7b801', '--color-accent-light': '#fef3c7' }, ocean: { '--color-primary': '#005f73', '--color-primary-dark': '#0a3a44', '--color-secondary': '#0a9396', '--color-background-start': '#e0fbfc', '--color-background-end': '#c2f0f4', '--color-text': '#001219', '--color-text-muted': '#003e4d', '--color-accent': '#ee9b00', '--color-accent-light': '#fef3d5' }, sunset: { '--color-primary': '#7c2d12', '--color-primary-dark': '#431407', '--color-secondary': '#c2410c', '--color-background-start': '#fff7ed', '--color-background-end': '#ffedd5', '--color-text': '#431407', '--color-text-muted': '#7c2d12', '--color-accent': '#f59e0b', '--color-accent-light': '#fef3c7' } };
 function applyTheme(themeName) { const theme = themes[themeName]; for (const key in theme) { document.body.style.setProperty(key, theme[key]); } document.querySelectorAll('.theme-button').forEach(btn => { btn.classList.toggle('active', btn.dataset.theme === themeName); }); }
 function setupThemeSwitcher() { const switcherContainers = [document.getElementById('theme-switcher'), document.getElementById('theme-switcher-mobile')]; switcherContainers.forEach(container => { if (container) { container.innerHTML = Object.keys(themes).map(themeName => `<button class="theme-button" data-theme="${themeName}" aria-label="Tema ${themeName}"><span class="w-4 h-4 rounded-full" style="background-color: ${themes[themeName]['--color-primary']};"></span></button>`).join(''); container.addEventListener('click', (e) => { const button = e.target.closest('.theme-button'); if (button) { applyTheme(button.dataset.theme); } }); } }); }
@@ -388,7 +536,7 @@ function generateNavLinks() {
         {
             title: 'Diagnóstico', icon: 'icon-stethoscope',
             links: [
-                { id: 'diagnostico', title: 'Língua e Pulso', icon: 'icon-stethoscope' },
+                { id: 'diagnostico', title: 'Métodos de Diagnóstico', icon: 'icon-stethoscope' },
             ]
         },
         {
@@ -427,22 +575,22 @@ document.addEventListener('DOMContentLoaded', () => {
     createAccordion('qi-accordion', qiData);
     createLifeCycleTimeline('female-cycles-timeline', lifeCyclesFemaleData, 'bg-pink-500');
     createLifeCycleTimeline('male-cycles-timeline', lifeCyclesMaleData, 'bg-blue-500');
-    createAccordion('perguntas-accordion', dezPerguntasData);
-    createAccordion('pulse-list-container', pulseData);
     setupGlossary();
     setupDietetics();
     setupTherapiesGrid();
     
-    // Configuração de layouts de abas e barras laterais
-    setupTabs('diagnosis-tabs', 'diagnosis-tab-content');
-    setupSidebarLayout('meridian-navigation', 'meridian-content-area', meridianData, 'meridian-content-');
+    // [MODIFIED] Setup for new accordion layouts
+    setupMeridianAccordion();
+    setupDiagnosisAccordion();
+    
+    // Configuração de layouts de barras laterais
     setupSidebarLayout('anatomy-navigation', 'anatomy-content-area', anatomyData, 'anatomy-content-');
     setupSidebarLayout('zangfu-navigation', 'zangfu-content-area', zangFuPatternsData, 'zangfu-content-');
     setupSidebarLayout('masters-navigation', 'masters-content-area', greatMastersData, 'master-content-');
 
     // Configuração de elementos interativos
     activateTooltips();
-    setupDiagnosisDiagrams();
+    setupDiagnosisDiagrams(); // Must be called after diagnosis accordion is created
     
     if (document.getElementById('cinco-elementos')) {
         setup5ElementsDiagram();

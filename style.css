@@ -106,7 +106,31 @@ aside { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
 .accordion-item:focus-within, .accordion-item:hover { border-color: var(--color-secondary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-secondary) 15%, transparent); }
 .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out, padding 0.5s ease-out, opacity 0.4s 0.2s ease-in, transform 0.4s 0.2s ease-in; padding: 0 1.5rem; opacity: 0; transform: translateY(-10px); font-size: 0.9rem; }
 .accordion-button { padding: 0.75rem 1.5rem; width: 100%; display: flex; justify-content: space-between; align-items: center; text-align: left; font-weight: 600; color: var(--color-text); }
-.accordion-button[aria-expanded="true"] + .accordion-content { max-height: 2500px; padding: 1rem 1.5rem 1.5rem; border-top: 1px solid var(--color-subtle-gray); opacity: 1; transform: translateY(0); }
+.accordion-button[aria-expanded="true"] + .accordion-content { max-height: 5000px; /* Increased max-height for meridian content */ padding: 1rem 1.5rem 1.5rem; border-top: 1px solid var(--color-subtle-gray); opacity: 1; transform: translateY(0); }
+.accordion-button[aria-expanded="true"] .chevron { transform: rotate(180deg); }
+
+/* --- [NEW] Yin Yang Section Styles --- */
+.yin-yang-svg {
+    animation: slow-rotate 60s linear infinite;
+}
+@keyframes slow-rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.yin-card, .yang-card {
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 15px -1px rgba(0,0,0,0.07);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+.yin-card {
+    background: linear-gradient(145deg, #2d3748, #1a202c);
+    color: #e2e8f0;
+}
+.yang-card {
+    background: linear-gradient(145deg, #ffffff, #f7fafc);
+    color: #4a5568;
+}
 
 /* --- 5 Elementos --- */
 .element-sphere { cursor: pointer; transition: transform 0.3s ease; }
@@ -158,18 +182,18 @@ aside { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
 .food-item { transition: opacity 0.4s ease-out, transform 0.4s ease-out, max-height 0.4s ease-out; transform-origin: top; border-left: 4px solid var(--color-secondary); }
 .food-item.hidden { opacity: 0; transform: scale(0.95); max-height: 0 !important; padding: 0; margin: 0; overflow: hidden; }
 
-/* --- NOVO: Estilos para a Grelha de Terapias --- */
+/* --- [MODIFIED] Estilos para a Grelha de Terapias --- */
 .therapies-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 1.5rem;
+    transition: all 0.5s ease;
 }
 .therapy-card {
     background-color: #fff;
     border-radius: 0.75rem;
     border: 1px solid var(--color-subtle-gray);
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    cursor: pointer;
     overflow: hidden;
     transition: all 0.4s ease;
 }
@@ -177,15 +201,16 @@ aside { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
     transform: translateY(-5px);
     box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
-.therapy-card-title {
+.therapy-card-title-wrapper {
     padding: 1.25rem;
     font-size: 1.25rem;
     font-weight: 700;
     font-family: 'Playfair Display', serif;
     color: var(--color-primary);
     position: relative;
+    cursor: pointer;
 }
-.therapy-card-title::after {
+.therapy-card-title-wrapper::after {
     content: '+';
     position: absolute;
     right: 1.25rem;
@@ -195,21 +220,29 @@ aside { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
     color: var(--color-secondary);
     transition: transform 0.4s ease;
 }
-.therapy-card.active .therapy-card-title::after {
+.therapy-card.expanded .therapy-card-title-wrapper::after {
     transform: translateY(-50%) rotate(45deg);
 }
 .therapy-content-wrapper {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.6s ease-in-out, padding 0.6s ease-in-out;
+    transition: max-height 0.6s ease-in-out;
 }
-.therapy-card.active .therapy-content-wrapper {
-    max-height: 2000px; /* Valor alto para permitir qualquer conteúdo */
+.therapy-card.expanded .therapy-content-wrapper {
+    max-height: 2500px; /* Valor alto para permitir qualquer conteúdo */
 }
 .therapy-content-inner {
     padding: 0 1.25rem 1.25rem;
     border-top: 1px solid var(--color-subtle-gray);
 }
+/* Logic for hiding other cards */
+.therapies-grid.has-expanded .therapy-card:not(.expanded) {
+    display: none;
+}
+.therapies-grid.has-expanded {
+    grid-template-columns: 1fr; /* Make the single card take full width */
+}
+
 
 /* --- Seletor de Tema --- */
 .theme-button { padding: 4px; border-radius: 9999px; border: 2px solid transparent; transition: border-color 0.3s; }
