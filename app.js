@@ -1,6 +1,6 @@
 // --- Importa todos os dados de data.js ---
 import { 
-    yinYangData, // NOVO
+    yinYangData,
     qiData, 
     meridianData, 
     lifeCyclesFemaleData, 
@@ -39,7 +39,7 @@ const globalSearchInput = document.getElementById('global-search-input');
 const searchResultsContainer = document.getElementById('search-results-container');
 let searchIndex = [];
 
-// --- LÓGICA DE NAVEGAÇÃO RESPONSIVA E PESQUISA (sem alterações) ---
+// --- LÓGICA DE NAVEGAÇÃO RESPONSIVA E PESQUISA ---
 function openMobileMenu() { document.body.classList.add('mobile-menu-open'); }
 function closeMobileMenu() { document.body.classList.remove('mobile-menu-open'); }
 openMenuBtn.addEventListener('click', openMobileMenu);
@@ -62,7 +62,7 @@ desktopSearchInput.addEventListener('focus', openSearchModal);
 closeSearchBtn.addEventListener('click', closeSearchModal);
 searchOverlay.addEventListener('click', closeSearchModal);
 
-// --- LÓGICA DE NAVEGAÇÃO PRINCIPAL (sem alterações) ---
+// --- LÓGICA DE NAVEGAÇÃO PRINCIPAL ---
 function showSection(targetId, linkText) {
     contentSections.forEach(section => {
         section.classList.toggle('active', section.id === targetId);
@@ -99,7 +99,7 @@ allNavHubs.forEach(hub => {
     });
 });
 
-// --- LÓGICA DE PESQUISA (sem alterações na execução) ---
+// --- LÓGICA DE PESQUISA ---
 function createSearchIndex() {
     meridianData.forEach(m => m.points.forEach(p => searchIndex.push({ title: `${p.id} - ${p.name}`, content: p.functions, type: 'Ponto', color: m.element, sectionId: 'meridianos' })));
     Object.values(glossaryData).forEach(i => searchIndex.push({ title: i.term, content: i.definition, type: 'Glossário', color: 'primary', sectionId: 'glossario' }));
@@ -148,13 +148,11 @@ searchResultsContainer.addEventListener('click', (e) => {
     }
 });
 
-// --- FUNÇÕES DE GERAÇÃO DE CONTEÚDO (ATUALIZADAS E NOVAS) ---
+// --- FUNÇÕES DE GERAÇÃO DE CONTEÚDO ---
 
-// NOVO: Gera a secção Yin-Yang
 function setupYinYangSection() {
     const container = document.getElementById('yin-yang-container');
     if (!container) return;
-
     container.innerHTML = `
         <div class="card-header"><h3>${yinYangData.title}</h3></div>
         <div class="card-content">
@@ -167,11 +165,9 @@ function setupYinYangSection() {
     `;
 }
 
-// NOVO: Gera o layout em grelha para as terapias
 function setupTherapiesGrid() {
     const container = document.getElementById('therapies-grid-container');
     if (!container) return;
-
     container.innerHTML = `
         <div class="text-center mb-8">
             <h2 class="text-3xl font-playfair font-bold text-primary">Terapêuticas da MTC</h2>
@@ -190,7 +186,6 @@ function setupTherapiesGrid() {
             `).join('')}
         </div>
     `;
-
     container.addEventListener('click', (e) => {
         const card = e.target.closest('.therapy-card');
         if (card) {
@@ -324,12 +319,11 @@ function setupSidebarLayout(navId, contentId, data, idPrefix = 'content-') {
     if (navItems.length > 0) navItems[0].click();
 }
 
-// Funções de layout específicas (Meridianos, Zang-Fu, Mestres) - sem alterações
 function setupMeridianLayout(item, idPrefix) { return `<div class="content-card" id="${idPrefix}${item.id}"><div class="pb-4 mb-4 border-b-2" style="border-color: var(--el-${item.color || 'gray'});"><h3 class="text-2xl font-playfair font-bold" style="color: var(--el-${item.color || 'gray'});">${item.name}</h3><p class="font-semibold text-gray-500">${item.element} / ${item.time}</p></div><div class="card-prose text-sm"><div class="grid md:grid-cols-2 gap-x-8"><div><h4 class="font-bold !text-base !mb-2 !mt-0">Funções Principais</h4><p class="text-gray-600">${item.functions}</p></div><div><h4 class="font-bold !text-base !mb-2 !mt-0">Sinais de Desequilíbrio</h4><p class="text-gray-600">${item.imbalances}</p></div></div><h4 class="font-bold !text-base !mb-2">Pontos Especiais</h4><div class="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-2 text-xs p-3 bg-gray-50 rounded-md"><div><strong>Fonte (Yuan):</strong> ${item.yuan_source}</div><div><strong>Conexão (Luo):</strong> ${item.luo_connecting}</div><div><strong>Fenda (Xi):</strong> ${item.xi_cleft}</div></div><h4 class="font-bold !text-base !mb-2">Pontos Shu Antigos</h4><div class="overflow-x-auto"><table class="w-full text-left !text-xs"><thead class="bg-gray-100"><tr><th class="p-2 font-semibold">Tipo</th><th class="p-2 font-semibold">Elemento</th><th class="p-2 font-semibold">Ponto</th><th class="p-2 font-semibold">Funções</th></tr></thead><tbody>${item.five_shu.map(p => `<tr class="border-b"><td class="p-2">${p.type}</td><td class="p-2">${p.element}</td><td class="p-2 font-bold">${p.point}</td><td class="p-2">${p.functions}</td></tr>`).join('')}</tbody></table></div><h4 class="font-bold !text-base !mb-2">Lista Completa de Pontos</h4><div class="space-y-3 max-h-80 overflow-y-auto pr-2">${item.points.map(p => `<div class="p-2 border-l-2 border-gray-200 hover:bg-gray-50"><strong class="text-primary-dark">${p.id} - ${p.name} (${p.character}) - ${p.pt_name}</strong><p class="text-gray-600 !mb-0">${p.functions}</p></div>`).join('')}</div></div></div>`; }
 function setupZangFuLayout(data) { return data.map((organ, organIndex) => `<div class="content-card" id="zangfu-content-${organ.id}"><div class="pb-4 mb-4 border-b-2" style="border-color: var(--el-${organ.color});"><h3 class="text-2xl font-playfair font-bold" style="color: var(--el-${organ.color});">Padrões do ${organ.name}</h3></div><div class="space-y-4" id="zangfu-accordion-${organ.id}">${organ.patterns.map((pattern, patternIndex) => { const uniqueId = `zangfu-${organIndex}-pattern-${patternIndex}`; return `<div class="accordion-item"><button class="accordion-button" aria-expanded="false" aria-controls="${uniqueId}-content" id="${uniqueId}-button"><span class="flex items-center gap-2"><svg class="w-5 h-5 text-gray-400"><use href="#icon-clipboard-heart"></use></svg>${pattern.name}</span><svg class="w-5 h-5 shrink-0 text-gray-400 chevron"><use href="#icon-chevron-down"></use></svg></button><div class="accordion-content card-prose text-sm" id="${uniqueId}-content" role="region" aria-labelledby="${uniqueId}-button"><h4 class="font-bold text-gray-700">Manifestações Clínicas:</h4><p>${pattern.symptoms}</p><h4 class="font-bold text-gray-700">Língua:</h4><p>${pattern.tongue}</p><h4 class="font-bold text-gray-700">Pulso:</h4><p>${pattern.pulse}</p><h4 class="font-bold text-gray-700">Princípio de Tratamento:</h4><p class="text-green-800 font-semibold">${pattern.treatmentPrinciple}</p></div></div>`; }).join('')}</div></div>`).join(''); }
 function setupMasterLayout(item, idPrefix) { return `<div class="content-card" id="${idPrefix}${item.id}"><div class="pb-4 mb-4 border-b-2" style="border-color: var(--el-water);"><img src="${item.image_placeholder}" alt="Retrato de ${item.name}" class="w-full h-48 object-cover rounded-lg mb-4 shadow-md"><h3 class="text-2xl font-playfair font-bold" style="color: var(--el-water);">${item.name}</h3><p class="font-semibold text-gray-500 text-sm">${item.dynasty}</p></div>${item.content}</div>`; }
 
-// --- LÓGICA DOS 5 ELEMENTOS (sem alterações) ---
+// --- LÓGICA DOS 5 ELEMENTOS ---
 const elementDiagramSVG = document.getElementById('element-diagram-svg');
 const elementDetailsContainer = document.getElementById('element-details-container');
 const pathsContainer = document.getElementById('cycle-paths-container');
@@ -351,7 +345,6 @@ if(btnGeracao) btnGeracao.addEventListener('click', () => switchCycle('geracao')
 if(btnControlo) btnControlo.addEventListener('click', () => switchCycle('controlo'));
 if (elementDiagramSVG) { elementDiagramSVG.addEventListener('click', (e) => { const sphereGroup = e.target.closest('.element-sphere'); if (sphereGroup) { selectedElementId = sphereGroup.id; update5ElementsUI(); } }); }
 
-// --- OUTRAS FUNÇÕES DE SETUP (sem alterações) ---
 function setupGlossary() { const glossaryContainer = document.getElementById('glossary-container'); if (!glossaryContainer) return; const categories = Object.values(glossaryData).reduce((acc, item) => { (acc[item.category] = acc[item.category] || []).push(item); return acc; }, {}); const sortedCategories = Object.keys(categories).sort(); glossaryContainer.innerHTML = sortedCategories.map(category => `<div class="visual-card mb-8"><div class="card-header"><h3 class="text-gray-700">${category}</h3></div><div class="card-content grid md:grid-cols-2 gap-x-8 gap-y-6">${categories[category].sort((a, b) => a.term.localeCompare(b.term)).map(item => `<div><h4 class="font-bold text-lg">${item.term}</h4><p class="text-gray-600">${item.definition}</p></div>`).join('')}</div></div>`).join(''); }
 function activateTooltips() { document.body.addEventListener('mouseover', e => { const term = e.target.closest('.tooltip-term'); if(term) { const existingTooltip = term.querySelector('.tooltip-box'); if (!existingTooltip) { const termKey = term.dataset.term.toLowerCase(); if (glossaryData[termKey]) { const tooltipBox = document.createElement('div'); tooltipBox.className = 'tooltip-box'; tooltipBox.textContent = glossaryData[termKey].definition; term.appendChild(tooltipBox); } } } }); }
 function setupDietetics() { const foodSearchInput = document.getElementById('food-search-input'); const foodResultsContainer = document.getElementById('food-results-container'); const foodAlphaNav = document.getElementById('food-alpha-nav'); function renderFoodList(foods) { const groupedFoods = foods.reduce((acc, food) => { const firstLetter = food.name.charAt(0).toUpperCase(); if (!acc[firstLetter]) acc[firstLetter] = []; acc[firstLetter].push(food); return acc; }, {}); const letters = Object.keys(groupedFoods).sort(); if (foodAlphaNav) foodAlphaNav.innerHTML = letters.map(letter => `<a href="#food-letter-${letter}">${letter}</a>`).join(''); if (foodResultsContainer) { foodResultsContainer.innerHTML = letters.map(letter => `<h3 id="food-letter-${letter}" class="food-group-header" tabindex="-1">${letter}</h3><div class="food-group-items">${groupedFoods[letter].map(food => `<div class="food-item visual-card p-4 mb-3"><h4 class="font-bold text-lg text-green-800">${food.name}</h4><div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm mt-2"><div><strong>Temp:</strong> <span class="font-semibold">${food.temp}</span></div><div><strong>Sabor:</strong> <span class="font-semibold">${food.flavor}</span></div><div class="col-span-2"><strong>Órgãos:</strong> <span class="font-semibold">${food.organs}</span></div></div><p class="text-sm mt-2"><strong>Ações:</strong> ${food.actions}</p></div>`).join('')}</div>`).join(''); } } if (foodSearchInput) { renderFoodList(foodData); foodSearchInput.addEventListener('input', (e) => { const searchTerm = e.target.value.toLowerCase().trim(); const headers = foodResultsContainer.querySelectorAll('.food-group-header'); headers.forEach(header => { const groupWrapper = header.nextElementSibling; if (!groupWrapper) return; const items = groupWrapper.querySelectorAll('.food-item'); let groupHasVisibleItems = false; items.forEach(item => { const foodName = item.querySelector('h4').textContent.toLowerCase(); const isVisible = foodName.includes(searchTerm); item.classList.toggle('hidden', !isVisible); if (isVisible) groupHasVisibleItems = true; }); header.style.display = groupHasVisibleItems ? 'block' : 'none'; groupWrapper.style.display = groupHasVisibleItems ? 'block' : 'none'; }); }); } }
@@ -360,14 +353,14 @@ const themes = { default: { '--color-primary': '#1a746b', '--color-primary-dark'
 function applyTheme(themeName) { const theme = themes[themeName]; for (const key in theme) { document.body.style.setProperty(key, theme[key]); } document.querySelectorAll('.theme-button').forEach(btn => { btn.classList.toggle('active', btn.dataset.theme === themeName); }); }
 function setupThemeSwitcher() { const switcherContainers = [document.getElementById('theme-switcher'), document.getElementById('theme-switcher-mobile')]; switcherContainers.forEach(container => { if (container) { container.innerHTML = Object.keys(themes).map(themeName => `<button class="theme-button" data-theme="${themeName}" aria-label="Tema ${themeName}"><span class="w-4 h-4 rounded-full" style="background-color: ${themes[themeName]['--color-primary']};"></span></button>`).join(''); container.addEventListener('click', (e) => { const button = e.target.closest('.theme-button'); if (button) { applyTheme(button.dataset.theme); } }); } }); }
 
-// --- ESTRUTURA DE NAVEGAÇÃO (ATUALIZADA) ---
+// --- ESTRUTURA DE NAVEGAÇÃO ---
 function generateNavLinks() {
     const navStructure = [
         { id: 'inicio', title: 'Início', icon: 'icon-home' },
         {
             title: 'Fundamentos', icon: 'icon-book-open',
             links: [
-                { id: 'yin-yang', title: 'Teoria Yin-Yang', icon: 'icon-yin-yang' }, // NOVO
+                { id: 'yin-yang', title: 'Teoria Yin-Yang', icon: 'icon-yin-yang' },
                 { id: 'substancias-fundamentais', title: 'Substâncias Fundamentais', icon: 'icon-atom' },
                 { id: 'tipos-de-qi', title: 'Tipos de Qi', icon: 'icon-wind' },
                 { id: 'cinco-elementos', title: 'Os 5 Elementos', icon: 'icon-star' },
@@ -378,9 +371,9 @@ function generateNavLinks() {
             ]
         },
         {
-            title: 'Diagnóstico', icon: 'icon-stethoscope', // NOME ALTERADO
+            title: 'Diagnóstico', icon: 'icon-stethoscope',
             links: [
-                { id: 'diagnostico', title: 'Língua e Pulso', icon: 'icon-stethoscope' }, // LINK UNIFICADO
+                { id: 'diagnostico', title: 'Língua e Pulso', icon: 'icon-stethoscope' },
             ]
         },
         {
@@ -410,12 +403,12 @@ function generateNavLinks() {
     allNavHubs.forEach(hub => hub.innerHTML = navHtml);
 }
 
-// --- PONTO DE ENTRADA DA APLICAÇÃO (ATUALIZADO) ---
+// --- PONTO DE ENTRADA DA APLICAÇÃO ---
 document.addEventListener('DOMContentLoaded', () => {
     generateNavLinks(); 
     
     // Geração de conteúdo dinâmico
-    setupYinYangSection(); // NOVO
+    setupYinYangSection();
     createAccordion('qi-accordion', qiData);
     createLifeCycleTimeline('female-cycles-timeline', lifeCyclesFemaleData, 'bg-pink-500');
     createLifeCycleTimeline('male-cycles-timeline', lifeCyclesMaleData, 'bg-blue-500');
@@ -423,10 +416,10 @@ document.addEventListener('DOMContentLoaded', () => {
     createAccordion('pulse-list-container', pulseData);
     setupGlossary();
     setupDietetics();
-    setupTherapiesGrid(); // NOVO
+    setupTherapiesGrid();
     
     // Configuração de layouts de abas e barras laterais
-    setupTabs('diagnosis-tabs', 'diagnosis-tab-content'); // ATUALIZADO
+    setupTabs('diagnosis-tabs', 'diagnosis-tab-content');
     setupSidebarLayout('meridian-navigation', 'meridian-content-area', meridianData, 'meridian-content-');
     setupSidebarLayout('anatomy-navigation', 'anatomy-content-area', anatomyData, 'anatomy-content-');
     setupSidebarLayout('zangfu-navigation', 'zangfu-content-area', zangFuPatternsData, 'zangfu-content-');
