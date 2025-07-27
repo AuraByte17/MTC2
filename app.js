@@ -10,11 +10,7 @@ import {
     foodData, 
     zangFuPatternsData, 
     dezPerguntasData, 
-    pulseData,
-    tongueDiagnosisData,
-    moxibustionData,
-    phytotherapyData,
-    philosophyAndPracticeData
+    pulseData 
 } from './data.js';
 
 // --- Seleção de Elementos DOM ---
@@ -26,7 +22,7 @@ const desktopNavHub = document.getElementById('desktop-navigation-hub');
 const currentSectionTitle = document.getElementById('current-section-title');
 const contentArea = document.getElementById('main-content-area');
 const mainContent = document.getElementById('main-content');
-let contentSections = [];
+let contentSections = []; // Será preenchido dinamicamente
 
 const allNavHubs = [mobileNavHub, desktopNavHub];
 
@@ -38,78 +34,33 @@ const searchOverlay = document.getElementById('search-overlay');
 const closeSearchBtn = document.getElementById('close-search-btn');
 const globalSearchInput = document.getElementById('global-search-input');
 const searchResultsContainer = document.getElementById('search-results-container');
-let searchIndex = [];
-
-// --- Lógica para o Seletor de Tema ---
-const themeToggleBtn = document.getElementById('theme-toggle-btn');
-const themeIconLight = document.getElementById('theme-icon-light');
-const themeIconDark = document.getElementById('theme-icon-dark');
-const themeText = document.getElementById('theme-text');
-
-function applyTheme(theme) {
-    document.body.dataset.theme = theme;
-    if (theme === 'dark') {
-        themeIconLight.classList.add('hidden');
-        themeIconDark.classList.remove('hidden');
-        if (themeText) themeText.textContent = 'Tema Escuro';
-    } else {
-        themeIconLight.classList.remove('hidden');
-        themeIconDark.classList.add('hidden');
-        if (themeText) themeText.textContent = 'Tema Claro';
-    }
-    localStorage.setItem('mtc-theme', theme);
-}
-
-function toggleTheme() {
-    const currentTheme = document.body.dataset.theme;
-    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-    applyTheme(newTheme);
-}
-
-if (themeToggleBtn) {
-    themeToggleBtn.addEventListener('click', toggleTheme);
-}
-
-// Aplicar tema guardado ao carregar a página
-const savedTheme = localStorage.getItem('mtc-theme') || 'light';
-applyTheme(savedTheme);
-
-
-// --- FUNÇÃO DE UTILIDADE: DEBOUNCE ---
-function debounce(func, delay) {
-    let timeout;
-    return function(...args) {
-        const context = this;
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(context, args), delay);
-    };
-}
+let searchIndex = []; // Onde todos os dados pesquisáveis serão guardados
 
 // --- LÓGICA DE NAVEGAÇÃO RESPONSIVA ---
 function openMobileMenu() { document.body.classList.add('mobile-menu-open'); }
 function closeMobileMenu() { document.body.classList.remove('mobile-menu-open'); }
-if(openMenuBtn) openMenuBtn.addEventListener('click', openMobileMenu);
-if(closeMenuBtn) closeMenuBtn.addEventListener('click', closeMobileMenu);
-if(mobileMenuOverlay) mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+openMenuBtn.addEventListener('click', openMobileMenu);
+closeMenuBtn.addEventListener('click', closeMobileMenu);
+mobileMenuOverlay.addEventListener('click', closeMobileMenu);
 
 // --- LÓGICA DA PESQUISA GLOBAL ---
-function openSearchModal() { 
+function openSearchModal() {
     document.body.classList.add('search-modal-open');
-    if(searchModalContainer) searchModalContainer.classList.remove('hidden');
-    setTimeout(() => globalSearchInput && globalSearchInput.focus(), 50); 
+    searchModalContainer.classList.remove('hidden');
+    setTimeout(() => globalSearchInput.focus(), 50); 
 }
 
-function closeSearchModal() { 
+function closeSearchModal() {
     document.body.classList.remove('search-modal-open');
-    if(searchModalContainer) searchModalContainer.classList.add('hidden');
-    if(globalSearchInput) globalSearchInput.value = ''; 
-    if(searchResultsContainer) searchResultsContainer.innerHTML = '<p class="text-center text-gray-500">Comece a escrever para ver os resultados.</p>';
+    searchModalContainer.classList.add('hidden');
+    globalSearchInput.value = ''; 
+    searchResultsContainer.innerHTML = '<p class="text-center text-gray-500">Comece a escrever para ver os resultados.</p>';
 }
 
-if(openSearchMobileBtn) openSearchMobileBtn.addEventListener('click', openSearchModal);
-if(desktopSearchInput) desktopSearchInput.addEventListener('focus', openSearchModal);
-if(closeSearchBtn) closeSearchBtn.addEventListener('click', closeSearchModal);
-if(searchOverlay) searchOverlay.addEventListener('click', closeSearchModal);
+openSearchMobileBtn.addEventListener('click', openSearchModal);
+desktopSearchInput.addEventListener('focus', openSearchModal);
+closeSearchBtn.addEventListener('click', closeSearchModal);
+searchOverlay.addEventListener('click', closeSearchModal);
 
 // --- LÓGICA DE NAVEGAÇÃO PRINCIPAL ---
 function showSection(targetId, linkText) {
@@ -122,40 +73,37 @@ function showSection(targetId, linkText) {
 
 function updateActiveLink(targetId) {
     allNavHubs.forEach(hub => {
-        if(hub) {
-            hub.querySelectorAll('.sidebar-link').forEach(link => {
-                const href = link.getAttribute('href');
-                const isActive = href === `#${targetId}`;
-                link.classList.toggle('active', isActive);
-                link.setAttribute('aria-current', isActive ? 'page' : 'false');
-            });
-        }
+        hub.querySelectorAll('.sidebar-link').forEach(link => {
+            const href = link.getAttribute('href');
+            const isActive = href === `#${targetId}`;
+            link.classList.toggle('active', isActive);
+            link.setAttribute('aria-current', isActive ? 'page' : 'false');
+        });
     });
 }
 
 allNavHubs.forEach(hub => {
-    if(hub) {
-        hub.addEventListener('click', (e) => {
-            const link = e.target.closest('a.sidebar-link');
-            const groupHeader = e.target.closest('.nav-group-header');
-            if (link) {
-                e.preventDefault();
-                const targetId = link.getAttribute('href').substring(1);
-                const linkText = link.querySelector('span').textContent;
-                showSection(targetId, linkText);
-                updateActiveLink(targetId);
-                closeMobileMenu();
-            }
-            if (groupHeader) {
-                const isOpen = groupHeader.classList.toggle('open');
-                groupHeader.setAttribute('aria-expanded', isOpen);
-            }
-        });
-    }
+    hub.addEventListener('click', (e) => {
+        const link = e.target.closest('a.sidebar-link');
+        const groupHeader = e.target.closest('.nav-group-header');
+        if (link) {
+            e.preventDefault();
+            const targetId = link.getAttribute('href').substring(1);
+            const linkText = link.querySelector('span').textContent;
+            showSection(targetId, linkText);
+            updateActiveLink(targetId);
+            closeMobileMenu();
+        }
+        if (groupHeader) {
+            groupHeader.classList.toggle('open');
+            groupHeader.setAttribute('aria-expanded', groupHeader.classList.contains('open'));
+        }
+    });
 });
 
 // --- CRIAÇÃO DO ÍNDICE DE PESQUISA ---
 function createSearchIndex() {
+    // 1. Meridianos e Pontos
     meridianData.forEach(meridian => {
         meridian.points.forEach(point => {
             searchIndex.push({
@@ -167,6 +115,8 @@ function createSearchIndex() {
             });
         });
     });
+
+    // 2. Glossário
     Object.values(glossaryData).forEach(item => {
         searchIndex.push({
             title: item.term,
@@ -176,6 +126,8 @@ function createSearchIndex() {
             sectionId: 'glossario'
         });
     });
+
+    // 3. Alimentos
     foodData.forEach(food => {
         searchIndex.push({
             title: food.name,
@@ -185,6 +137,8 @@ function createSearchIndex() {
             sectionId: 'dietetica'
         });
     });
+
+    // 4. Padrões Zang-Fu
     zangFuPatternsData.forEach(organ => {
         organ.patterns.forEach(pattern => {
             searchIndex.push({
@@ -198,29 +152,31 @@ function createSearchIndex() {
     });
 }
 
+
 // --- LÓGICA DE EXECUÇÃO DA PESQUISA ---
 function performSearch(query) {
-    if (!searchResultsContainer) return;
     if (query.length < 2) {
         searchResultsContainer.innerHTML = '<p class="text-center text-gray-500">Escreva pelo menos 2 letras para pesquisar.</p>';
         return;
     }
+
     const lowerCaseQuery = query.toLowerCase();
     const results = searchIndex.filter(item => 
         item.title.toLowerCase().includes(lowerCaseQuery) || 
         item.content.toLowerCase().includes(lowerCaseQuery)
     );
+
     renderSearchResults(results);
 }
 
 function renderSearchResults(results) {
-    if (!searchResultsContainer) return;
     if (results.length === 0) {
         searchResultsContainer.innerHTML = '<p class="text-center text-gray-500">Nenhum resultado encontrado.</p>';
         return;
     }
+
     searchResultsContainer.innerHTML = results.map(item => `
-        <div class="search-result-item" data-section-id="${item.sectionId}" tabindex="0">
+        <div class="search-result-item" data-section-id="${item.sectionId}">
             <h4>${item.title}</h4>
             <p>${item.content}</p>
             <span class="result-type-badge" style="background-color: var(--el-${item.color}, var(--color-primary))">${item.type}</span>
@@ -228,36 +184,33 @@ function renderSearchResults(results) {
     `).join('');
 }
 
-if(globalSearchInput) globalSearchInput.addEventListener('input', debounce((e) => performSearch(e.target.value), 300));
-if(searchResultsContainer) {
-    searchResultsContainer.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') e.target.click();
-    });
-    searchResultsContainer.addEventListener('click', (e) => {
-        const resultItem = e.target.closest('.search-result-item');
-        if (resultItem) {
-            const sectionId = resultItem.dataset.sectionId;
-            const link = document.querySelector(`#desktop-navigation-hub a[href="#${sectionId}"]`);
-            if (link) {
-                const linkText = link.querySelector('span').textContent;
-                showSection(sectionId, linkText);
-                updateActiveLink(sectionId);
-                closeSearchModal();
-            }
+globalSearchInput.addEventListener('input', (e) => performSearch(e.target.value));
+
+searchResultsContainer.addEventListener('click', (e) => {
+    const resultItem = e.target.closest('.search-result-item');
+    if (resultItem) {
+        const sectionId = resultItem.dataset.sectionId;
+        const link = document.querySelector(`#desktop-navigation-hub a[href="#${sectionId}"]`);
+        if (link) {
+            const linkText = link.querySelector('span').textContent;
+            showSection(sectionId, linkText);
+            updateActiveLink(sectionId);
+            closeSearchModal();
         }
-    });
-}
+    }
+});
 
 
 // --- FUNÇÕES DE GERAÇÃO DE CONTEÚDO ---
 function createAccordion(containerId, data) {
     const container = document.getElementById(containerId);
     if (!container) return;
+
     container.innerHTML = data.map((item, index) => {
         const uniqueId = `${containerId}-item-${index}`;
         return `
         <div class="accordion-item">
-            <button class="accordion-button flex items-center justify-between w-full text-left" aria-expanded="false" aria-controls="${uniqueId}-content" id="${uniqueId}-button">
+            <button class="accordion-button" aria-expanded="false" aria-controls="${uniqueId}-content" id="${uniqueId}-button">
                 <span class="flex items-center">
                     ${item.color ? `<span class="w-3 h-3 rounded-full mr-3" style="background-color: var(--el-${item.color});"></span>` : ''}
                     ${item.name || item.title}
@@ -269,6 +222,7 @@ function createAccordion(containerId, data) {
             </div>
         </div>`;
     }).join('');
+
     container.addEventListener('click', (e) => {
         const button = e.target.closest('.accordion-button');
         if (button) {
@@ -297,17 +251,21 @@ function setupTabs(tabsContainerId, tabContentContainerId) {
     const tabsContainer = document.getElementById(tabsContainerId);
     const tabContentContainer = document.getElementById(tabContentContainerId);
     if (!tabsContainer || !tabContentContainer) return;
+
     const tabs = tabsContainer.querySelectorAll('[role="tab"]');
     const tabPanels = tabContentContainer.querySelectorAll('[role="tabpanel"]');
+
     tabsContainer.addEventListener('click', (e) => {
         const clickedTab = e.target.closest('[role="tab"]');
         if (!clickedTab) return;
+
         tabs.forEach(tab => {
             tab.setAttribute('aria-selected', 'false');
             tab.classList.remove('active');
         });
         clickedTab.setAttribute('aria-selected', 'true');
         clickedTab.classList.add('active');
+
         tabPanels.forEach(panel => panel.classList.remove('active'));
         const targetPanel = document.getElementById(clickedTab.getAttribute('aria-controls'));
         if (targetPanel) {
@@ -320,6 +278,7 @@ function setupSidebarLayout(navId, contentId, data, idPrefix = 'content-') {
     const navContainer = document.getElementById(navId);
     const contentContainer = document.getElementById(contentId);
     if (!navContainer || !contentContainer) return;
+
     navContainer.innerHTML = data.map(item => `
         <button class="sidebar-nav-item flex items-center text-left w-full" data-id="${item.id}">
             ${item.color ? `<span class="w-4 h-4 rounded-full mr-3 flex-shrink-0" style="background-color: var(--el-${item.color});"></span>` : ''}
@@ -345,16 +304,20 @@ function setupSidebarLayout(navId, contentId, data, idPrefix = 'content-') {
     
     const navItems = navContainer.querySelectorAll('.sidebar-nav-item');
     const contentCards = contentContainer.querySelectorAll('.content-card');
+
     navContainer.addEventListener('click', (e) => {
         const button = e.target.closest('.sidebar-nav-item');
         if (!button) return;
+
         const targetId = button.dataset.id;
         navItems.forEach(nav => nav.classList.remove('active'));
         button.classList.add('active');
+        
         contentCards.forEach(card => card.classList.remove('active'));
         const targetCard = contentContainer.querySelector(`#${idPrefix}${targetId}`);
         if(targetCard) targetCard.classList.add('active');
     });
+
     contentContainer.addEventListener('click', (e) => {
         const button = e.target.closest('.accordion-button');
         if (button) {
@@ -362,6 +325,7 @@ function setupSidebarLayout(navId, contentId, data, idPrefix = 'content-') {
             button.setAttribute('aria-expanded', !isExpanded);
         }
     });
+
     if (navItems.length > 0) navItems[0].click();
 }
 
@@ -383,12 +347,14 @@ function setupMeridianLayout(item, idPrefix) {
                     <p class="text-gray-600">${item.imbalances}</p>
                 </div>
             </div>
+            
             <h4 class="font-bold !text-base !mb-2">Pontos Especiais</h4>
             <div class="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-2 text-xs p-3 bg-gray-50 rounded-md">
                 <div><strong>Fonte (Yuan):</strong> ${item.yuan_source}</div>
                 <div><strong>Conexão (Luo):</strong> ${item.luo_connecting}</div>
                 <div><strong>Fenda (Xi):</strong> ${item.xi_cleft}</div>
             </div>
+
             <h4 class="font-bold !text-base !mb-2">Pontos Shu Antigos</h4>
             <div class="overflow-x-auto">
                 <table class="w-full text-left !text-xs">
@@ -402,6 +368,7 @@ function setupMeridianLayout(item, idPrefix) {
                     </tbody>
                 </table>
             </div>
+            
             <h4 class="font-bold !text-base !mb-2">Lista Completa de Pontos</h4>
             <div class="space-y-3 max-h-80 overflow-y-auto pr-2">
                 ${item.points.map(p => `<div class="p-2 border-l-2 border-gray-200 hover:bg-gray-50">
@@ -448,10 +415,174 @@ function setupZangFuLayout(data) {
     `).join('');
 }
 
+// --- LÓGICA DOS 5 ELEMENTOS (CORRIGIDA E MELHORADA) ---
+const elementButtonsContainer = document.getElementById('element-buttons');
+const elementDetailsContainer = document.getElementById('element-details-container');
+const pathsContainer = document.getElementById('cycle-paths-container');
+const btnGeracao = document.getElementById('btn-geracao');
+const btnControlo = document.getElementById('btn-controlo');
+const cycleInfoBox = document.getElementById('cycle-info-box');
+const defaultColor = '#a8a29e'; // Cor neutra para caminhos inativos
+let currentCycle = 'geracao';
+let selectedElementId = null;
+
+const cycleInfo = {
+    geracao: { title: 'Ciclo de Geração (Sheng)', description: 'Este ciclo representa a nutrição e o apoio. Cada elemento é a "mãe" do seguinte, nutrindo-o e promovendo o seu crescimento.', color: 'bg-green-100', textColor: 'text-green-800' },
+    controlo: { title: 'Ciclo de Controlo (Ke)', description: 'Este ciclo representa o controlo e a restrição, garantindo que nenhum elemento se torna excessivo e mantendo o equilíbrio do sistema.', color: 'bg-red-100', textColor: 'text-red-800' }
+};
+
+// Coordenadas precisas para um pentágono regular num viewBox 300x300
+const elementCoords = {
+    madeira: { x: 150, y: 45 },
+    fogo: { x: 255, y: 125 },
+    terra: { x: 208, y: 255 },
+    metal: { x: 92, y: 255 },
+    agua: { x: 45, y: 125 }
+};
+
+// Caminhos SVG calculados com base nas coordenadas
+const cyclePaths = {
+    geracao: [
+        { id: 'madeira-fogo', d: `M ${elementCoords.madeira.x} ${elementCoords.madeira.y} C 210 65, 230 80, ${elementCoords.fogo.x} ${elementCoords.fogo.y}` },
+        { id: 'fogo-terra', d: `M ${elementCoords.fogo.x} ${elementCoords.fogo.y} C 250 180, 240 220, ${elementCoords.terra.x} ${elementCoords.terra.y}` },
+        { id: 'terra-metal', d: `M ${elementCoords.terra.x} ${elementCoords.terra.y} C 160 285, 130 285, ${elementCoords.metal.x} ${elementCoords.metal.y}` },
+        { id: 'metal-agua', d: `M ${elementCoords.metal.x} ${elementCoords.metal.y} C 60 220, 50 180, ${elementCoords.agua.x} ${elementCoords.agua.y}` },
+        { id: 'agua-madeira', d: `M ${elementCoords.agua.x} ${elementCoords.agua.y} C 70 80, 90 65, ${elementCoords.madeira.x} ${elementCoords.madeira.y}` }
+    ],
+    controlo: [
+        { id: 'madeira-terra', d: `M ${elementCoords.madeira.x} ${elementCoords.madeira.y} L ${elementCoords.terra.x} ${elementCoords.terra.y}` },
+        { id: 'fogo-metal', d: `M ${elementCoords.fogo.x} ${elementCoords.fogo.y} L ${elementCoords.metal.x} ${elementCoords.metal.y}` },
+        { id: 'terra-agua', d: `M ${elementCoords.terra.x} ${elementCoords.terra.y} L ${elementCoords.agua.x} ${elementCoords.agua.y}` },
+        { id: 'metal-madeira', d: `M ${elementCoords.metal.x} ${elementCoords.metal.y} L ${elementCoords.madeira.x} ${elementCoords.madeira.y}` },
+        { id: 'agua-fogo', d: `M ${elementCoords.agua.x} ${elementCoords.agua.y} L ${elementCoords.fogo.x} ${elementCoords.fogo.y}` }
+    ]
+};
+
+function renderCyclePaths() {
+    if(!pathsContainer) return;
+    pathsContainer.innerHTML = cyclePaths[currentCycle].map(p => `<path id="${p.id}" class="cycle-path" d="${p.d}" stroke="${defaultColor}" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>`).join('');
+}
+
+function update5ElementsUI() {
+    if(!elementButtonsContainer) return;
+    elementButtonsContainer.querySelectorAll('.element').forEach(btn => btn.setAttribute('aria-pressed', 'false'));
+    document.querySelectorAll('.arrow-marker').forEach(marker => marker.style.fill = defaultColor);
+    
+    if (pathsContainer) {
+        pathsContainer.querySelectorAll('.cycle-path').forEach(path => {
+            path.style.stroke = defaultColor;
+            path.style.strokeWidth = '2.5';
+            path.classList.remove('draw');
+        });
+    }
+    
+    if (selectedElementId) {
+        const elData = fiveElementsData[selectedElementId];
+        const selectedButton = document.getElementById(selectedElementId);
+        if (selectedButton) selectedButton.setAttribute('aria-pressed', 'true');
+
+        const targetElementId = elData.target[currentCycle];
+        const activePathId = `${selectedElementId}-${targetElementId}`;
+        const activePath = document.getElementById(activePathId);
+        
+        if (activePath) {
+            const color = `var(--el-${elData.color})`;
+            activePath.style.stroke = color;
+            activePath.style.color = color;
+            activePath.style.strokeWidth = '4';
+            activePath.classList.add('draw');
+            const marker = document.querySelector(`#arrow path`);
+            if (marker) marker.style.fill = color;
+        }
+
+        elementDetailsContainer.innerHTML = `
+            <div class="text-left p-6 rounded-lg border-2" style="border-color: var(--el-${elData.color}); background-color: #fafcff;">
+                <h3 class="text-2xl font-playfair font-bold mb-4" style="color: var(--el-${elData.color});">${elData.name}</h3>
+                <div class="card-prose">
+                    <p class="font-semibold text-gray-600 mb-2">Relações no Ciclo de ${currentCycle.charAt(0).toUpperCase() + currentCycle.slice(1)}:</p>
+                    <p class="text-sm">${elData.relations[currentCycle]}</p>
+                    <table class="w-full text-sm mt-4"><tbody>${elData.table}</tbody></table>
+                </div>
+            </div>`;
+    } else {
+        elementDetailsContainer.innerHTML = '<div class="flex items-center justify-center h-full text-center text-gray-500 p-4 bg-gray-50 rounded-lg"><p>Clique num elemento do diagrama para ver as suas correspondências detalhadas e a sua relação no ciclo atual.</p></div>';
+    }
+}
+
+function switchCycle(cycle) {
+    currentCycle = cycle;
+    const info = cycleInfo[cycle];
+    if(cycleInfoBox) {
+        cycleInfoBox.className = `mb-6 p-4 rounded-lg text-center transition-colors duration-500 ${info.color} ${info.textColor}`;
+        cycleInfoBox.innerHTML = `<h4 class="font-bold">${info.title}</h4><p class="text-sm">${info.description}</p>`;
+    }
+    if(btnGeracao) btnGeracao.classList.toggle('active', cycle === 'geracao');
+    if(btnControlo) btnControlo.classList.toggle('active', cycle === 'controlo');
+    renderCyclePaths();
+    update5ElementsUI();
+}
+
+if(btnGeracao) btnGeracao.addEventListener('click', () => switchCycle('geracao'));
+if(btnControlo) btnControlo.addEventListener('click', () => switchCycle('controlo'));
+
+if (elementButtonsContainer) {
+    elementButtonsContainer.addEventListener('click', (e) => {
+        const button = e.target.closest('.element');
+        if (button) {
+            selectedElementId = button.id;
+            update5ElementsUI();
+        }
+    });
+}
+
+// --- FIM DA LÓGICA DOS 5 ELEMENTOS ---
+
+function setupGlossary() {
+    const glossaryContainer = document.getElementById('glossary-container');
+    if (!glossaryContainer) return;
+
+    const categories = Object.values(glossaryData).reduce((acc, item) => {
+        (acc[item.category] = acc[item.category] || []).push(item);
+        return acc;
+    }, {});
+    const sortedCategories = Object.keys(categories).sort();
+    
+    glossaryContainer.innerHTML = sortedCategories.map(category => `
+        <div class="visual-card mb-8">
+            <div class="card-header"><h3 class="text-gray-700">${category}</h3></div>
+            <div class="card-content grid md:grid-cols-2 gap-x-8 gap-y-6">
+                ${categories[category].sort((a, b) => a.term.localeCompare(b.term)).map(item => `
+                    <div>
+                        <h4 class="font-bold text-lg">${item.term}</h4>
+                        <p class="text-gray-600">${item.definition}</p>
+                    </div>`).join('')}
+            </div>
+        </div>`).join('');
+}
+
+function activateTooltips() {
+    document.body.addEventListener('mouseover', e => {
+        const term = e.target.closest('.tooltip-term');
+        if(term) {
+            const existingTooltip = term.querySelector('.tooltip-box');
+            if (!existingTooltip) {
+                const termKey = term.dataset.term.toLowerCase();
+                if (glossaryData[termKey]) {
+                    const tooltipBox = document.createElement('div');
+                    tooltipBox.className = 'tooltip-box';
+                    tooltipBox.textContent = glossaryData[termKey].definition;
+                    term.appendChild(tooltipBox);
+                }
+            }
+        }
+    });
+}
+
 function setupDietetics() {
     const foodSearchInput = document.getElementById('food-search-input');
     const foodResultsContainer = document.getElementById('food-results-container');
     const foodAlphaNav = document.getElementById('food-alpha-nav');
+
     function renderFoodList(foods) {
         const groupedFoods = foods.reduce((acc, food) => {
             const firstLetter = food.name.charAt(0).toUpperCase();
@@ -460,7 +591,9 @@ function setupDietetics() {
             return acc;
         }, {});
         const letters = Object.keys(groupedFoods).sort();
+        
         if (foodAlphaNav) foodAlphaNav.innerHTML = letters.map(letter => `<a href="#food-letter-${letter}">${letter}</a>`).join('');
+
         if (foodResultsContainer) {
             foodResultsContainer.innerHTML = letters.map(letter => `
                 <h3 id="food-letter-${letter}" class="food-group-header" tabindex="-1">${letter}</h3>
@@ -478,327 +611,86 @@ function setupDietetics() {
                 </div>`).join('');
         }
     }
+
     if (foodSearchInput) {
         renderFoodList(foodData);
-        foodSearchInput.addEventListener('input', debounce((e) => {
+        foodSearchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase().trim();
             const headers = foodResultsContainer.querySelectorAll('.food-group-header');
+            
             headers.forEach(header => {
                 const groupWrapper = header.nextElementSibling;
                 if (!groupWrapper) return;
+
                 const items = groupWrapper.querySelectorAll('.food-item');
                 let groupHasVisibleItems = false;
+                
                 items.forEach(item => {
                     const foodName = item.querySelector('h4').textContent.toLowerCase();
                     const isVisible = foodName.includes(searchTerm);
                     item.classList.toggle('hidden', !isVisible);
-                    if (isVisible) groupHasVisibleItems = true;
+                    if (isVisible) {
+                        groupHasVisibleItems = true;
+                    }
                 });
+
                 header.style.display = groupHasVisibleItems ? 'block' : 'none';
+                groupWrapper.style.display = groupHasVisibleItems ? 'block' : 'none';
             });
-        }, 300));
+        });
     }
 }
 
-function setupGlossary() {
-    const container = document.getElementById('glossary-container');
-    if (!container) return;
-
-    const groupedTerms = Object.values(glossaryData).reduce((acc, term) => {
-        const category = term.category || 'Outros';
-        if (!acc[category]) {
-            acc[category] = [];
-        }
-        acc[category].push(term);
-        return acc;
-    }, {});
-
-    const sortedCategories = Object.keys(groupedTerms).sort();
-
-    container.innerHTML = sortedCategories.map(category => `
-        <div class="visual-card mb-6">
-            <div class="card-header">
-                <h3>${category}</h3>
-            </div>
-            <div class="card-content divide-y divide-gray-200">
-                ${groupedTerms[category].sort((a, b) => a.term.localeCompare(b.term)).map(term => `
-                    <div class="py-4">
-                        <h4 class="text-lg font-semibold text-gray-800">${term.term}</h4>
-                        <p class="text-gray-600 mt-1">${term.definition}</p>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-    `).join('');
-}
-
-function setupFiveElements() {
-    const elements = {
-        madeira: { x: 150, y: 60 },
-        fogo: { x: 240, y: 105 },
-        terra: { x: 202, y: 225 },
-        metal: { x: 98, y: 225 },
-        agua: { x: 60, y: 105 }
-    };
-    const svgContainer = document.getElementById('cycle-paths-container');
-    const detailsContainer = document.getElementById('element-details-container');
-    const infoBox = document.getElementById('cycle-info-box');
-    const btnGeracao = document.getElementById('btn-geracao');
-    const btnControlo = document.getElementById('btn-controlo');
-    const elementButtons = document.querySelectorAll('.element-diagram .element');
-
-    if (!svgContainer || !detailsContainer || !btnGeracao || !btnControlo) return;
-
-    let currentCycle = 'geracao';
-
-    function drawPath(startId, endId, cycleType) {
-        const start = elements[startId];
-        const end = elements[endId];
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        const d = cycleType === 'geracao' 
-            ? `M ${start.x},${start.y} Q ${(start.x + end.x) / 2 + (start.y - end.y) / 4},${(start.y + end.y) / 2 - (start.x - end.x) / 4} ${end.x},${end.y}`
-            : `M ${start.x},${start.y} L ${end.x},${end.y}`;
-        
-        path.setAttribute('d', d);
-        path.setAttribute('class', `cycle-path ${cycleType}`);
-        path.setAttribute('marker-end', 'url(#arrow)');
-        svgContainer.appendChild(path);
-    }
-
-    function updateCycleView(cycleType) {
-        currentCycle = cycleType;
-        svgContainer.innerHTML = ''; // Limpa os caminhos existentes
-        btnGeracao.classList.toggle('active', cycleType === 'geracao');
-        btnControlo.classList.toggle('active', cycleType === 'controlo');
-        infoBox.innerHTML = `<p class="text-center font-semibold text-lg">${cycleType === 'geracao' ? 'Ciclo de Geração (Sheng)' : 'Ciclo de Controlo (Ke)'}</p><p class="text-center text-gray-500">Clique num elemento para ver os detalhes.</p>`;
-        
-        const cycleOrder = ['madeira', 'fogo', 'terra', 'metal', 'agua'];
-        for (let i = 0; i < cycleOrder.length; i++) {
-            const startId = cycleOrder[i];
-            const targetData = fiveElementsData[startId];
-            if (targetData) {
-                const endId = targetData.target[cycleType];
-                if (endId) {
-                    drawPath(startId, endId, cycleType);
-                }
-            }
-        }
-    }
-
-    function showElementDetails(elementId) {
-        const data = fiveElementsData[elementId];
-        if (!data) return;
-
-        elementButtons.forEach(btn => btn.classList.remove('active'));
-        document.getElementById(elementId).classList.add('active');
-
-        detailsContainer.innerHTML = `
-            <div class="p-4 rounded-lg" style="border: 2px solid var(--el-${data.color}); background-color: var(--el-${data.color}20);">
-                <h3 class="text-2xl font-bold mb-3" style="color: var(--el-${data.color});">${data.name}</h3>
-                <p class="font-semibold">${data.relations.geracao}</p>
-                <p class="font-semibold mb-4">${data.relations.controlo}</p>
-                <table class="w-full text-sm">
-                    <tbody>${data.table}</tbody>
-                </table>
-            </div>`;
-        
-        infoBox.innerHTML = `<p class="text-center font-semibold text-lg" style="color: var(--el-${data.color});">${data.name}</p><p class="text-center text-gray-500">${data.relations[currentCycle]}</p>`;
-    }
-
-    btnGeracao.addEventListener('click', () => updateCycleView('geracao'));
-    btnControlo.addEventListener('click', () => updateCycleView('controlo'));
-    elementButtons.forEach(button => {
-        button.addEventListener('click', () => showElementDetails(button.id));
-    });
-
-    updateCycleView('geracao');
-    showElementDetails('madeira');
-}
-
+// --- LÓGICA DOS DIAGRAMAS DE DIAGNÓSTICO (MELHORADA) ---
 function setupDiagnosisDiagrams() {
-    document.querySelectorAll('#panel-observacao .diagram-container').forEach(container => {
-        const infoBox = container.previousElementSibling;
-        if (!infoBox || !infoBox.classList.contains('info-box-placeholder')) return;
-        const defaultText = infoBox.textContent;
-        const areas = container.querySelectorAll('.diagram-area-svg[data-info]');
-        areas.forEach(area => {
-            const updateInfo = () => { infoBox.innerHTML = `<p class="font-semibold text-center">${area.dataset.info}</p>`; };
-            const resetInfo = () => { infoBox.innerHTML = `<p class="text-center text-gray-500">${defaultText}</p>`; };
-            area.addEventListener('mouseover', updateInfo);
-            area.addEventListener('focus', updateInfo);
-            area.addEventListener('mouseout', resetInfo);
-            area.addEventListener('blur', resetInfo);
-        });
-    });
+    // Interatividade do Diagrama da Língua
+    const tongueContainer = document.querySelector('.diagram-container');
+    if (tongueContainer) {
+        const tongueAreas = tongueContainer.querySelectorAll('.diagram-area-svg');
+        const tongueInfoBox = tongueContainer.parentElement.querySelector('.p-4.bg-gray-100');
+        if (tongueAreas.length > 0 && tongueInfoBox) {
+            const defaultText = tongueInfoBox.firstElementChild.textContent;
+            tongueAreas.forEach(area => {
+                const updateInfo = () => {
+                    if (tongueInfoBox) {
+                        tongueInfoBox.innerHTML = `<p class="font-semibold">${area.dataset.info}</p>`;
+                    }
+                };
+                const resetInfo = () => {
+                    if (tongueInfoBox) {
+                        tongueInfoBox.innerHTML = `<p class="text-center text-gray-500">${defaultText}</p>`;
+                    }
+                };
+                area.addEventListener('mouseover', updateInfo);
+                area.addEventListener('focus', updateInfo);
+                area.addEventListener('mouseout', resetInfo);
+                area.addEventListener('blur', resetInfo);
+            });
+        }
+    }
 
-    const tongueContainer = document.querySelector('#tongue-details-container');
-    const tongueDiagramAreas = document.querySelectorAll('#panel-observacao .diagram-area-svg[data-area]');
-    if (tongueContainer && tongueDiagramAreas.length > 0) {
-        tongueDiagramAreas.forEach(area => {
-            const areaKey = area.dataset.area;
-            const areaData = tongueDiagnosisData[areaKey];
-            if (!areaData) return;
+    // Interatividade do Novo Diagrama do Pulso
+    const pulseSVG = document.getElementById('pulse-diagram-svg');
+    if (pulseSVG) {
+        const pulsePositions = pulseSVG.querySelectorAll('.pulse-pos-circle');
+        const pulseInfoBoxes = document.querySelectorAll('.pulse-info-box');
 
-            const updateTongueInfo = () => {
-                tongueContainer.innerHTML = `
-                    <h4 class="font-bold text-lg text-primary mb-2">${areaData.title}</h4>
-                    <div class="text-sm space-y-2">
-                        <div>
-                            <h5 class="font-semibold">Aparência Típica:</h5>
-                            <ul class="list-disc list-inside text-gray-600">${areaData.appearance.map(item => `<li>${item}</li>`).join('')}</ul>
-                        </div>
-                        <div>
-                            <h5 class="font-semibold">Sintomas Associados:</h5>
-                            <ul class="list-disc list-inside text-gray-600">${areaData.symptoms.map(item => `<li>${item}</li>`).join('')}</ul>
-                        </div>
-                    </div>
-                `;
-            };
-            const resetTongueInfo = () => {
-                tongueContainer.innerHTML = `<p class="text-center text-gray-500">Passe o rato sobre uma área do diagrama para ver os detalhes.</p>`;
-            };
-            area.addEventListener('mouseover', updateTongueInfo);
-            area.addEventListener('focus', updateTongueInfo);
-            area.addEventListener('mouseout', resetTongueInfo);
-            area.addEventListener('blur', resetTongueInfo);
+        pulsePositions.forEach(pos => {
+            pos.addEventListener('mouseover', () => {
+                const positionName = pos.dataset.pos;
+                pulsePositions.forEach(p => p.classList.toggle('active', p.dataset.pos === positionName));
+                pulseInfoBoxes.forEach(box => box.classList.toggle('active', box.dataset.pos === positionName));
+            });
+
+            pos.addEventListener('mouseout', () => {
+                pulsePositions.forEach(p => p.classList.remove('active'));
+                pulseInfoBoxes.forEach(box => box.classList.remove('active'));
+            });
         });
     }
 }
 
-function setupTherapeutics(containerId, data) {
-    const container = document.getElementById(containerId);
-    if (!container || !data) return;
-
-    let methodsHtml = '';
-    if (data.types && data.types[1] && data.types[1].methods) {
-        methodsHtml = `<ul class="list-disc list-inside ml-4">${data.types[1].methods.join('')}</ul>`;
-    }
-
-    container.innerHTML = `
-        <p>${data.introduction}</p>
-        <h4>Tipos de Moxabustão</h4>
-        <p><strong>${data.types[0].name}:</strong> ${data.types[0].description}</p>
-        <p><strong>${data.types[1].name}:</strong> ${data.types[1].description}</p>
-        ${methodsHtml}
-        <h4>Funções Terapêuticas</h4>
-        ${data.functions.map(f => `<p><strong>${f.title}:</strong> ${f.content}</p>`).join('')}
-        <h4>Contraindicações</h4>
-        <ul class="list-disc list-inside">${data.contraindications.map(c => `<li>${c}</li>`).join('')}</ul>
-    `;
-}
-
-function setupPhytotherapy(containerId, data) {
-    const container = document.getElementById(containerId);
-    if (!container || !data) return;
-
-    container.innerHTML = `
-        <p>${data.introduction}</p>
-        <h4>Princípios Fundamentais</h4>
-        ${data.principles.map(p => `<p><strong>${p.name}:</strong> ${p.description}</p>`).join('')}
-        <h4>${data.formula_structure.title}</h4>
-        <p>${data.formula_structure.description}</p>
-        <ul class="list-disc list-inside ml-4">
-            ${data.formula_structure.roles.map(r => `<li>${r}</li>`).join('')}
-        </ul>
-        <h4>Exemplos Comuns</h4>
-        <h5>${data.examples[0].type}</h5>
-        <ul>${data.examples[0].items.map(i => `<li><strong>${i.name}:</strong> ${i.functions}</li>`).join('')}</ul>
-        <h5>${data.examples[1].type}</h5>
-        <ul>${data.examples[1].items.map(i => `<li><strong>${i.name}:</strong> ${i.functions}</li>`).join('')}</ul>
-    `;
-}
-
-function setupPhilosophyAndPractice() {
-    const container = document.getElementById('philosophy-content-area');
-    if (!container || !philosophyAndPracticeData) return;
-
-    const { masters, internal_arts } = philosophyAndPracticeData;
-
-    const mastersHtml = `
-        <div class="visual-card mb-8">
-            <div class="card-header"><h3>${masters.title}</h3></div>
-            <div class="card-content card-prose"><p>${masters.introduction}</p></div>
-        </div>
-        <div class="space-y-8">
-            ${masters.list.map(master => `
-                <div class="visual-card">
-                    <div class="card-header">
-                        <div>
-                            <h3 class="text-xl">${master.name}</h3>
-                            <p class="text-sm text-gray-500 font-semibold">${master.title} (${master.period})</p>
-                        </div>
-                    </div>
-                    <div class="card-content card-prose">
-                        <p>${master.introduction}</p>
-                        <h4 class="!mt-6">Principais Contribuições</h4>
-                        <ul class="list-disc list-inside">${master.key_contributions.map(c => `<li>${c}</li>`).join('')}</ul>
-                        
-                        <div class="mt-6 p-4 bg-gray-50 rounded-lg">
-                            <h5 class="font-bold text-primary">${master.detailed_principles.title}</h5>
-                            <p class="text-sm text-gray-600">${master.detailed_principles.description}</p>
-                            <ul class="text-sm mt-2 space-y-1">${master.detailed_principles.principles.map(p => `<li><strong>${p.name}:</strong> ${p.content}</li>`).join('')}</ul>
-                        </div>
-                        <blockquote class="mt-4 border-l-4 border-primary pl-4 italic text-gray-600">"${master.famous_quote}"</blockquote>
-                    </div>
-                </div>
-            `).join('')}
-        </div>
-    `;
-
-    const internalArtsHtml = `
-        <div class="visual-card mt-12">
-            <div class="card-header"><h3>${internal_arts.title}</h3></div>
-            <div class="card-content">
-                <p class="card-prose">${internal_arts.introduction}</p>
-                <div id="internal-arts-tabs-container" class="mt-4">
-                    <div class="border-b border-gray-200 mb-6">
-                        <nav id="internal-arts-tabs" class="-mb-px flex space-x-6" aria-label="Tabs">
-                            <button class="tab-button active" id="tab-qigong" aria-controls="panel-qigong" role="tab" aria-selected="true">Qi Gong</button>
-                            <button class="tab-button" id="tab-taichi" aria-controls="panel-taichi" role="tab" aria-selected="false">Tai Chi</button>
-                        </nav>
-                    </div>
-                    <div id="internal-arts-tab-content">
-                        <div class="tab-content active" id="panel-qigong" role="tabpanel" aria-labelledby="tab-qigong"></div>
-                        <div class="tab-content" id="panel-taichi" role="tabpanel" aria-labelledby="tab-taichi"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-
-    container.innerHTML = mastersHtml + internalArtsHtml;
-
-    const qigongPanel = document.getElementById('panel-qigong');
-    const taichiPanel = document.getElementById('panel-taichi');
-
-    if (qigongPanel) {
-        const { qigong } = internal_arts;
-        qigongPanel.innerHTML = `
-            <div class="card-prose">
-                <h3 class="!text-2xl">${qigong.title}</h3>
-                <p>${qigong.introduction}</p>
-                <div class="visual-card my-6"><div class="card-header"><h4>${qigong.foundational_concepts.title}</h4></div><div class="card-content">${qigong.foundational_concepts.concepts.map(c => `<h5>${c.name}</h5><div>${c.content}</div>`).join('')}</div></div>
-                <div class="visual-card my-6"><div class="card-header"><h4>${qigong.ba_duan_jin.title}</h4></div><div class="card-content"><p>${qigong.ba_duan_jin.description}</p><div class="space-y-4 mt-4">${qigong.ba_duan_jin.movements.map(m => `<div><strong>${m.name}:</strong> ${m.movement}<br><small class="text-green-700"><em>Benefícios: ${m.benefits}</em></small></div>`).join('')}</div></div></div>
-                <div class="visual-card my-6"><div class="card-header"><h4>${qigong.yi_jin_jing.title}</h4></div><div class="card-content"><p>${qigong.yi_jin_jing.description}</p><div class="space-y-4 mt-4">${qigong.yi_jin_jing.movements.map(m => `<div><strong>${m.name}:</strong> ${m.movement}<br><small class="text-green-700"><em>Benefícios: ${m.benefits}</em></small></div>`).join('')}</div></div></div>
-            </div>`;
-    }
-
-    if (taichiPanel) {
-        const { taichi } = internal_arts;
-        taichiPanel.innerHTML = `
-            <div class="card-prose">
-                <h3 class="!text-2xl">${taichi.title}</h3>
-                <p>${taichi.introduction}</p>
-                <div class="visual-card my-6"><div class="card-header"><h4>${taichi.philosophy_and_principles.title}</h4></div><div class="card-content">${taichi.philosophy_and_principles.principles.map(p => `<h5>${p.name}</h5><div>${p.content}</div>`).join('')}</div></div>
-                <div class="visual-card my-6"><div class="card-header"><h4>${taichi.advanced_concepts.title}</h4></div><div class="card-content">${taichi.advanced_concepts.concepts.map(c => `<h5>${c.name}</h5><div>${c.content}</div>`).join('')}</div></div>
-                <div class="visual-card my-6"><div class="card-header"><h4>${taichi.eight_forces.title}</h4></div><div class="card-content"><p>${taichi.eight_forces.description}</p><div class="space-y-4 mt-4">${taichi.eight_forces.forces.map(f => `<div><strong>${f.name} (${f.translation}):</strong> ${f.description}</div>`).join('')}</div></div></div>
-            </div>`;
-    }
-    
-    setupTabs('internal-arts-tabs', 'internal-arts-tab-content');
-}
-
-
+// --- Função para gerar os links de navegação ---
 function generateNavLinks() {
     const navStructure = [
         { id: 'inicio', title: 'Início', icon: 'icon-home' },
@@ -814,16 +706,22 @@ function generateNavLinks() {
         { id: 'meridianos', title: 'Meridianos e Pontos', icon: 'icon-meridian' },
         { id: 'anatomia-energetica', title: 'Anatomia Energética', icon: 'icon-anatomy' },
         { id: 'padroes-zang-fu', title: 'Padrões Zang-Fu', icon: 'icon-zangfu-patterns' },
-        { id: 'diagnostico-geral', title: 'Diagnóstico', icon: 'icon-diagnosis' },
+        {
+            title: 'Diagnóstico', icon: 'icon-diagnosis',
+            links: [
+                { id: 'diagnostico-geral', title: 'Geral e Visual', icon: 'icon-diagnosis' },
+                { id: 'pulsologia', title: 'Pulsologia', icon: 'icon-diagnosis' }
+            ]
+        },
         {
             title: 'Terapêuticas', icon: 'icon-tuina',
             links: [
                 { id: 'dietetica', title: 'Dietética', icon: 'icon-diet' },
                 { id: 'fitoterapia', title: 'Fitoterapia', icon: 'icon-fitoterapia' },
-                { id: 'moxabustao', title: 'Moxabustão', icon: 'icon-moxibustion' }
+                { id: 'moxabustao', title: 'Moxabustão', icon: 'icon-moxibustion' },
+                { id: 'qigong', title: 'Qi Gong & Tai Chi', icon: 'icon-qigong' }
             ]
         },
-        { id: 'filosofia-e-pratica', title: 'Filosofia e Prática', icon: 'icon-scroll' },
         { id: 'glossario', title: 'Glossário', icon: 'icon-glossary' },
     ];
 
@@ -831,44 +729,40 @@ function generateNavLinks() {
         if (item.links) {
             return `
                 <div class="nav-group">
-                    <button class="nav-group-header flex items-center justify-between w-full" aria-expanded="false">
-                        <span>
-                            <svg><use href="#${item.icon}"></use></svg>
+                    <button class="nav-group-header flex items-center justify-between w-full p-2 rounded-lg" aria-expanded="false">
+                        <span class="flex items-center">
+                            <svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${item.icon}"></use></svg>
                             <span class="font-semibold">${item.title}</span>
                         </span>
-                        <svg class="w-5 h-5 shrink-0 chevron"><use href="#icon-chevron-down"></use></svg>
+                        <svg class="w-5 h-5 shrink-0 text-gray-400 chevron"><use href="#icon-chevron-down"></use></svg>
                     </button>
-                    <div class="nav-group-content space-y-1">
+                    <div class="nav-group-content pl-4 pt-1 space-y-1">
                         ${item.links.map(link => `
-                            <a href="#${link.id}" class="sidebar-link flex items-center">
-                                <span>
-                                    <svg><use href="#${link.icon}"></use></svg>
-                                    <span>${link.title}</span>
-                                </span>
+                            <a href="#${link.id}" class="sidebar-link flex items-center p-2 rounded-lg">
+                                <svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${link.icon}"></use></svg>
+                                <span>${link.title}</span>
                             </a>
                         `).join('')}
                     </div>
                 </div>`;
         } else {
             return `
-                <a href="#${item.id}" class="sidebar-link flex items-center">
-                    <span>
-                        <svg><use href="#${item.icon}"></use></svg>
-                        <span>${item.title}</span>
-                    </span>
+                <a href="#${item.id}" class="sidebar-link flex items-center p-2 rounded-lg">
+                    <svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${item.icon}"></use></svg>
+                    <span>${item.title}</span>
                 </a>`;
         }
     };
     
     const navHtml = navStructure.map(generateHtml).join('');
-    allNavHubs.forEach(hub => {
-        if(hub) hub.innerHTML = navHtml;
-    });
+    allNavHubs.forEach(hub => hub.innerHTML = navHtml);
 }
+
 
 // --- PONTO DE ENTRADA DA APLICAÇÃO ---
 document.addEventListener('DOMContentLoaded', () => {
-    generateNavLinks();
+    // Geração de conteúdo principal
+    generateNavLinks(); 
     createAccordion('qi-accordion', qiData);
     createLifeCycleTimeline('female-cycles-timeline', lifeCyclesFemaleData, 'bg-pink-500');
     createLifeCycleTimeline('male-cycles-timeline', lifeCyclesMaleData, 'bg-blue-500');
@@ -876,21 +770,32 @@ document.addEventListener('DOMContentLoaded', () => {
     createAccordion('pulse-list-container', pulseData);
     setupGlossary();
     setupDietetics();
-    setupTherapeutics('moxabustao-content-area', moxibustionData);
-    setupPhytotherapy('fitoterapia-content-area', phytotherapyData);
-    setupPhilosophyAndPractice();
     
-    setupTabs('diagnosis-tabs', 'diagnosis-tab-content');
-    setupFiveElements();
+    // Configuração de componentes interativos
+    setupTabs('qigong-tabs', 'qigong-tab-content');
     setupSidebarLayout('meridian-navigation', 'meridian-content-area', meridianData, 'meridian-content-');
     setupSidebarLayout('anatomy-navigation', 'anatomy-content-area', anatomyData, 'anatomy-content-');
     setupSidebarLayout('zangfu-navigation', 'zangfu-content-area', zangFuPatternsData, 'zangfu-content-');
+    activateTooltips();
     setupDiagnosisDiagrams();
-
-    createSearchIndex();
-    if(mainContent) {
-        contentSections = mainContent.querySelectorAll('.content-section');
+    
+    // Inicializa o diagrama dos 5 Elementos
+    if (document.getElementById('cinco-elementos')) {
+        switchCycle('geracao');
     }
+
+    // Animação da barra lateral
+    document.querySelectorAll('aside .sidebar-link, aside .nav-group').forEach((el, index) => {
+        el.style.animationDelay = `${index * 0.07}s`;
+    });
+
+    // Construção do índice de pesquisa
+    createSearchIndex();
+    
+    // Seleciona as secções de conteúdo DEPOIS de serem criadas
+    contentSections = mainContent.querySelectorAll('.content-section');
+    
+    // Mostra a secção inicial
     showSection('inicio', 'Início');
     updateActiveLink('inicio');
 });
