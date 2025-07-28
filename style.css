@@ -36,6 +36,12 @@ h1, h2, h3, h4, .font-playfair {
     font-family: 'Playfair Display', serif;
 }
 
+/* [NOVO] Adiciona uma fonte para caracteres chineses, se disponível */
+.font-chinese {
+    font-family: 'KaiTi', 'STKaiti', 'SimSun', serif;
+}
+
+
 /* --- Custom Scrollbar --- */
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--color-background-start); }
@@ -101,14 +107,67 @@ aside { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
 .text-primary-dark { color: var(--color-primary-dark); } 
 .card-prose img { border-radius: 0.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-top: 1rem; margin-bottom: 1rem; }
 
-/* --- Accordion Styling --- */
-.accordion-item { border: 1px solid var(--color-subtle-gray); border-radius: 0.5rem; background-color: #fff; transition: box-shadow 0.2s, border-color 0.2s; }
-.accordion-item:focus-within, .accordion-item:hover { border-color: var(--color-secondary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-secondary) 15%, transparent); }
-.accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out, padding 0.5s ease-out, opacity 0.4s 0.2s ease-in, transform 0.4s 0.2s ease-in; padding: 0; opacity: 0; transform: translateY(-10px); font-size: 0.9rem; }
-.accordion-content-inner { padding: 1rem 1.5rem 1.5rem; }
-.accordion-button { padding: 0.75rem 1.5rem; width: 100%; display: flex; justify-content: space-between; align-items: center; text-align: left; font-weight: 600; color: var(--color-text); }
-.accordion-button[aria-expanded="true"] + .accordion-content { max-height: 5000px; padding: 0; border-top: 1px solid var(--color-subtle-gray); opacity: 1; transform: translateY(0); }
-.accordion-button[aria-expanded="true"] .chevron { transform: rotate(180deg); }
+/* --- [ATUALIZADO] Accordion Styling --- */
+.accordion-item { 
+    border: 1px solid var(--color-subtle-gray); 
+    border-radius: 0.5rem; 
+    background-color: #fff; 
+    transition: all 0.3s ease-in-out;
+    overflow: hidden;
+}
+.accordion-item:focus-within, .accordion-item:hover { 
+    border-color: var(--color-secondary); 
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-secondary) 15%, transparent); 
+}
+.accordion-button { 
+    padding: 0.75rem 1.5rem; 
+    width: 100%; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    text-align: left; 
+    font-weight: 600; 
+    color: var(--color-text); 
+    cursor: pointer;
+}
+.accordion-title-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.accordion-content { 
+    max-height: 0; 
+    overflow: hidden; 
+    transition: max-height 0.5s ease-in-out, opacity 0.3s ease-in-out;
+    opacity: 0;
+}
+.accordion-content-inner {
+    padding: 1rem 1.5rem 1.5rem; 
+    border-top: 1px solid var(--color-subtle-gray);
+    font-size: 0.9rem;
+}
+.accordion-item.is-open > .accordion-content,
+.accordion-button[aria-expanded="true"] + .accordion-content { 
+    max-height: 5000px; /* Valor alto para permitir qualquer conteúdo */
+    opacity: 1;
+}
+.accordion-button[aria-expanded="true"] .chevron { 
+    transform: rotate(180deg); 
+}
+/* Lógica para esconder outros cartões */
+[class*="-accordion"].has-expanded-item .accordion-item {
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+}
+[class*="-accordion"].has-expanded-item .accordion-item:not(.is-open) {
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.95);
+    display: none; /* Esconde para evitar ocupar espaço */
+}
+[class*="-accordion"].has-expanded-item .accordion-item.is-open {
+    flex-grow: 1; /* Permite que o item aberto ocupe o espaço */
+}
+
 
 /* --- Yin Yang Section Styles --- */
 .yin-yang-svg { animation: slow-rotate 60s linear infinite; }
@@ -117,7 +176,23 @@ aside { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
 .yin-card { background: linear-gradient(145deg, #2d3748, #1a202c); color: #e2e8f0; }
 .yang-card { background: linear-gradient(145deg, #ffffff, #f7fafc); color: #4a5568; }
 
-/* --- Timeline, Sidebar Nav, Tooltips --- */
+/* --- 5 Elementos --- */
+.element-sphere { cursor: pointer; transition: transform 0.3s ease; }
+.element-sphere .sphere-circle { transition: all 0.3s ease; }
+.element-sphere .sphere-text { font-size: 14px; font-weight: 600; fill: black; text-anchor: middle; pointer-events: none; }
+.element-sphere.active { transform: scale(1.1); transform-origin: center; }
+.element-sphere.active .sphere-circle { stroke: white; stroke-width: 3px; }
+.cycle-path { stroke-dasharray: 1000; stroke-dashoffset: 1000; transition: stroke 0.4s ease-in-out, stroke-width 0.4s ease-in-out; }
+.cycle-path.draw { animation: draw-line 1s forwards; }
+@keyframes draw-line { to { stroke-dashoffset: 0; } }
+.arrow-marker { transition: fill 0.4s ease-in-out; }
+
+/* --- Tabs, Timeline, etc. --- */
+.tab-button { padding: 0.75rem 1rem; font-weight: 600; color: var(--color-text-muted); border-bottom: 3px solid transparent; transition: color 0.3s, border-color 0.3s; display: flex; align-items: center; }
+.tab-button.active, .tab-button:hover { color: var(--color-primary); }
+.tab-button.active { border-bottom-color: var(--color-accent); }
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.5s; }
 .timeline-item { position: relative; padding-left: 2.5rem; padding-bottom: 1.5rem; }
 .timeline-item::before { content: ''; position: absolute; left: 14px; top: 14px; bottom: 0; width: 2px; background-color: var(--color-subtle-gray); }
 .timeline-container > .timeline-item:last-child { padding-bottom: 0; }
@@ -132,59 +207,18 @@ aside { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
 .tooltip-box { display: block; position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%) translateY(10px); background-color: var(--color-primary-dark); color: white; padding: 0.75rem; border-radius: 8px; width: 280px; font-size: 0.875rem; line-height: 1.5; z-index: 50; box-shadow: 0 5px 15px rgba(0,0,0,0.2); opacity: 0; visibility: hidden; pointer-events: none; transition: all 0.3s ease; }
 .tooltip-term:hover .tooltip-box, .tooltip-term:focus .tooltip-box, .tooltip-term:focus-within .tooltip-box { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
 
-/* --- [MODIFIED] Expanding Card Grid Styles --- */
-.therapies-grid, .meridian-grid { display: grid; gap: 1.5rem; transition: all 0.5s ease; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
-.expandable-card { background-color: #fff; border-radius: 0.75rem; border: 1px solid var(--color-subtle-gray); box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden; transition: all 0.4s ease; }
-.expandable-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
-.expandable-card-title-wrapper { padding: 1.25rem; position: relative; cursor: pointer; }
-.expandable-card-title { font-size: 1.25rem; font-weight: 700; font-family: 'Playfair Display', serif; color: var(--color-primary); }
-.expandable-card-title-wrapper::after { content: '+'; position: absolute; right: 1.25rem; top: 50%; transform: translateY(-50%) rotate(0deg); font-size: 1.5rem; color: var(--color-secondary); transition: transform 0.4s ease; }
-.expandable-card.expanded .expandable-card-title-wrapper::after { transform: translateY(-50%) rotate(45deg); }
-.expandable-card-content-wrapper { max-height: 0; overflow: hidden; transition: max-height 0.6s ease-in-out; }
-.expandable-card.expanded .expandable-card-content-wrapper { max-height: 5000px; }
-.expandable-card-content-inner { padding: 0 1.25rem 1.25rem; border-top: 1px solid var(--color-subtle-gray); }
-/* [MODIFIED] Animation for fade in/out */
-.therapies-grid.has-expanded .expandable-card:not(.expanded),
-.meridian-grid.has-expanded .expandable-card:not(.expanded) {
-    opacity: 0;
-    transform: scale(0.95);
-    pointer-events: none;
-    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s 0.3s;
-    visibility: hidden;
-}
-.therapies-grid.has-expanded, .meridian-grid.has-expanded { grid-template-columns: 1fr; }
-.expandable-card-content-inner { padding-top: 1.5rem; }
+/* --- Diagramas de Diagnóstico --- */
+.diagram-container { position: relative; }
+.diagram-area-svg { fill: color-mix(in srgb, var(--color-secondary) 10%, transparent); stroke: color-mix(in srgb, var(--color-secondary) 40%, transparent); stroke-width: 1.5px; cursor: pointer; transition: all 0.3s ease; }
+.diagram-area-svg:hover, .diagram-area-svg:focus { fill: color-mix(in srgb, var(--color-secondary) 30%, transparent); stroke: var(--color-accent); stroke-width: 2.5px; transform-origin: center; animation: pulse-effect 1.5s infinite; }
+@keyframes pulse-effect { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+.pulse-pos-circle { fill: #fff; stroke: var(--color-secondary); stroke-width: 2; cursor: pointer; transition: all 0.3s ease; }
+.pulse-pos-circle:hover, .pulse-pos-circle.active { fill: var(--color-accent); stroke: var(--color-primary); transform: scale(1.1); transform-origin: center; }
+.pulse-pos-label { font-size: 10px; font-family: 'Inter', sans-serif; fill: var(--color-text-muted); pointer-events: none; }
+.pulse-info-box { padding: 0.5rem; margin-top: 0.5rem; border: 2px solid var(--color-subtle-gray); border-radius: 8px; transition: all 0.3s ease; }
+.pulse-info-box.active { border-color: var(--color-accent); background-color: var(--color-accent-light); transform: scale(1.05); }
 
-/* Meridian Card Specifics */
-.meridian-card { border-left: 5px solid var(--element-color); }
-.meridian-element-badge { position: absolute; top: 0.5rem; right: 2.5rem; font-size: 0.75rem; font-weight: 600; color: var(--element-color); }
-
-/* Therapy Card Title Specifics */
-.therapy-title-content { display: flex; flex-direction: column; text-align: center; }
-.therapy-characters { font-size: 1.5rem; color: var(--color-text-muted); font-family: serif; }
-.therapy-pinyin { font-size: 0.8rem; color: var(--color-text-muted); font-style: italic; margin-top: 0.25rem; }
-
-/* Qi Grid Styles */
-#qi-grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
-.qi-card-item .card-header h3 { font-size: 1.1rem; }
-.qi-card-item .card-content { font-size: 0.9rem; padding: 1rem; }
-
-/* [MODIFIED] Diagnosis Section Layout */
-#diagnosis-container { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
-@media (min-width: 1024px) {
-    #diagnosis-container { grid-template-columns: 1fr 1fr; }
-}
-.diagnosis-diagram-wrapper { position: relative; }
-.diagnosis-info-box { background-color: #fff; border-radius: 0.5rem; padding: 1.5rem; border: 1px solid var(--color-subtle-gray); min-height: 150px; transition: all 0.3s ease; }
-.diagram-area-svg, .pulse-pos-circle { cursor: pointer; transition: all 0.3s ease; }
-.diagram-area-svg { fill: color-mix(in srgb, var(--color-secondary) 10%, transparent); stroke: color-mix(in srgb, var(--color-secondary) 40%, transparent); stroke-width: 1.5px; }
-.diagram-area-svg:hover { fill: color-mix(in srgb, var(--color-secondary) 30%, transparent); }
-.diagram-area-svg.active { fill: color-mix(in srgb, var(--color-accent) 40%, transparent); stroke: var(--color-accent); stroke-width: 2.5px; }
-.pulse-pos-circle { fill: #fff; stroke: var(--color-secondary); stroke-width: 2; }
-.pulse-pos-circle:hover { fill: var(--color-accent-light); }
-.pulse-pos-circle.active { fill: var(--color-accent); stroke: var(--color-primary); transform: scale(1.1); transform-origin: center; }
-
-/* Dietética */
+/* --- Dietética --- */
 #food-alpha-nav { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--color-subtle-gray); }
 #food-alpha-nav a { padding: 0.25rem 0.75rem; border-radius: 9999px; font-weight: 600; color: var(--color-primary); background-color: var(--color-accent-light); text-decoration: none; transition: all 0.2s ease; }
 #food-alpha-nav a:hover { background-color: var(--color-accent); color: var(--color-primary-dark); }
@@ -213,7 +247,8 @@ body.mobile-menu-open #sidebar { transform: translateX(0); }
     #main-content-area { padding: 1rem; }
     .card-content { padding: 1rem; }
     .card-header h3 { font-size: 1.1rem; }
-    .therapies-grid, .meridian-grid { grid-template-columns: 1fr; }
+    #cinco-elementos .grid { grid-template-columns: 1fr; }
+    .tab-button { font-size: 0.875rem; padding: 0.75rem 0.5rem; }
 }
 
 /* --- Reduced Motion Preference --- */

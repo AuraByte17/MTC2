@@ -46,6 +46,7 @@
         <symbol id="icon-git-branch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></symbol>
         <symbol id="icon-refresh-cw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></symbol>
         <symbol id="icon-body" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"></circle><path d="M9 20h6"></path><path d="M9 16.5v-4l2-3h2l2 3v4"></path></symbol>
+        <symbol id="icon-heart-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 12.5c0-1.5-1-2.5-2.5-2.5s-2.5 1-2.5 2.5c0 1.5 1 2.5 2.5 2.5s2.5-1 2.5-2.5Z"></path><path d="M22 12.5h-2.5"></path><path d="M2 12.5H8"></path><path d="m16 7.5-2 2.5-2.5-5-2.5 5-2-2.5"></path></symbol>
         <symbol id="icon-stethoscope" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.8 2.3A.3.3 0 1 0 5.4 2l-1.6 6.4c-.3 1.2.5 2.5 1.7 2.8l1.2.3c1.2.3 2.5-.5 2.8-1.7L12 5.1s.5-.8 1.2-.3l1.2 1 1-1.2-1.2-1c-.5-.5.3-1.2.3-1.2l4.9-2.5s.8-.5-.3-1.7l-1.5-1.5c-1.2-1.2-1.7-.3-1.7-.3L12.5 8l-1.6-6.4C10.6 1 9.4.2 8.2.5L7 1.7c-1.2.3-2 1.5-1.7 2.8L4.8 2.3z"></path><path d="M7.8 12.3 5.4 20a.5.5 0 0 0 .9.4l1.4-2.9c.2-.4.8-.5 1.1-.2l2.6 2.6c.3.3.8.3 1.1 0l2.6-2.6c.3-.3.9-.2 1.1.2l1.4 2.9a.5.5 0 0 0 .9-.4l-2.4-7.7"></path></symbol>
         <symbol id="icon-clipboard-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H9a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z"></path><path d="M9.5 3v1.5a1.5 1.5 0 0 0 3 0V3"></path><path d="M11.99 16.03a2.5 2.5 0 0 0 4.02 0c.73-2.07-2.1-4.2-4.02-4.2-1.92 0-4.75 2.13-4.02 4.2a2.5 2.5 0 0 0 4.02 0Z"></path></symbol>
         <symbol id="icon-soup" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9Z"></path><path d="M7 21h10"></path><path d="M19.5 12 22 6"></path><path d="M16 6c0-1.5-1-4-4-4S8 4.5 8 6"></path></symbol>
@@ -142,11 +143,36 @@
                         <div class="visual-card">
                             <div class="card-header"><h3>Os Diferentes Tipos de Qi</h3></div>
                             <div class="card-content">
-                                <div id="qi-accordion" class="space-y-3"></div>
+                                <!-- [ATUALIZADO] Container para cartões estáticos de Qi -->
+                                <div id="qi-cards-container" class="grid md:grid-cols-2 gap-6">
+                                    <!-- Conteúdo gerado por JS -->
+                                </div>
                             </div>
                         </div>
                     </section>
-                    
+
+                    <section id="cinco-elementos" class="content-section">
+                         <div class="visual-card mb-6">
+                            <div class="card-header"><h3>A Teoria dos Cinco Elementos</h3></div>
+                            <div class="card-content">
+                               <div id="cycle-info-box"></div>
+                               <div class="flex justify-center gap-4 mb-6">
+                                  <button id="btn-geracao" class="tab-button">Geração (Sheng)</button>
+                                  <button id="btn-controlo" class="tab-button">Controlo (Ke)</button>
+                               </div>
+                               <div class="grid md:grid-cols-2 gap-8 items-center">
+                                  <div id="element-diagram-container" class="relative w-full max-w-xs mx-auto aspect-square">
+                                      <svg id="element-diagram-svg" class="absolute inset-0 w-full h-full" viewBox="0 0 300 300">
+                                          <g id="cycle-paths-container"></g>
+                                          <g id="element-spheres-container"></g>
+                                      </svg>
+                                  </div>
+                                  <div id="element-details-container"></div>
+                               </div>
+                            </div>
+                         </div>
+                    </section>
+
                     <section id="ciclos-de-vida" class="content-section">
                         <div class="grid md:grid-cols-2 gap-8">
                             <div class="visual-card">
@@ -164,8 +190,8 @@
                         <div class="visual-card">
                             <div class="card-header"><h3>Os 12 Meridianos Principais</h3></div>
                             <div class="card-content">
-                                <div id="meridian-accordion-container" class="space-y-3">
-                                    <!-- Meridian accordion generated by JS -->
+                                <div id="meridian-accordion-container" class="space-y-3 meridian-accordion">
+                                    <!-- Acordeão de Meridianos gerado por JS -->
                                 </div>
                             </div>
                         </div>
@@ -189,8 +215,8 @@
                         <div class="visual-card">
                              <div class="card-header"><h3>Métodos de Diagnóstico</h3></div>
                              <div class="card-content">
-                                <div id="diagnosis-accordion-container" class="space-y-3">
-                                    <!-- Diagnosis accordion generated by JS -->
+                                <div id="diagnosis-accordion-container" class="space-y-3 diagnosis-accordion">
+                                    <!-- Acordeão de Diagnóstico gerado por JS -->
                                 </div>
                              </div>
                         </div>
@@ -208,8 +234,9 @@
                     </section>
                     
                     <section id="terapias" class="content-section">
-                        <div id="therapies-grid-container">
-                            <!-- Therapies grid generated by JS -->
+                        <!-- [ATUALIZADO] Container para o novo acordeão de terapias -->
+                        <div id="therapies-container">
+                            <!-- Conteúdo gerado por JS -->
                         </div>
                     </section>
                     
