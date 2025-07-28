@@ -1,16 +1,16 @@
 /* --- Root Variables and Modern Body Styles --- */
 :root {
-    /* Paleta Padrão (Verde) */
-    --color-primary: #1a746b; 
-    --color-primary-dark: #0b3d38; 
-    --color-secondary: #00a896; 
-    --color-background-start: #f0fdfa;
-    --color-background-end: #dcfce7;
-    --color-text: #0b3d38; 
-    --color-text-muted: #3f6662;
-    --color-accent: #f7b801;
-    --color-accent-light: #fef3c7;
-    --color-subtle-gray: #e5e7eb;
+    /* Paleta Revitalizada */
+    --color-primary: #2d5a67; /* Um verde-azulado mais profundo e sóbrio */
+    --color-primary-dark: #1e3c45; 
+    --color-secondary: #3aa394; /* Um verde-água vibrante */
+    --color-background-start: #f4f9f8;
+    --color-background-end: #e8f3f1;
+    --color-text: #2a3331; 
+    --color-text-muted: #5a6e6a;
+    --color-accent: #e88c38; /* Um laranja quente como destaque */
+    --color-accent-light: #fdf0e6;
+    --color-subtle-gray: #dce3e1;
 
     /* Cores dos Elementos (Fixas) */
     --el-wood: #4ade80;
@@ -22,10 +22,9 @@
 
 body {
     font-family: 'Inter', sans-serif;
-    background: linear-gradient(135deg, var(--color-background-start), var(--color-background-end));
+    background-color: var(--color-background-start);
     color: var(--color-text);
     overflow: hidden;
-    transition: background 0.5s ease;
 }
 
 body.mobile-menu-open, body.search-modal-open {
@@ -36,18 +35,15 @@ h1, h2, h3, h4, .font-playfair {
     font-family: 'Playfair Display', serif;
 }
 
-/* [NOVO] Adiciona uma fonte para caracteres chineses, se disponível */
 .font-chinese {
     font-family: 'KaiTi', 'STKaiti', 'SimSun', serif;
 }
 
-
 /* --- Custom Scrollbar --- */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: var(--color-background-start); }
-::-webkit-scrollbar-thumb { background-color: var(--color-secondary); border-radius: 10px; border: 2px solid var(--color-background-start); }
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: var(--color-background-end); }
+::-webkit-scrollbar-thumb { background-color: var(--color-secondary); border-radius: 10px; border: 3px solid var(--color-background-end); }
 ::-webkit-scrollbar-thumb:hover { background-color: var(--color-primary); }
-
 
 /* --- General Accessibility and Behavior --- */
 :focus-visible {
@@ -61,7 +57,7 @@ h1, h2, h3, h4, .font-playfair {
 }
 
 /* --- Main Sidebar Navigation --- */
-aside { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); border-right: 1px solid rgba(0,0,0,0.05); }
+aside { background-color: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); border-right: 1px solid rgba(0,0,0,0.05); }
 .nav-group-header { cursor: pointer; transition: background-color 0.2s ease-in-out; }
 .nav-group-header:hover { background-color: var(--color-accent-light); }
 .nav-group-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-in-out; }
@@ -70,7 +66,7 @@ aside { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
 [aria-expanded] .chevron { transition: transform 0.3s ease-in-out; }
 .sidebar-link { transition: all 0.3s ease-in-out; border-left: 3px solid transparent; }
 .sidebar-link:hover { background-color: var(--color-accent-light); border-left-color: var(--color-accent); transform: translateX(5px); }
-.sidebar-link.active, a.sidebar-link[aria-current="page"] { background-color: var(--color-primary); color: white; box-shadow: 0 4px 14px 0 rgba(26, 116, 107, 0.38); border-left-color: var(--color-accent); }
+.sidebar-link.active, a.sidebar-link[aria-current="page"] { background-color: var(--color-primary); color: white; box-shadow: 0 4px 14px 0 rgba(45, 90, 103, 0.3); border-left-color: var(--color-accent); }
 .sidebar-link.active svg, a.sidebar-link[aria-current="page"] svg { color: white; }
 
 /* --- Animations --- */
@@ -81,14 +77,17 @@ aside { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
 @keyframes fadeIn { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
 /* --- Card and Content Styling --- */
-.visual-card { 
-    background-color: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(5px);
-    border-radius: 0.75rem; 
-    border: 1px solid #dee2e6; 
-    box-shadow: 0 4px 15px -1px rgb(0 0 0 / 0.07), 0 2px 8px -2px rgb(0 0 0 / 0.05); 
+.floating-card, .visual-card { 
+    background-color: #ffffff;
+    border-radius: 1rem; 
+    border: 1px solid var(--color-subtle-gray); 
+    box-shadow: 0 10px 25px -5px rgba(45, 90, 103, 0.1), 0 4px 6px -2px rgba(45, 90, 103, 0.05); 
     overflow: hidden; 
     transition: transform 0.3s ease, box-shadow 0.3s ease; 
+}
+.floating-card:hover, .visual-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 35px -8px rgba(45, 90, 103, 0.15), 0 8px 10px -4px rgba(45, 90, 103, 0.08);
 }
 .card-header { 
     padding: 1rem 1.5rem; 
@@ -96,7 +95,7 @@ aside { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
     display: flex; 
     align-items: center; 
     gap: 0.75rem; 
-    background: linear-gradient(to right, var(--color-background-start), #fff);
+    background-color: #fcfdfd;
 }
 .card-header h3 { margin: 0; font-size: 1.2rem; font-weight: 700; color: var(--color-primary); }
 .card-content { padding: 1.5rem; line-height: 1.7; }
@@ -107,10 +106,10 @@ aside { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
 .text-primary-dark { color: var(--color-primary-dark); } 
 .card-prose img { border-radius: 0.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-top: 1rem; margin-bottom: 1rem; }
 
-/* --- [ATUALIZADO] Accordion Styling --- */
+/* --- Accordion Styling --- */
 .accordion-item { 
     border: 1px solid var(--color-subtle-gray); 
-    border-radius: 0.5rem; 
+    border-radius: 0.75rem; 
     background-color: #fff; 
     transition: all 0.3s ease-in-out;
     overflow: hidden;
@@ -120,7 +119,7 @@ aside { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-secondary) 15%, transparent); 
 }
 .accordion-button { 
-    padding: 0.75rem 1.5rem; 
+    padding: 1rem 1.5rem; 
     width: 100%; 
     display: flex; 
     justify-content: space-between; 
@@ -130,44 +129,19 @@ aside { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
     color: var(--color-text); 
     cursor: pointer;
 }
-.accordion-title-content {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
+.accordion-title-content { display: flex; align-items: center; gap: 0.75rem; }
 .accordion-content { 
-    max-height: 0; 
-    overflow: hidden; 
-    transition: max-height 0.5s ease-in-out, opacity 0.3s ease-in-out;
-    opacity: 0;
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.5s ease-in-out;
 }
+.accordion-content > div { overflow: hidden; }
+.accordion-button[aria-expanded="true"] + .accordion-content { grid-template-rows: 1fr; }
 .accordion-content-inner {
     padding: 1rem 1.5rem 1.5rem; 
     border-top: 1px solid var(--color-subtle-gray);
     font-size: 0.9rem;
 }
-.accordion-item.is-open > .accordion-content,
-.accordion-button[aria-expanded="true"] + .accordion-content { 
-    max-height: 5000px; /* Valor alto para permitir qualquer conteúdo */
-    opacity: 1;
-}
-.accordion-button[aria-expanded="true"] .chevron { 
-    transform: rotate(180deg); 
-}
-/* Lógica para esconder outros cartões */
-[class*="-accordion"].has-expanded-item .accordion-item {
-    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
-}
-[class*="-accordion"].has-expanded-item .accordion-item:not(.is-open) {
-    opacity: 0;
-    visibility: hidden;
-    transform: scale(0.95);
-    display: none; /* Esconde para evitar ocupar espaço */
-}
-[class*="-accordion"].has-expanded-item .accordion-item.is-open {
-    flex-grow: 1; /* Permite que o item aberto ocupe o espaço */
-}
-
 
 /* --- Yin Yang Section Styles --- */
 .yin-yang-svg { animation: slow-rotate 60s linear infinite; }
@@ -207,16 +181,22 @@ aside { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
 .tooltip-box { display: block; position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%) translateY(10px); background-color: var(--color-primary-dark); color: white; padding: 0.75rem; border-radius: 8px; width: 280px; font-size: 0.875rem; line-height: 1.5; z-index: 50; box-shadow: 0 5px 15px rgba(0,0,0,0.2); opacity: 0; visibility: hidden; pointer-events: none; transition: all 0.3s ease; }
 .tooltip-term:hover .tooltip-box, .tooltip-term:focus .tooltip-box, .tooltip-term:focus-within .tooltip-box { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
 
-/* --- Diagramas de Diagnóstico --- */
-.diagram-container { position: relative; }
-.diagram-area-svg { fill: color-mix(in srgb, var(--color-secondary) 10%, transparent); stroke: color-mix(in srgb, var(--color-secondary) 40%, transparent); stroke-width: 1.5px; cursor: pointer; transition: all 0.3s ease; }
-.diagram-area-svg:hover, .diagram-area-svg:focus { fill: color-mix(in srgb, var(--color-secondary) 30%, transparent); stroke: var(--color-accent); stroke-width: 2.5px; transform-origin: center; animation: pulse-effect 1.5s infinite; }
-@keyframes pulse-effect { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+/* --- [NOVO] Diagramas de Diagnóstico --- */
+.diagram-area-svg { fill: var(--color-secondary); opacity: 0.1; stroke: var(--color-secondary); stroke-width: 2px; cursor: pointer; transition: all 0.3s ease; }
+.diagram-area-svg:hover { opacity: 0.3; stroke: var(--color-accent); }
+.diagram-area-svg.active { opacity: 0.4; stroke: var(--color-accent); stroke-width: 3px; }
 .pulse-pos-circle { fill: #fff; stroke: var(--color-secondary); stroke-width: 2; cursor: pointer; transition: all 0.3s ease; }
-.pulse-pos-circle:hover, .pulse-pos-circle.active { fill: var(--color-accent); stroke: var(--color-primary); transform: scale(1.1); transform-origin: center; }
+.pulse-pos-circle:hover { fill: var(--color-accent-light); stroke: var(--color-accent); }
+.pulse-pos-circle.active { fill: var(--color-accent); stroke: var(--color-primary); transform: scale(1.1); transform-origin: center; }
 .pulse-pos-label { font-size: 10px; font-family: 'Inter', sans-serif; fill: var(--color-text-muted); pointer-events: none; }
-.pulse-info-box { padding: 0.5rem; margin-top: 0.5rem; border: 2px solid var(--color-subtle-gray); border-radius: 8px; transition: all 0.3s ease; }
-.pulse-info-box.active { border-color: var(--color-accent); background-color: var(--color-accent-light); transform: scale(1.05); }
+.diagnosis-info-panel {
+    background-color: #fff;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    border: 1px solid var(--color-subtle-gray);
+    transition: all 0.3s ease;
+    min-height: 150px;
+}
 
 /* --- Dietética --- */
 #food-alpha-nav { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--color-subtle-gray); }
@@ -225,6 +205,46 @@ aside { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
 .food-group-header { font-size: 1.5rem; font-weight: 700; font-family: 'Playfair Display', serif; color: var(--color-secondary); margin-top: 1.5rem; margin-bottom: 1rem; }
 .food-item { transition: opacity 0.4s ease-out, transform 0.4s ease-out, max-height 0.4s ease-out; transform-origin: top; border-left: 4px solid var(--color-secondary); }
 .food-item.hidden { opacity: 0; transform: scale(0.95); max-height: 0 !important; padding: 0; margin: 0; overflow: hidden; }
+
+/* --- [NOVO] Estilos para a Grelha de Terapias --- */
+.therapies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+.therapy-card {
+    perspective: 1000px;
+    cursor: pointer;
+    background-color: transparent;
+    min-height: 220px;
+}
+.therapy-card-front, .therapy-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px -5px rgba(45, 90, 103, 0.1), 0 4px 6px -2px rgba(45, 90, 103, 0.05);
+    border: 1px solid var(--color-subtle-gray);
+}
+.therapy-card-front {
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 1.5rem;
+}
+.therapy-card-back {
+    background-color: #fcfdfd;
+    transform: rotateY(180deg);
+    overflow-y: auto;
+}
+.therapy-card.expanded .therapy-card-front { transform: rotateY(-180deg); }
+.therapy-card.expanded .therapy-card-back { transform: rotateY(0deg); }
+.therapy-card-title-wrapper { text-align: center; }
+.therapy-content-inner { padding: 1.5rem; }
 
 /* --- ESTILOS PARA NAVEGAÇÃO MÓVEL --- */
 #mobile-menu-container { visibility: hidden; pointer-events: none; }
@@ -249,6 +269,7 @@ body.mobile-menu-open #sidebar { transform: translateX(0); }
     .card-header h3 { font-size: 1.1rem; }
     #cinco-elementos .grid { grid-template-columns: 1fr; }
     .tab-button { font-size: 0.875rem; padding: 0.75rem 0.5rem; }
+    .diagnosis-grid { grid-template-columns: 1fr; }
 }
 
 /* --- Reduced Motion Preference --- */
