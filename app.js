@@ -275,35 +275,7 @@ function setupQiGrid() {
     `).join('');
     const diagramContainer = document.getElementById('qi-diagram-container');
     if(diagramContainer) {
-        diagramContainer.innerHTML = `
-            <h3 class="text-xl font-playfair font-bold text-primary text-center mb-4 mt-8">Diagrama da Geração de Qi</h3>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" class="w-full max-w-2xl mx-auto">
-                <defs>
-                    <marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                        <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--color-secondary)"/>
-                    </marker>
-                </defs>
-                <style>
-                    .qi-box { fill: #fff; stroke: var(--color-secondary); stroke-width: 1.5px; rx: 8px; }
-                    .qi-text { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; fill: var(--color-primary-dark); text-anchor: middle; }
-                    .qi-line { stroke: var(--color-secondary); stroke-width: 2px; marker-end: url(#arrowhead); }
-                    .qi-plus { font-size: 24px; fill: var(--color-text-muted); text-anchor: middle; }
-                </style>
-                <rect class="qi-box" x="10" y="10" width="100" height="40"/><text class="qi-text" x="60" y="35">Gu Qi (Alimentos)</text>
-                <rect class="qi-box" x="150" y="10" width="100" height="40"/><text class="qi-text" x="200" y="35">Kong Qi (Ar)</text>
-                <rect class="qi-box" x="290" y="10" width="100" height="40"/><text class="qi-text" x="340" y="35">Yuan Qi (Original)</text>
-                <path class="qi-line" d="M 60 50 V 100" />
-                <path class="qi-line" d="M 200 50 V 100" />
-                <text class="qi-plus" x="130" y="85">+</text>
-                <rect class="qi-box" x="100" y="100" width="200" height="40"/><text class="qi-text" x="200" y="125">Zong Qi (Peitoral)</text>
-                <path class="qi-line" d="M 200 140 V 180" />
-                <path class="qi-line" d="M 340 50 C 340 100, 250 150, 220 180" fill="none" />
-                <rect class="qi-box" x="40" y="220" width="120" height="40"/><text class="qi-text" x="100" y="245">Ying Qi (Nutritivo)</text>
-                <rect class="qi-box" x="240" y="220" width="120" height="40"/><text class="qi-text" x="300" y="245">Wei Qi (Defensivo)</text>
-                <path class="qi-line" d="M 200 180 L 100 220" fill="none" />
-                <path class="qi-line" d="M 200 180 L 300 220" fill="none" />
-            </svg>
-        `;
+        diagramContainer.innerHTML = ''; // Remove o diagrama
     }
 }
 
@@ -342,6 +314,7 @@ function createLifeCycleTimeline(containerId, data, colorClass) {
             </div>
         </div>`).join('');
 }
+
 function setupSidebarLayout(navId, contentId, data, idPrefix = 'content-') {
     const navContainer = document.getElementById(navId);
     const contentContainer = document.getElementById(contentId);
@@ -361,7 +334,7 @@ function setupSidebarLayout(navId, contentId, data, idPrefix = 'content-') {
     } else {
         contentContainer.innerHTML = data.map(item => `
             <div class="content-card" id="${idPrefix}${item.id}">
-                <div class.pb-4 mb-4 border-b-2" style="border-color: var(--el-${item.color || 'primary'});">
+                <div class="pb-4 mb-4 border-b-2" style="border-color: var(--el-${item.color || 'primary'});">
                     <h3 class="text-2xl font-playfair font-bold" style="color: var(--el-${item.color || 'primary'});">${item.name || item.title}</h3>
                 </div>
                 ${item.content ? `<div class="card-prose">${item.content}</div>` : ''}
@@ -382,7 +355,6 @@ function setupSidebarLayout(navId, contentId, data, idPrefix = 'content-') {
         if(targetCard) targetCard.classList.add('active');
     });
 
-    // [CORRIGIDO] Listener de eventos delegado para os acordeões de Zang-Fu
     contentContainer.addEventListener('click', (e) => {
         const button = e.target.closest('.accordion-button');
         if (button) {
