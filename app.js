@@ -13,8 +13,7 @@ import {
     dezPerguntasData, 
     pulseData,
     greatMastersData,
-    therapiesData,
-    linguaData
+    therapiesData
 } from './data.js';
 
 // --- Seleção de Elementos DOM ---
@@ -204,16 +203,33 @@ function setupYinYangSection() {
         </div>`;
 }
 
-function setupExpandingCardGrid(containerId, data, cardRenderer, gridClass = 'therapies-grid') {
-    const container = document.getElementById(containerId);
+function setupTherapiesGrid() {
+    const container = document.getElementById('therapies-grid-container');
     if (!container) return;
-    container.innerHTML = `<div class="${gridClass}">${data.map(item => cardRenderer(item)).join('')}</div>`;
-    const grid = container.querySelector(`.${gridClass}`);
+    container.innerHTML = `
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-playfair font-bold text-primary">Terapêuticas da MTC</h2>
+            <p class="text-gray-600 mt-2 max-w-2xl mx-auto">Explore as principais modalidades de tratamento. Clique em cada cartão para aprender mais.</p>
+        </div>
+        <div class="therapies-grid">
+            ${therapiesData.map(therapy => `
+                <div class="therapy-card" data-id="${therapy.id}">
+                    <div class="therapy-card-title-wrapper">
+                        <h3 class="therapy-card-title">${therapy.title}</h3>
+                    </div>
+                    <div class="therapy-content-wrapper">
+                        <div class="therapy-content-inner">
+                            ${therapy.content}
+                        </div>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+    const grid = container.querySelector('.therapies-grid');
     if (!grid) return;
     grid.addEventListener('click', (e) => {
-        const cardTitle = e.target.closest('.expandable-card-title-wrapper');
-        if (!cardTitle) return;
-        const card = cardTitle.closest('.expandable-card');
+        const card = e.target.closest('.therapy-card');
         if (!card) return;
         const isExpanded = card.classList.contains('expanded');
         if (isExpanded) {
@@ -221,62 +237,14 @@ function setupExpandingCardGrid(containerId, data, cardRenderer, gridClass = 'th
             grid.classList.remove('has-expanded');
         } else {
             const alreadyExpandedCard = grid.querySelector('.expanded');
-            if (alreadyExpandedCard) {
-                alreadyExpandedCard.classList.remove('expanded');
-            }
+            if (alreadyExpandedCard) return;
             card.classList.add('expanded');
             grid.classList.add('has-expanded');
             setTimeout(() => {
                  card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 350);
+            }, 300);
         }
     });
-}
-
-const therapyCardRenderer = (therapy) => {
-    const match = therapy.title.match(/(.+) \((.+?) - (.+?)\)/);
-    const portuguese = match ? match[1].trim() : therapy.title;
-    const characters = match ? match[2] : '';
-    const pinyin = match ? `(${match[3]})` : '';
-    return `
-    <div class="expandable-card therapy-card" data-id="${therapy.id}">
-        <div class="expandable-card-title-wrapper">
-            <div class="therapy-title-content">
-                <span class="therapy-characters">${characters}</span>
-                <h3 class="expandable-card-title">${portuguese}</h3>
-                <span class="therapy-pinyin">${pinyin}</span>
-            </div>
-        </div>
-        <div class="expandable-card-content-wrapper">
-            <div class="expandable-card-content-inner">${therapy.content}</div>
-        </div>
-    </div>`;
-};
-
-const meridianCardRenderer = (meridian) => `
-    <div class="expandable-card meridian-card" data-id="${meridian.id}" style="--element-color: var(--el-${meridian.color});">
-        <div class="expandable-card-title-wrapper">
-            <h3 class="expandable-card-title">${meridian.name}</h3>
-            <span class="meridian-element-badge">${meridian.element} / ${meridian.time}</span>
-        </div>
-        <div class="expandable-card-content-wrapper">
-            <div class="expandable-card-content-inner">${getMeridianPanelContent(meridian)}</div>
-        </div>
-    </div>`;
-
-function setupQiGrid() {
-    const container = document.getElementById('qi-grid-container');
-    if (!container) return;
-    container.innerHTML = qiData.map(qi => `
-        <div class="visual-card qi-card-item">
-            <div class="card-header"><h3>${qi.title}</h3></div>
-            <div class="card-content card-prose">${qi.content}</div>
-        </div>
-    `).join('');
-    const diagramContainer = document.getElementById('qi-diagram-container');
-    if(diagramContainer) {
-        diagramContainer.innerHTML = ''; // Remove o diagrama
-    }
 }
 
 function createAccordion(containerId, data) {
@@ -319,14 +287,12 @@ function setupSidebarLayout(navId, contentId, data, idPrefix = 'content-') {
     const navContainer = document.getElementById(navId);
     const contentContainer = document.getElementById(contentId);
     if (!navContainer || !contentContainer) return;
-
     navContainer.innerHTML = data.map(item => `
         <button class="sidebar-nav-item flex items-center text-left w-full" data-id="${item.id}">
             ${item.color ? `<span class="w-4 h-4 rounded-full mr-3 flex-shrink-0" style="background-color: var(--el-${item.color});"></span>` : ''}
             <span class="font-semibold text-sm">${item.name || item.title}</span>
         </button>
     `).join('');
-    
     if (navId === 'zangfu-navigation') {
         contentContainer.innerHTML = setupZangFuLayout(data);
     } else if (navId === 'masters-navigation') {
@@ -340,10 +306,8 @@ function setupSidebarLayout(navId, contentId, data, idPrefix = 'content-') {
                 ${item.content ? `<div class="card-prose">${item.content}</div>` : ''}
             </div>`).join('');
     }
-    
     const navItems = navContainer.querySelectorAll('.sidebar-nav-item');
     const contentCards = contentContainer.querySelectorAll('.content-card');
-
     navContainer.addEventListener('click', (e) => {
         const button = e.target.closest('.sidebar-nav-item');
         if (!button) return;
@@ -354,7 +318,6 @@ function setupSidebarLayout(navId, contentId, data, idPrefix = 'content-') {
         const targetCard = contentContainer.querySelector(`#${idPrefix}${targetId}`);
         if(targetCard) targetCard.classList.add('active');
     });
-
     contentContainer.addEventListener('click', (e) => {
         const button = e.target.closest('.accordion-button');
         if (button) {
@@ -362,12 +325,21 @@ function setupSidebarLayout(navId, contentId, data, idPrefix = 'content-') {
             button.setAttribute('aria-expanded', !isExpanded);
         }
     });
-
     if (navItems.length > 0) navItems[0].click();
 }
 
 function getMeridianPanelContent(item) { 
     return `<div class="card-prose text-sm"><div class="grid md:grid-cols-2 gap-x-8"><div><h4 class="font-bold !text-base !mb-2 !mt-0">Funções Principais</h4><p class="text-gray-600">${item.functions}</p></div><div><h4 class="font-bold !text-base !mb-2 !mt-0">Sinais de Desequilíbrio</h4><p class="text-gray-600">${item.imbalances}</p></div></div><h4 class="font-bold !text-base !mb-2">Pontos Especiais</h4><div class="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-2 text-xs p-3 bg-gray-50 rounded-md"><div><strong>Fonte (Yuan):</strong> ${item.yuan_source}</div><div><strong>Conexão (Luo):</strong> ${item.luo_connecting}</div><div><strong>Fenda (Xi):</strong> ${item.xi_cleft}</div></div><h4 class="font-bold !text-base !mb-2">Pontos Shu Antigos</h4><div class="overflow-x-auto"><table class="w-full text-left !text-xs"><thead class="bg-gray-100"><tr><th class="p-2 font-semibold">Tipo</th><th class="p-2 font-semibold">Elemento</th><th class="p-2 font-semibold">Ponto</th><th class="p-2 font-semibold">Funções</th></tr></thead><tbody>${item.five_shu.map(p => `<tr class="border-b"><td class="p-2">${p.type}</td><td class="p-2">${p.element}</td><td class="p-2 font-bold">${p.point}</td><td class="p-2">${p.functions}</td></tr>`).join('')}</tbody></table></div><h4 class="font-bold !text-base !mb-2">Lista Completa de Pontos</h4><div class="space-y-3 max-h-80 overflow-y-auto pr-2">${item.points.map(p => `<div class="p-2 border-l-2 border-gray-200 hover:bg-gray-50"><strong class="text-primary-dark">${p.id} - ${p.name} (${p.character}) - ${p.pt_name}</strong><p class="text-gray-600 !mb-0">${p.functions}</p></div>`).join('')}</div></div>`; 
+}
+
+function setupMeridianAccordion() {
+    const accordionData = meridianData.map(meridian => ({
+        title: meridian.name,
+        content: getMeridianPanelContent(meridian),
+        color: meridian.color,
+        id: meridian.id
+    }));
+    createAccordion('meridian-accordion-container', accordionData);
 }
 
 function setupZangFuLayout(data) { return data.map((organ) => `<div class="content-card" id="zangfu-content-${organ.id}"><div class="pb-4 mb-4 border-b-2" style="border-color: var(--el-${organ.color});"><h3 class="text-2xl font-playfair font-bold" style="color: var(--el-${organ.color});">Padrões do ${organ.name}</h3></div><div class="space-y-4">${organ.patterns.map((pattern, patternIndex) => { const uniqueId = `zangfu-${organ.id}-pattern-${patternIndex}`; return `<div class="accordion-item"><button class="accordion-button" aria-expanded="false" aria-controls="${uniqueId}-content" id="${uniqueId}-button"><span class="flex items-center gap-2"><svg class="w-5 h-5 text-gray-400"><use href="#icon-clipboard-heart"></use></svg>${pattern.name}</span><svg class="w-5 h-5 shrink-0 text-gray-400 chevron"><use href="#icon-chevron-down"></use></svg></button><div class="accordion-content" id="${uniqueId}-content" role="region" aria-labelledby="${uniqueId}-button"><div class="accordion-content-inner card-prose text-sm"><h4 class="font-bold text-gray-700">Manifestações Clínicas:</h4><p>${pattern.symptoms}</p><h4 class="font-bold text-gray-700">Língua:</h4><p>${pattern.tongue}</p><h4 class="font-bold text-gray-700">Pulso:</h4><p>${pattern.pulse}</p><h4 class="font-bold text-gray-700">Princípio de Tratamento:</h4><p class="text-green-800 font-semibold">${pattern.treatmentPrinciple}</p></div></div></div>`; }).join('')}</div></div>`).join(''); }
@@ -377,63 +349,55 @@ function setupGlossary() { const glossaryContainer = document.getElementById('gl
 function activateTooltips() { document.body.addEventListener('mouseover', e => { const term = e.target.closest('.tooltip-term'); if(term) { const existingTooltip = term.querySelector('.tooltip-box'); if (!existingTooltip) { const termKey = term.dataset.term.toLowerCase(); if (glossaryData[termKey]) { const tooltipBox = document.createElement('div'); tooltipBox.className = 'tooltip-box'; tooltipBox.textContent = glossaryData[termKey].definition; term.appendChild(tooltipBox); } } } }); }
 function setupDietetics() { const foodSearchInput = document.getElementById('food-search-input'); const foodResultsContainer = document.getElementById('food-results-container'); const foodAlphaNav = document.getElementById('food-alpha-nav'); function renderFoodList(foods) { const groupedFoods = foods.reduce((acc, food) => { const firstLetter = food.name.charAt(0).toUpperCase(); if (!acc[firstLetter]) acc[firstLetter] = []; acc[firstLetter].push(food); return acc; }, {}); const letters = Object.keys(groupedFoods).sort(); if (foodAlphaNav) foodAlphaNav.innerHTML = letters.map(letter => `<a href="#food-letter-${letter}">${letter}</a>`).join(''); if (foodResultsContainer) { foodResultsContainer.innerHTML = letters.map(letter => `<h3 id="food-letter-${letter}" class="food-group-header" tabindex="-1">${letter}</h3><div class="food-group-items">${groupedFoods[letter].map(food => `<div class="food-item visual-card p-4 mb-3"><h4 class="font-bold text-lg text-green-800">${food.name}</h4><div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm mt-2"><div><strong>Temp:</strong> <span class="font-semibold">${food.temp}</span></div><div><strong>Sabor:</strong> <span class="font-semibold">${food.flavor}</span></div><div class="col-span-2"><strong>Órgãos:</strong> <span class="font-semibold">${food.organs}</span></div></div><p class="text-sm mt-2"><strong>Ações:</strong> ${food.actions}</p></div>`).join('')}</div>`).join(''); } } if (foodSearchInput) { renderFoodList(foodData); foodSearchInput.addEventListener('input', (e) => { const searchTerm = e.target.value.toLowerCase().trim(); const headers = foodResultsContainer.querySelectorAll('.food-group-header'); headers.forEach(header => { const groupWrapper = header.nextElementSibling; if (!groupWrapper) return; const items = groupWrapper.querySelectorAll('.food-item'); let groupHasVisibleItems = false; items.forEach(item => { const foodName = item.querySelector('h4').textContent.toLowerCase(); const isVisible = foodName.includes(searchTerm); item.classList.toggle('hidden', !isVisible); if (isVisible) groupHasVisibleItems = true; }); header.style.display = groupHasVisibleItems ? 'block' : 'none'; groupWrapper.style.display = groupHasVisibleItems ? 'block' : 'none'; }); }); } }
 
-function setupDiagnosis() {
-    const container = document.getElementById('diagnosis-container');
+function setupDiagnosisAccordion() {
+    const container = document.getElementById('diagnosis-accordion-container');
     if (!container) return;
-    const linguaDiagram = container.querySelector('#lingua-diagram-svg');
-    const linguaInfoBox = container.querySelector('#lingua-info-box');
-    if (linguaDiagram && linguaInfoBox) {
-        const defaultLinguaText = linguaInfoBox.innerHTML;
-        const linguaAreas = linguaDiagram.querySelectorAll('.diagram-area-svg');
-        linguaDiagram.addEventListener('click', (e) => {
-            const clickedArea = e.target.closest('.diagram-area-svg');
-            linguaAreas.forEach(area => area.classList.remove('active'));
-            if (clickedArea) {
-                clickedArea.classList.add('active');
-                const areaKey = clickedArea.dataset.area;
-                const info = linguaData[areaKey];
-                if (info) {
-                    linguaInfoBox.innerHTML = `<h4 class="font-bold text-primary mb-2">${info.title}</h4><p class="text-sm text-gray-600 text-left">${info.info}</p>`;
-                }
-            } else {
-                linguaInfoBox.innerHTML = defaultLinguaText;
-            }
+    const perguntasContent = `<div id="perguntas-accordion-inner" class="space-y-3"></div>`;
+    const linguaContent = `<div class="card-prose"><p class="text-sm text-center mb-4">Passe o rato sobre as áreas para ver as correspondências.</p><div class="diagram-container relative max-w-xs mx-auto"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 200" class="rounded-lg bg-pink-50 shadow-inner"><defs><radialGradient id="tongueGradient" cx="50%" cy="80%" r="70%" fx="50%" fy="80%"><stop offset="0%" style="stop-color:#f8b4c4;" /><stop offset="100%" style="stop-color:#e18da0;" /></radialGradient></defs><path fill="url(#tongueGradient)" d="M75,198 C20,150 25,110 75,22 C125,110 130,150 75,198 Z" /><path fill="#d17c90" d="M75,198 C73,180 73,150 75,110 C77,150 77,180 75,198 Z" opacity="0.4" /></svg><svg class="absolute top-0 left-0 w-full h-full" viewBox="0 0 150 200"><path class="diagram-area-svg" data-info="Ponta: Coração. Reflete o estado do Shen, ansiedade e insónia." d="M75 198 C 60 173, 60 163, 75 150 C 90 163, 90 173, 75 198 Z" /><path class="diagram-area-svg" data-info="Área atrás da ponta: Pulmão. Mostra condições do sistema respiratório e do Wei Qi." d="M75 150 C 55 140, 55 115, 75 110 C 95 115, 95 140, 75 150 Z" /><path class="diagram-area-svg" data-info="Laterais: Fígado e Vesícula Biliar. Indicam estagnação de Qi, irritabilidade e tensão." d="M56,115 C 35,115 28,80 45,45 L55,40 C 55,70 55,95 56,115Z" /><path class="diagram-area-svg" data-info="Laterais: Fígado e Vesícula Biliar. Indicam estagnação de Qi, irritabilidade e tensão." d="M94,115 C 115,115 122,80 105,45 L95,40 C 95,70 95,95 94,115Z" /><path class="diagram-area-svg" data-info="Centro: Baço e Estômago. Reflete o estado da digestão e da produção de Qi e Sangue." d="M75 110 C 60 115, 55 40, 75 40 C 95 40, 90 115, 75 110 Z" /><path class="diagram-area-svg" data-info="Raiz: Rim, Bexiga, Intestinos. Mostra a constituição (Jing) e o estado do Aquecedor Inferior." d="M75 40 C 55 45, 55 22, 75 22 C 95 22, 95 45, 75 40 Z" /></svg></div><div class="p-4 bg-gray-100 rounded-lg mt-4 min-h-[60px] flex items-center justify-center text-center"><p class="text-gray-500 text-sm">Passe o rato sobre uma área.</p></div></div>`;
+    const pulsoContent = `<div class="flex flex-col items-center"><p class="card-prose text-sm text-center mb-4">Passe o rato sobre as posições para ver os órgãos correspondentes.</p><svg id="pulse-diagram-svg" class="w-48 h-auto mb-4" viewBox="0 0 100 120"><path d="M20,110 C20,80 30,70 50,70 C70,70 80,80 80,110" stroke="#d1a377" stroke-width="12" fill="none" stroke-linecap="round"/><path d="M50,70 V0" stroke="#e6be99" stroke-width="20" fill="none" stroke-linecap="round"/><circle id="pulse-pos-cun" data-pos="cun" class="pulse-pos-circle" cx="50" cy="20" r="8"/><circle id="pulse-pos-guan" data-pos="guan" class="pulse-pos-circle" cx="50" cy="40" r="8"/><circle id="pulse-pos-chi" data-pos="chi" class="pulse-pos-circle" cx="50" cy="60" r="8"/><text x="62" y="24" class="pulse-pos-label">Cun</text><text x="62" y="44" class="pulse-pos-label">Guan</text><text x="62" y="64" class="pulse-pos-label">Chi</text></svg><div id="pulse-info-container" class="w-full max-w-sm grid grid-cols-2 gap-4 text-center"><div><h5 class="font-bold text-gray-700">Pulso Esquerdo</h5><div class="pulse-info-box" data-pos="cun"><strong class="text-red-600">Coração</strong><br><span class="text-xs">(ID)</span></div><div class="pulse-info-box" data-pos="guan"><strong class="text-green-600">Fígado</strong><br><span class="text-xs">(VB)</span></div><div class="pulse-info-box" data-pos="chi"><strong class="text-blue-600">Rim Yin</strong><br><span class="text-xs">(B)</span></div></div><div><h5 class="font-bold text-gray-700">Pulso Direito</h5><div class="pulse-info-box" data-pos="cun"><strong class="text-gray-500">Pulmão</strong><br><span class="text-xs">(IG)</span></div><div class="pulse-info-box" data-pos="guan"><strong class="text-orange-500">Baço</strong><br><span class="text-xs">(E)</span></div><div class="pulse-info-box" data-pos="chi"><strong class="text-blue-800">Rim Yang</strong><br><span class="text-xs">(TA)</span></div></div></div></div><div class="border-t mt-4 pt-4"><h4 class="text-center font-bold mb-2">Tipos de Pulso Comuns</h4><div id="pulse-list-container-inner" class="space-y-3 max-h-64 overflow-y-auto"></div></div>`;
+    const diagnosisData = [
+        { title: 'As 10+1 Perguntas', content: perguntasContent },
+        { title: 'Diagnóstico da Língua', content: linguaContent },
+        { title: 'Diagnóstico do Pulso', content: pulsoContent }
+    ];
+    createAccordion('diagnosis-accordion-container', diagnosisData);
+    createAccordion('perguntas-accordion-inner', dezPerguntasData);
+    createAccordion('pulse-list-container-inner', pulseData);
+    container.addEventListener('click', (e) => {
+        const button = e.target.closest('.accordion-button');
+        if (button) {
+            const isExpanded = button.getAttribute('aria-expanded') === 'true';
+            button.setAttribute('aria-expanded', !isExpanded);
+        }
+    });
+}
+
+function setupDiagnosisDiagrams() {
+    document.querySelectorAll('.diagram-area-svg').forEach(area => {
+        const infoBox = area.closest('.diagram-container').nextElementSibling;
+        if (!infoBox) return;
+        const defaultText = infoBox.innerHTML;
+        area.addEventListener('mouseover', () => {
+            if (infoBox) infoBox.innerHTML = `<p class="font-semibold">${area.dataset.info}</p>`;
         });
-    }
-    const pulseDiagram = container.querySelector('#pulse-diagram-svg');
-    const pulseInfoBox = container.querySelector('#pulse-info-box');
-    if (pulseDiagram && pulseInfoBox) {
-        const defaultPulseText = pulseInfoBox.innerHTML;
-        const pulsePositions = pulseDiagram.querySelectorAll('.pulse-pos-circle');
-        pulseDiagram.addEventListener('click', (e) => {
-            const clickedPos = e.target.closest('.pulse-pos-circle');
-            pulsePositions.forEach(pos => pos.classList.remove('active'));
-            if (clickedPos) {
-                clickedPos.classList.add('active');
-                const posKey = clickedPos.dataset.pos;
-                const pulseInfoData = {
-                    cun: { title: 'Cun (Polegada)', info: 'Posição mais distal. Esquerda: Coração. Direita: Pulmão.' },
-                    guan: { title: 'Guan (Barreira)', info: 'Posição intermédia. Esquerda: Fígado/VB. Direita: Baço/Estômago.' },
-                    chi: { title: 'Chi (Pé)', info: 'Posição mais proximal. Esquerda: Rim Yin. Direita: Rim Yang.' }
-                };
-                const info = pulseInfoData[posKey];
-                if (info) {
-                    pulseInfoBox.innerHTML = `<h4 class="font-bold text-primary mb-2">${info.title}</h4><p class="text-sm text-gray-600 text-left">${info.info}</p>`;
-                }
-            } else {
-                pulseInfoBox.innerHTML = defaultPulseText;
-            }
+        area.addEventListener('mouseout', () => {
+            if (infoBox) infoBox.innerHTML = defaultText;
         });
-    }
-    const pulseListContainer = container.querySelector('#pulse-list-container');
-    if (pulseListContainer) {
-        createAccordion('pulse-list-container', pulseData);
-        pulseListContainer.addEventListener('click', (e) => {
-            const button = e.target.closest('.accordion-button');
-            if (button) {
-                const isExpanded = button.getAttribute('aria-expanded') === 'true';
-                button.setAttribute('aria-expanded', !isExpanded);
-            }
+    });
+    const pulseSVG = document.getElementById('pulse-diagram-svg');
+    if (pulseSVG) {
+        const pulsePositions = pulseSVG.querySelectorAll('.pulse-pos-circle');
+        const pulseInfoBoxes = document.querySelectorAll('.pulse-info-box');
+        pulsePositions.forEach(pos => {
+            pos.addEventListener('mouseover', () => {
+                const positionName = pos.dataset.pos;
+                pulsePositions.forEach(p => p.classList.toggle('active', p.dataset.pos === positionName));
+                pulseInfoBoxes.forEach(box => box.classList.toggle('active', box.dataset.pos === positionName));
+            });
+            pos.addEventListener('mouseout', () => {
+                pulsePositions.forEach(p => p.classList.remove('active'));
+                pulseInfoBoxes.forEach(box => box.classList.remove('active'));
+            });
         });
     }
 }
@@ -484,14 +448,15 @@ function generateNavLinks() {
 document.addEventListener('DOMContentLoaded', () => {
     generateNavLinks(); 
     setupYinYangSection();
-    setupQiGrid();
+    createAccordion('qi-accordion', qiData);
     createLifeCycleTimeline('female-cycles-timeline', lifeCyclesFemaleData, 'bg-pink-500');
     createLifeCycleTimeline('male-cycles-timeline', lifeCyclesMaleData, 'bg-blue-500');
     setupGlossary();
     setupDietetics();
-    setupExpandingCardGrid('therapies-grid-container', therapiesData, therapyCardRenderer);
-    setupExpandingCardGrid('meridian-grid-container', meridianData, meridianCardRenderer, 'meridian-grid');
-    setupDiagnosis();
+    setupTherapiesGrid();
+    setupMeridianAccordion();
+    setupDiagnosisAccordion();
+    setupDiagnosisDiagrams();
     setupSidebarLayout('anatomy-navigation', 'anatomy-content-area', anatomyData, 'anatomy-content-');
     setupSidebarLayout('zangfu-navigation', 'zangfu-content-area', zangFuPatternsData, 'zangfu-content-');
     setupSidebarLayout('masters-navigation', 'masters-content-area', greatMastersData, 'master-content-');
