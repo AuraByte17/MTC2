@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vida em Harmonia: MTC</title>
+    <title>Atlas de MTC</title>
     
     <!-- Scripts e Fontes Externas -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -29,6 +29,7 @@
         </defs>
         
         <!-- Ícones da Aplicação -->
+        <symbol id="icon-app-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.83 16.14A2 2 0 0 1 10.24 18H13.8a2 2 0 0 1 1.44-1.86l-1.3-4.09a2 2 0 0 0-3.48 0Z"></path><path d="M12 2a2.83 2.83 0 0 0-2 5.17l-1.28 4.01a2 2 0 0 0 1.44 2.58h6.58a2 2 0 0 0 1.44-2.58L14 7.17A2.83 2.83 0 0 0 12 2Z"></path><path d="M4 18a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2"></path></symbol>
         <symbol id="icon-yin-yang" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a7.5 7.5 0 0 1 0 15v5A10 10 0 0 1 12 2Z"></path></symbol>
         <symbol id="icon-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></symbol>
         <symbol id="icon-book-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></symbol>
@@ -50,17 +51,21 @@
         <!-- Sidebar para Desktop e Móvel -->
         <div id="mobile-menu-container" class="fixed inset-0 z-40 md:hidden">
             <div id="mobile-menu-overlay" class="absolute inset-0 bg-black/50"></div>
-            <aside id="sidebar" class="w-64 bg-white shadow-lg p-6 flex-shrink-0 flex flex-col h-full transition-transform duration-300 -translate-x-full">
-                <div class="flex items-center justify-between mb-4">
-                    <h1 class="text-2xl font-playfair font-bold text-gray-800">Menu</h1>
-                    <button id="close-menu-btn" class="p-1"><svg class="w-6 h-6 text-gray-600"><use href="#icon-close"></use></svg><span class="sr-only">Fechar Menu</span></button>
+            <aside id="sidebar" class="w-64 bg-white shadow-lg p-4 flex-shrink-0 flex flex-col h-full transition-transform duration-300 -translate-x-full">
+                <div class="sidebar-header">
+                    <svg class="w-8 h-8 sidebar-logo"><use href="#icon-app-logo"></use></svg>
+                    <h1 class="font-playfair font-bold">Atlas de MTC</h1>
                 </div>
-                <nav id="navigation-hub" class="space-y-1 overflow-y-auto flex-grow"></nav>
+                <button id="close-menu-btn" class="absolute top-4 right-4 p-1"><svg class="w-6 h-6 text-gray-600"><use href="#icon-close"></use></svg><span class="sr-only">Fechar Menu</span></button>
+                <nav id="navigation-hub" class="space-y-1 overflow-y-auto flex-grow mt-4"></nav>
             </aside>
         </div>
-        <aside class="w-64 bg-white shadow-lg p-6 flex-shrink-0 hidden md:flex flex-col">
-            <h1 class="text-2xl font-playfair font-bold text-gray-800 mb-4 text-center">Vida em Harmonia</h1>
-            <div class="relative mb-4">
+        <aside class="w-64 bg-white shadow-lg p-4 flex-shrink-0 hidden md:flex flex-col">
+            <div class="sidebar-header">
+                <svg class="w-8 h-8 sidebar-logo"><use href="#icon-app-logo"></use></svg>
+                <h1 class="font-playfair font-bold">Atlas de MTC</h1>
+            </div>
+            <div class="relative my-4">
                 <input type="search" id="desktop-search-input" placeholder="Pesquisa global..." class="w-full p-2 pl-8 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-accent focus:border-transparent transition">
                 <svg class="w-4 h-4 absolute top-1/2 left-2.5 -translate-y-1/2 text-gray-400"><use href="#icon-search"></use></svg>
             </div>
@@ -82,7 +87,7 @@
                     
                     <section id="inicio" class="content-section">
                         <div class="floating-card">
-                            <div class="card-header"><h3>Bem-vindo ao Guia de Medicina Tradicional Chinesa</h3></div>
+                            <div class="card-header"><h3>Bem-vindo ao Atlas de MTC</h3></div>
                             <div class="card-content card-prose">
                                 <p>Este guia interativo foi concebido para ser uma referência rápida e completa sobre os conceitos fundamentais da Medicina Tradicional Chinesa (MTC). Utilize o menu lateral para navegar pelas diferentes secções.</p>
                                 <h4>Como Utilizar:</h4>
