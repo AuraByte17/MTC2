@@ -122,8 +122,11 @@
                     </section>
 
                     <section id="tipos-de-qi" class="content-section">
-                        <div class="card-header mb-6"><h3>Os Diferentes Tipos de Qi</h3></div>
-                        <div id="qi-cards-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                        <div class="text-center mb-12">
+                            <h2 class="text-3xl font-playfair font-bold text-primary">Os Diferentes Tipos de Qi</h2>
+                            <p class="text-gray-600 mt-2 max-w-2xl mx-auto">Clique num cartão para ver a descrição.</p>
+                        </div>
+                        <div id="qi-cards-container" class="flip-grid"></div>
                     </section>
 
                     <section id="cinco-elementos" class="content-section">
@@ -166,21 +169,23 @@
                             <h2 class="text-3xl font-playfair font-bold text-primary">Os 12 Meridianos Principais</h2>
                             <p class="text-gray-600 mt-2 max-w-2xl mx-auto">Clique num meridiano para explorar os seus detalhes.</p>
                         </div>
-                        <div id="meridian-grid-container"></div>
+                        <div id="meridian-grid-container" class="zoom-grid"></div>
                     </section>
 
                     <section id="anatomia-energetica" class="content-section">
-                        <div class="flex flex-col lg:flex-row gap-6">
-                            <nav id="anatomy-navigation" class="w-full lg:w-1/4 space-y-2"></nav>
-                            <div id="anatomy-content-area" class="flex-1 content-area"></div>
+                        <div class="text-center mb-12">
+                            <h2 class="text-3xl font-playfair font-bold text-primary">Anatomia Energética</h2>
+                            <p class="text-gray-600 mt-2 max-w-2xl mx-auto">Clique num sistema para explorar a sua visão na MTC.</p>
                         </div>
+                        <div id="anatomy-grid-container" class="zoom-grid"></div>
                     </section>
 
                     <section id="padroes-zang-fu" class="content-section">
-                         <div class="flex flex-col lg:flex-row gap-6">
-                            <nav id="zangfu-navigation" class="w-full lg:w-1/4 space-y-2"></nav>
-                            <div id="zangfu-content-area" class="flex-1 content-area"></div>
+                         <div class="text-center mb-12">
+                            <h2 class="text-3xl font-playfair font-bold text-primary">Padrões de Desarmonia Zang-Fu</h2>
+                            <p class="text-gray-600 mt-2 max-w-2xl mx-auto">Clique num órgão para ver os seus padrões de desarmonia comuns.</p>
                         </div>
+                        <div id="zangfu-grid-container" class="zoom-grid"></div>
                     </section>
 
                     <section id="diagnostico" class="content-section">
@@ -189,10 +194,8 @@
                             <div class="card-content grid md:grid-cols-2 gap-8 items-center diagnosis-grid">
                                 <div id="lingua-diagram-container" class="relative max-w-xs mx-auto">
                                     <svg id="lingua-diagram-svg" viewBox="0 0 150 200" class="w-full h-auto">
-                                        <!-- SVG base da língua -->
                                         <path fill="#f8b4c4" d="M75,198 C20,150 25,110 75,22 C125,110 130,150 75,198 Z" />
                                         <path fill="#d17c90" d="M75,198 C73,180 73,150 75,110 C77,150 77,180 75,198 Z" opacity="0.4" />
-                                        <!-- Áreas clicáveis -->
                                         <g>
                                             <path class="diagram-area-svg" data-area="ponta" d="M75 198 C 60 173, 60 163, 75 150 C 90 163, 90 173, 75 198 Z" />
                                             <path class="diagram-area-svg" data-area="pre-ponta" d="M75 150 C 55 140, 55 115, 75 110 C 95 115, 95 140, 75 150 Z" />
@@ -247,13 +250,20 @@
                         </div>
                     </section>
                     
-                    <section id="terapias" class="content-section"><div id="therapies-grid-container"></div></section>
+                    <section id="terapias" class="content-section">
+                        <div class="text-center mb-12">
+                            <h2 class="text-3xl font-playfair font-bold text-primary">Terapêuticas da MTC</h2>
+                            <p class="text-gray-600 mt-2 max-w-2xl mx-auto">Clique num cartão para explorar os seus detalhes.</p>
+                        </div>
+                        <div id="therapies-grid-container" class="zoom-grid"></div>
+                    </section>
                     
                     <section id="grandes-mestres" class="content-section">
-                        <div class="flex flex-col lg:flex-row gap-6">
-                            <nav id="masters-navigation" class="w-full lg:w-1/4 space-y-2"></nav>
-                            <div id="masters-content-area" class="flex-1 content-area"></div>
+                        <div class="text-center mb-12">
+                            <h2 class="text-3xl font-playfair font-bold text-primary">Grandes Mestres</h2>
+                            <p class="text-gray-600 mt-2 max-w-2xl mx-auto">Clique num mestre para saber mais sobre as suas contribuições.</p>
                         </div>
+                        <div id="masters-grid-container" class="flip-grid"></div>
                     </section>
 
                     <section id="glossario" class="content-section"><div id="glossary-container"></div></section>
@@ -277,7 +287,7 @@
         </div>
     </div>
 
-    <!-- [NOVO] Modal de Conteúdo (Zoom) -->
+    <!-- Modal de Conteúdo (Zoom) -->
     <div id="content-modal">
         <div id="content-modal-overlay"></div>
         <div id="content-modal-container">
