@@ -132,7 +132,7 @@ aside { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
 .tooltip-box { display: block; position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%) translateY(10px); background-color: var(--color-primary-dark); color: white; padding: 0.75rem; border-radius: 8px; width: 280px; font-size: 0.875rem; line-height: 1.5; z-index: 50; box-shadow: 0 5px 15px rgba(0,0,0,0.2); opacity: 0; visibility: hidden; pointer-events: none; transition: all 0.3s ease; }
 .tooltip-term:hover .tooltip-box, .tooltip-term:focus .tooltip-box, .tooltip-term:focus-within .tooltip-box { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
 
-/* --- [MODIFIED] Expanding Card Grid Styles (for Terapias, Meridianos) --- */
+/* --- [MODIFIED] Expanding Card Grid Styles --- */
 .therapies-grid, .meridian-grid { display: grid; gap: 1.5rem; transition: all 0.5s ease; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
 .expandable-card { background-color: #fff; border-radius: 0.75rem; border: 1px solid var(--color-subtle-gray); box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden; transition: all 0.4s ease; }
 .expandable-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
@@ -143,39 +143,38 @@ aside { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
 .expandable-card-content-wrapper { max-height: 0; overflow: hidden; transition: max-height 0.6s ease-in-out; }
 .expandable-card.expanded .expandable-card-content-wrapper { max-height: 5000px; }
 .expandable-card-content-inner { padding: 0 1.25rem 1.25rem; border-top: 1px solid var(--color-subtle-gray); }
-/* [MODIFIED] Animation for fade in/out */
 .therapies-grid.has-expanded .expandable-card:not(.expanded),
 .meridian-grid.has-expanded .expandable-card:not(.expanded) {
     opacity: 0;
     transform: scale(0.95);
     pointer-events: none;
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s 0.3s;
+    visibility: hidden;
 }
 .therapies-grid.has-expanded, .meridian-grid.has-expanded { grid-template-columns: 1fr; }
-.expandable-card-content-inner { padding-top: 1.5rem; } /* Adds space requested */
+.expandable-card-content-inner { padding-top: 1.5rem; }
 
 /* Meridian Card Specifics */
 .meridian-card { border-left: 5px solid var(--element-color); }
 .meridian-element-badge { position: absolute; top: 0.5rem; right: 2.5rem; font-size: 0.75rem; font-weight: 600; color: var(--element-color); }
 
-/* [MODIFIED] Therapy Card Title Specifics */
+/* Therapy Card Title Specifics */
 .therapy-title-content { display: flex; flex-direction: column; text-align: center; }
 .therapy-characters { font-size: 1.5rem; color: var(--color-text-muted); font-family: serif; }
 .therapy-pinyin { font-size: 0.8rem; color: var(--color-text-muted); font-style: italic; margin-top: 0.25rem; }
 
-/* [MODIFIED] Qi Grid & Diagram Styles */
+/* Qi Grid Styles */
 #qi-grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
 .qi-card-item .card-header h3 { font-size: 1.1rem; }
 .qi-card-item .card-content { font-size: 0.9rem; padding: 1rem; }
 
 /* [MODIFIED] Diagnosis Section Layout */
 #diagnosis-container { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
     #diagnosis-container { grid-template-columns: 1fr 1fr; }
-    #pulse-section { grid-template-columns: 1fr 1fr; }
 }
 .diagnosis-diagram-wrapper { position: relative; }
-.diagnosis-info-box { background-color: #fff; border-radius: 0.5rem; padding: 1.5rem; border: 1px solid var(--color-subtle-gray); min-height: 150px; }
+.diagnosis-info-box { background-color: #fff; border-radius: 0.5rem; padding: 1.5rem; border: 1px solid var(--color-subtle-gray); min-height: 150px; transition: all 0.3s ease; }
 .diagram-area-svg, .pulse-pos-circle { cursor: pointer; transition: all 0.3s ease; }
 .diagram-area-svg { fill: color-mix(in srgb, var(--color-secondary) 10%, transparent); stroke: color-mix(in srgb, var(--color-secondary) 40%, transparent); stroke-width: 1.5px; }
 .diagram-area-svg:hover { fill: color-mix(in srgb, var(--color-secondary) 30%, transparent); }
