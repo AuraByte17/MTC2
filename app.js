@@ -75,7 +75,7 @@ function openContentModal(htmlContent) {
     contentModalContent.innerHTML = htmlContent;
     document.body.classList.add('content-modal-open');
     
-    // Inicializa qualquer acordeão que possa estar dentro do novo conteúdo do modal
+    // [CORREÇÃO] Inicializa qualquer acordeão que possa estar dentro do novo conteúdo do modal
     const modalAccordions = contentModalContent.querySelectorAll('.accordion-container');
     modalAccordions.forEach(accordion => initializeAccordion(accordion));
 }
@@ -283,6 +283,7 @@ function setupFlipGrid(containerId, data, cardRenderer) {
         const card = e.target.closest('.flip-card');
         if (!card) return;
         
+        // Se o clique for no botão de detalhes, não vira o cartão, abre o modal
         if (e.target.closest('.details-btn')) {
             const masterId = e.target.closest('.details-btn').dataset.id;
             const masterInfo = greatMastersData.find(m => m.id === masterId);
@@ -299,6 +300,7 @@ function setupFlipGrid(containerId, data, cardRenderer) {
 
 // --- RENDERERS PARA O SISTEMA DE GRELHAS ---
 
+// Meridianos (Zoom)
 const renderMeridianCard = (item) => `
     <div class="meridian-card" data-id="${item.id}">
         <span class="meridian-card-color-bar" style="background-color: var(--el-${item.color});"></span>
@@ -330,6 +332,7 @@ const renderMeridianModalContent = (item) => `
         <div class="space-y-3 max-h-80 overflow-y-auto pr-2">${item.points.map(p => `<div class="p-2 border-l-2 border-gray-200 hover:bg-gray-50"><strong class="text-primary-dark">${p.id} - ${p.name} (${p.character}) - ${p.pt_name}</strong><p class="text-gray-600 !mb-0">${p.functions}</p></div>`).join('')}</div>
     </div>`;
 
+// Terapêuticas (Zoom)
 const renderTherapyCard = (item) => {
     const regex = /(.+?)\s\((.+?)(?:\s-\s(.+?))?\)/;
     const match = item.title.match(regex);
@@ -353,6 +356,7 @@ const renderTherapyModalContent = (item) => `
     <div class="card-header"><h3>${item.title}</h3></div>
     <div class="card-content card-prose">${item.content}</div>`;
 
+// Padrões Zang-Fu (Zoom)
 const renderZangFuCard = (item) => `
     <div class="meridian-card" data-id="${item.id}">
         <span class="meridian-card-color-bar" style="background-color: var(--el-${item.color});"></span>
@@ -367,9 +371,10 @@ const renderZangFuModalContent = (item) => `
         <h3>Padrões de ${item.name}</h3>
     </div>
     <div class="card-content">
-        <div class="accordion-container">${createAccordionHTML(item.patterns, `modal-zangfu-${item.id}`)}</div>
+        <div class="space-y-3 accordion-container">${createAccordionHTML(item.patterns, `modal-zangfu-${item.id}`)}</div>
     </div>`;
 
+// Anatomia Energética (Zoom)
 const renderAnatomyCard = (item) => `
     <div class="meridian-card p-4 flex items-center justify-center text-center h-full" data-id="${item.id}">
         <h4 class="font-playfair font-bold text-lg text-primary">${item.title}</h4>
@@ -379,6 +384,7 @@ const renderAnatomyModalContent = (item) => `
     <div class="card-header"><h3>${item.title}</h3></div>
     <div class="card-content card-prose">${item.content}</div>`;
 
+// Tipos de Qi (Flip)
 const renderQiFlipCard = (item) => `
     <div class="flip-card">
         <div class="flip-card-inner">
@@ -391,6 +397,7 @@ const renderQiFlipCard = (item) => `
         </div>
     </div>`;
 
+// Grandes Mestres (Flip)
 const renderMasterFlipCard = (item) => `
     <div class="flip-card">
         <div class="flip-card-inner">
@@ -461,8 +468,8 @@ function setupDiagnosisDiagrams() {
 function setupDiagnosisAccordion() {
     const container = document.getElementById('diagnosis-accordion-container');
     if(!container) return;
-    const perguntasContent = `<div id="perguntas-accordion-inner" class="accordion-container"></div>`;
-    const pulseTypesContent = `<div id="pulse-list-container-inner" class="accordion-container"></div>`;
+    const perguntasContent = `<div id="perguntas-accordion-inner" class="space-y-3 accordion-container"></div>`;
+    const pulseTypesContent = `<div id="pulse-list-container-inner" class="space-y-3 accordion-container"></div>`;
     const diagnosisData = [ { title: 'As 10+1 Perguntas', content: perguntasContent }, { title: 'Tipos de Pulso Comuns', content: pulseTypesContent } ];
     
     container.innerHTML = createAccordionHTML(diagnosisData, 'diagnosis-sub');
@@ -550,7 +557,7 @@ function generateNavLinks() {
         if (item.links) {
             return `<div class="nav-group"><button class="nav-group-header flex items-center justify-between w-full p-2 rounded-lg" aria-expanded="false"><span class="flex items-center"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${item.icon}"></use></svg><span class="font-semibold">${item.title}</span></span><svg class="w-5 h-5 shrink-0 text-gray-400 chevron"><use href="#icon-chevron-down"></use></svg></button><div class="nav-group-content pl-4 pt-1 space-y-1">${item.links.map(link => `<a href="#${link.id}" class="sidebar-link flex items-center p-2 rounded-lg"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${link.icon}"></use></svg><span>${link.title}</span></a>`).join('')}</div></div>`;
         } else {
-            return `<a href="#${link.id}" class="sidebar-link flex items-center p-2 rounded-lg"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${item.icon}"></use></svg><span>${item.title}</span></a>`;
+            return `<a href="#${item.id}" class="sidebar-link flex items-center p-2 rounded-lg"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${item.icon}"></use></svg><span>${item.title}</span></a>`;
         }
     };
     const navHtml = navStructure.map(generateHtml).join('');
