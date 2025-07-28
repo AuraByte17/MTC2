@@ -1,5 +1,28 @@
 // --- DATA (Conteúdo completo com anatomia expandida) ---
 
+export const linguaData = {
+    ponta: {
+        title: 'Ponta (Coração)',
+        info: 'Reflete o estado do Shen (Mente/Espírito). Uma ponta vermelha indica Calor no Coração, muitas vezes associado a ansiedade, agitação mental ou insónia. Pontos vermelhos podem significar um Calor mais intenso. Uma ponta pálida sugere Deficiência de Qi ou Sangue do Coração.'
+    },
+    'pre-ponta': {
+        title: 'Atrás da Ponta (Pulmão)',
+        info: 'Mostra condições do sistema respiratório e do Wei Qi (energia defensiva). Uma ligeira vermelhidão pode indicar Calor no Pulmão (ex: início de uma constipação por Vento-Calor). Fissuras pequenas podem apontar para uma secura ou Deficiência de Yin do Pulmão.'
+    },
+    laterais: {
+        title: 'Laterais (Fígado e Vesícula Biliar)',
+        info: 'Indicam o estado do fluxo de Qi do Fígado. Laterais vermelhas e inchadas são um sinal clássico de Estagnação de Qi do Fígado ou subida do Yang do Fígado, associado a irritabilidade, stress e dores de cabeça. Marcas de dentes podem indicar Estagnação de Qi com Deficiência de Baço.'
+    },
+    centro: {
+        title: 'Centro (Baço e Estômago)',
+        info: 'Reflete o estado da digestão. Uma saburra amarela e espessa no centro indica Humidade-Calor no sistema digestivo. Fissuras no centro podem apontar para uma condição crónica de Deficiência de Yin do Estômago. Uma ausência de saburra no centro pode indicar "fogo no estômago".'
+    },
+    raiz: {
+        title: 'Raiz (Rim, Bexiga, Intestinos)',
+        info: 'Mostra a nossa constituição (Jing) e o estado do Aquecedor Inferior. Uma saburra espessa, amarela e gordurosa na raiz é um sinal de Humidade-Calor no Aquecedor Inferior. Uma língua descascada na raiz pode indicar uma Deficiência de Yin do Rim severa.'
+    }
+};
+
 // Exporta os dados sobre a Teoria do Yin-Yang
 export const yinYangData = {
     id: 'yin-yang',
@@ -1142,9 +1165,9 @@ export const greatMastersData = [
 // NOVO: Exporta os dados sobre Terapias (Versão Aprofundada e Expandida)
 export const therapiesData = [
     {
-
         id: 'acupuntura',
         title: 'Acupuntura (针灸 - Zhēnjiǔ)',
+        icon: 'icon-needle', // Ícone adicionado
         content: `<div class="card-prose">
             <p class="mb-4">A <strong>Acupuntura</strong> é a prática de inserir agulhas muito finas em pontos específicos do corpo (os "acupontos" ou <em>Xue Wei</em>) para estimular e reequilibrar o fluxo de Qi nos Meridianos (<em>Jingluo</em>). É a terapia da Medicina Chinesa mais conhecida no Ocidente.</p>
             
@@ -1188,6 +1211,7 @@ export const therapiesData = [
     {
         id: 'ventosaterapia',
         title: 'Ventosaterapia (拔罐 - Báguàn)',
+        icon: 'icon-cup', // Ícone adicionado
         content: `<div class="card-prose">
             <p class="mb-4">A <strong>Ventosaterapia</strong> é um método no qual se cria um vácuo parcial em copos, que são depois aplicados na pele. A sucção resultante puxa a pele e as camadas superficiais dos músculos, promovendo um fluxo vigoroso de Qi e Sangue na área, aliviando a dor e expelindo fatores patogénicos.</p>
             
@@ -1234,6 +1258,7 @@ export const therapiesData = [
     {
         id: 'moxabustao',
         title: 'Moxabustão (灸 - Jiǔ)',
+        icon: 'icon-fire', // Ícone adicionado
         content: `<div class="card-prose">
             <p class="mb-4">A <strong>Moxabustão</strong> é uma terapia de calor que utiliza a erva seca <strong><em>Artemisia Vulgaris</em> (艾叶 - Ai Ye)</strong>. O calor gerado pela sua combustão lenta penetra profundamente nos meridianos para aquecer, mover o Qi, expelir o Frio e a Humidade, e tonificar o Yang Qi.</p>
             
@@ -1272,6 +1297,7 @@ export const therapiesData = [
     {
         id: 'fitoterapia',
         title: 'Fitoterapia Chinesa (中药 - Zhōngyào)',
+        icon: 'icon-leaf', // Ícone adicionado
         content: `<div class="card-prose">
             <p class="mb-4">A <strong>Fitoterapia Chinesa</strong> é um dos pilares mais sofisticados da MTC. Utiliza uma vasta matéria médica (plantas, minerais) para criar fórmulas personalizadas que tratam padrões de desarmonia. As ervas raramente são usadas isoladamente; o seu poder reside na sinergia complexa das fórmulas.</p>
             
@@ -1312,6 +1338,7 @@ export const therapiesData = [
     {
         id: 'qigong',
         title: 'Qigong (气功)',
+        icon: 'icon-wind', // Ícone adicionado
         content: `<div class="card-prose">
             <p class="mb-4"><strong>Qigong</strong> (Trabalho da Energia) é uma prática ancestral chinesa que combina movimento lento, técnicas de respiração e foco mental para cultivar e equilibrar o Qi (energia vital). É a base de práticas mais complexas como o Tai Chi.</p>
 
@@ -1354,6 +1381,7 @@ export const therapiesData = [
     {
         id: 'taichi',
         title: 'Tai Chi (太极拳)',
+        icon: 'icon-yin-yang', // Ícone adicionado
         content: `<div class="card-prose">
             <p class="mb-4">O <strong>Tai Chi Chuan</strong> (Punho do Supremo Último) é uma arte marcial interna que evoluiu do Qigong. É frequentemente descrito como "meditação em movimento", consistindo em sequências de movimentos fluidos e interligados (as "formas").</p>
 
