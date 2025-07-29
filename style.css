@@ -222,7 +222,7 @@ aside {
 .yin-card { background: linear-gradient(145deg, #2d3748, #1a202c); color: #e2e8f0; }
 .yang-card { background: linear-gradient(145deg, #ffffff, #f7fafc); color: #4a5568; }
 
-/* --- 5 ELEMENTOS (ESTILO PROFISSIONAL) --- */
+/* --- 5 ELEMENTOS (ESTILO FINAL) --- */
 #element-diagram-container {
     position: relative;
     display: flex;
@@ -232,15 +232,10 @@ aside {
 #element-diagram-svg {
     overflow: visible;
 }
-.element-bg-ring {
-    fill: none;
-    stroke: var(--color-background-end);
-    stroke-width: 40;
-}
 .element-sphere .sphere-shadow {
     fill: var(--color-subtle-gray);
     filter: blur(5px);
-    opacity: 0.5;
+    opacity: 0.6;
     transition: all 0.3s ease;
 }
 .element-sphere { 
@@ -248,42 +243,36 @@ aside {
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
 }
 .element-sphere:hover {
-    transform: scale(1.05);
+    transform: scale(1.08);
 }
 .element-sphere .sphere-circle { 
     transition: all 0.3s ease; 
-    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+    stroke: rgba(0,0,0,0.1);
+    stroke-width: 1px;
 }
 .element-sphere .sphere-text { 
     font-size: 14px; 
     font-weight: 600; 
-    fill: var(--color-primary-dark); 
+    fill: white; 
     text-anchor: middle; 
     pointer-events: none; 
-    mix-blend-mode: screen;
-    filter: invert(1) grayscale(1) contrast(10);
 }
 .element-sphere.active { 
-    transform: scale(1.15); 
-    animation: pulse 2s infinite;
-}
-@keyframes pulse {
-    0% { transform: scale(1.15); }
-    50% { transform: scale(1.18); }
-    100% { transform: scale(1.15); }
+    transform: scale(1.1); 
 }
 .element-sphere.active .sphere-circle { 
     stroke: white; 
     stroke-width: 3px; 
-    filter: drop-shadow(0 0 12px currentColor);
+    filter: drop-shadow(0 0 10px rgba(0,0,0,0.3));
 }
 .cycle-path { 
     stroke-dasharray: 1000; 
     stroke-dashoffset: 1000; 
     transition: stroke 0.4s ease-in-out, stroke-width 0.4s ease-in-out, opacity 0.4s ease-in-out; 
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.1));
 }
 .cycle-path.draw { 
-    animation: draw-line 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards; 
+    animation: draw-line 1s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards; 
 }
 @keyframes draw-line { to { stroke-dashoffset: 0; } }
 .arrow-marker { transition: fill 0.4s ease-in-out; }
