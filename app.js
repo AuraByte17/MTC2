@@ -18,6 +18,7 @@ import {
 } from './data.js';
 
 // --- Seleção de Elementos DOM ---
+const loadingScreen = document.getElementById('loading-screen');
 const openMenuBtn = document.getElementById('open-menu-btn');
 const closeMenuBtn = document.getElementById('close-menu-btn');
 const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
@@ -74,6 +75,9 @@ searchOverlay.addEventListener('click', closeSearchModal);
 function openContentModal(htmlContent) {
     contentModalContent.innerHTML = htmlContent;
     document.body.classList.add('content-modal-open');
+    
+    const modalAccordions = contentModalContent.querySelectorAll('.accordion-container');
+    modalAccordions.forEach(accordion => initializeAccordion(accordion));
 }
 function closeContentModal() {
     document.body.classList.remove('content-modal-open');
@@ -211,24 +215,13 @@ function createAccordionHTML(data, containerIdPrefix = '') {
 function setupYinYangSection() {
     const container = document.getElementById('yin-yang-container');
     if (!container) return;
-    const newSvg = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" class="w-full max-w-xs mx-auto yin-yang-svg">
-        <defs>
-            <linearGradient id="yin-grad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#4a5568" /><stop offset="100%" stop-color="#1a202c" /></linearGradient>
-            <linearGradient id="yang-grad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ffffff" /><stop offset="100%" stop-color="#e2e8f0" /></linearGradient>
-            <filter id="soft-glow" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="5" stdDeviation="8" flood-color="#000" flood-opacity="0.15"/></filter>
-        </defs>
-        <g filter="url(#soft-glow)">
-            <circle cx="100" cy="100" r="98" fill="url(#yang-grad)" stroke="#e2e8f0" stroke-width="2"/>
-            <path fill="url(#yin-grad)" d="M100,2 a98,98 0 0,0 0,196 a49,49 0 0,1 0,-98 a49,49 0 0,0 0,-98 Z"/>
-            <circle fill="url(#yin-grad)" cx="100" cy="149" r="18"/><circle fill="url(#yang-grad)" cx="100" cy="51" r="18"/>
-        </g>
-    </svg>`;
+    const svg = document.getElementById('yin-yang-loader-svg').innerHTML; // Reutiliza o SVG do loader
     container.innerHTML = `
         <div class="card-header"><h3>${yinYangData.title}</h3></div>
         <div class="card-content">
             <div class="grid lg:grid-cols-2 gap-8 items-center">
-                <div class="p-4">${newSvg}</div><div class="card-prose">${yinYangData.content}</div>
+                <div class="p-4"><svg viewBox="0 0 200 200" class="w-full max-w-xs mx-auto yin-yang-svg">${svg}</svg></div>
+                <div class="card-prose">${yinYangData.content}</div>
             </div>
             <div class="mt-8 grid md:grid-cols-2 gap-6">
                 <div class="yin-card"><h4 class="font-bold text-xl mb-3 text-center text-gray-100">YIN (阴)</h4><ul class="list-disc list-inside space-y-2 text-gray-300"><li>Noite, Lua, Escuro, Frio</li><li>Repouso, Passivo, Interior, Baixo</li><li>Substância, Matéria, Estrutura</li></ul></div>
@@ -247,15 +240,8 @@ function createLifeCycleTimeline(containerId, data, colorClass) {
         </div>`).join('');
 }
 
-// --- [NOVO] SISTEMA DE GRELHAS GENÉRICO ---
+// --- SISTEMA DE GRELHAS GENÉRICO ---
 
-/**
- * Cria uma grelha de cartões que abrem um modal de zoom.
- * @param {string} containerId - ID do container da grelha.
- * @param {Array} data - Array de dados.
- * @param {Function} cardRenderer - Função que renderiza o HTML de um cartão.
- * @param {Function} modalContentRenderer - Função que renderiza o HTML do conteúdo do modal.
- */
 function setupZoomGrid(containerId, data, cardRenderer, modalContentRenderer) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -276,12 +262,6 @@ function setupZoomGrid(containerId, data, cardRenderer, modalContentRenderer) {
     });
 }
 
-/**
- * Cria uma grelha de cartões que viram.
- * @param {string} containerId - ID do container da grelha.
- * @param {Array} data - Array de dados.
- * @param {Function} cardRenderer - Função que renderiza o HTML de um cartão (frente e verso).
- */
 function setupFlipGrid(containerId, data, cardRenderer) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -291,6 +271,16 @@ function setupFlipGrid(containerId, data, cardRenderer) {
     container.addEventListener('click', (e) => {
         const card = e.target.closest('.flip-card');
         if (!card) return;
+        
+        if (e.target.closest('.details-btn')) {
+            const masterId = e.target.closest('.details-btn').dataset.id;
+            const masterInfo = greatMastersData.find(m => m.id === masterId);
+            if (masterInfo) {
+                openContentModal(renderMasterModalContent(masterInfo));
+            }
+            return;
+        }
+        
         card.classList.toggle('flipped');
     });
 }
@@ -298,7 +288,6 @@ function setupFlipGrid(containerId, data, cardRenderer) {
 
 // --- RENDERERS PARA O SISTEMA DE GRELHAS ---
 
-// Meridianos (Zoom)
 const renderMeridianCard = (item) => `
     <div class="meridian-card" data-id="${item.id}">
         <span class="meridian-card-color-bar" style="background-color: var(--el-${item.color});"></span>
@@ -330,7 +319,6 @@ const renderMeridianModalContent = (item) => `
         <div class="space-y-3 max-h-80 overflow-y-auto pr-2">${item.points.map(p => `<div class="p-2 border-l-2 border-gray-200 hover:bg-gray-50"><strong class="text-primary-dark">${p.id} - ${p.name} (${p.character}) - ${p.pt_name}</strong><p class="text-gray-600 !mb-0">${p.functions}</p></div>`).join('')}</div>
     </div>`;
 
-// Terapêuticas (Zoom)
 const renderTherapyCard = (item) => {
     const regex = /(.+?)\s\((.+?)(?:\s-\s(.+?))?\)/;
     const match = item.title.match(regex);
@@ -344,7 +332,7 @@ const renderTherapyCard = (item) => {
         titleHTML = `<div class="text-xl font-playfair my-1">${item.title}</div>`;
     }
     return `
-    <div class="meridian-card text-center p-4" data-id="${item.id}">
+    <div class="meridian-card text-center p-4 flex flex-col justify-center items-center h-full" data-id="${item.id}">
         ${titleHTML}
         ${pinyinHTML}
     </div>`;
@@ -354,7 +342,6 @@ const renderTherapyModalContent = (item) => `
     <div class="card-header"><h3>${item.title}</h3></div>
     <div class="card-content card-prose">${item.content}</div>`;
 
-// Padrões Zang-Fu (Zoom)
 const renderZangFuCard = (item) => `
     <div class="meridian-card" data-id="${item.id}">
         <span class="meridian-card-color-bar" style="background-color: var(--el-${item.color});"></span>
@@ -369,12 +356,11 @@ const renderZangFuModalContent = (item) => `
         <h3>Padrões de ${item.name}</h3>
     </div>
     <div class="card-content">
-        <div class="space-y-3" id="modal-zangfu-accordion">${createAccordionHTML(item.patterns, `modal-zangfu-${item.id}`)}</div>
+        <div class="accordion-container">${createAccordionHTML(item.patterns, `modal-zangfu-${item.id}`)}</div>
     </div>`;
 
-// Anatomia Energética (Zoom)
 const renderAnatomyCard = (item) => `
-    <div class="meridian-card p-4" data-id="${item.id}">
+    <div class="meridian-card p-4 flex items-center justify-center text-center h-full" data-id="${item.id}">
         <h4 class="font-playfair font-bold text-lg text-primary">${item.title}</h4>
     </div>`;
 
@@ -382,7 +368,6 @@ const renderAnatomyModalContent = (item) => `
     <div class="card-header"><h3>${item.title}</h3></div>
     <div class="card-content card-prose">${item.content}</div>`;
 
-// Tipos de Qi (Flip)
 const renderQiFlipCard = (item) => `
     <div class="flip-card">
         <div class="flip-card-inner">
@@ -395,7 +380,6 @@ const renderQiFlipCard = (item) => `
         </div>
     </div>`;
 
-// Grandes Mestres (Flip)
 const renderMasterFlipCard = (item) => `
     <div class="flip-card">
         <div class="flip-card-inner">
@@ -413,8 +397,12 @@ const renderMasterFlipCard = (item) => `
     </div>`;
 
 const renderMasterModalContent = (item) => `
-    <div class="card-header"><img src="${item.image_placeholder}" alt="Retrato de ${item.name}" class="w-full h-48 object-cover"><h3 class="text-2xl font-playfair font-bold">${item.name}</h3><p class="font-semibold text-gray-500 text-sm">${item.dynasty}</p></div>
-    <div class="card-content card-prose">${item.content}</div>`;
+    <div class="card-header"><h3 class="text-2xl font-playfair font-bold">${item.name}</h3></div>
+    <div class="card-content card-prose">
+        <img src="${item.image_placeholder}" alt="Retrato de ${item.name}" class="w-full h-48 object-cover rounded-lg mb-4 shadow-md">
+        <p class="font-semibold text-gray-500 text-sm !-mt-2 !mb-4">${item.dynasty}</p>
+        ${item.content}
+    </div>`;
 
 
 // --- LÓGICA DE DIAGNÓSTICO ---
@@ -462,8 +450,8 @@ function setupDiagnosisDiagrams() {
 function setupDiagnosisAccordion() {
     const container = document.getElementById('diagnosis-accordion-container');
     if(!container) return;
-    const perguntasContent = `<div id="perguntas-accordion-inner" class="space-y-3"></div>`;
-    const pulseTypesContent = `<div id="pulse-list-container-inner" class="space-y-3"></div>`;
+    const perguntasContent = `<div id="perguntas-accordion-inner" class="accordion-container"></div>`;
+    const pulseTypesContent = `<div id="pulse-list-container-inner" class="accordion-container"></div>`;
     const diagnosisData = [ { title: 'As 10+1 Perguntas', content: perguntasContent }, { title: 'Tipos de Pulso Comuns', content: pulseTypesContent } ];
     
     container.innerHTML = createAccordionHTML(diagnosisData, 'diagnosis-sub');
@@ -496,7 +484,24 @@ let selectedElementId = null;
 const cycleInfo = { geracao: { title: 'Ciclo de Geração (Sheng)', description: 'Este ciclo representa a nutrição e o apoio. Cada elemento é a "mãe" do seguinte, nutrindo-o e promovendo o seu crescimento.', color: 'bg-green-100', textColor: 'text-green-800' }, controlo: { title: 'Ciclo de Controlo (Ke)', description: 'Este ciclo representa o controlo e a restrição, garantindo que nenhum elemento se torna excessivo e mantendo o equilíbrio do sistema.', color: 'bg-red-100', textColor: 'text-red-800' } };
 const elementCoords = { madeira: { x: 150, y: 45 }, fogo: { x: 255, y: 125 }, terra: { x: 208, y: 255 }, metal: { x: 92, y: 255 }, agua: { x: 45, y: 125 } };
 const cyclePaths = { geracao: [ { id: 'madeira-fogo', d: `M ${elementCoords.madeira.x} ${elementCoords.madeira.y} C 210 65, 230 80, ${elementCoords.fogo.x} ${elementCoords.fogo.y}` }, { id: 'fogo-terra', d: `M ${elementCoords.fogo.x} ${elementCoords.fogo.y} C 250 180, 240 220, ${elementCoords.terra.x} ${elementCoords.terra.y}` }, { id: 'terra-metal', d: `M ${elementCoords.terra.x} ${elementCoords.terra.y} C 160 285, 130 285, ${elementCoords.metal.x} ${elementCoords.metal.y}` }, { id: 'metal-agua', d: `M ${elementCoords.metal.x} ${elementCoords.metal.y} C 60 220, 50 180, ${elementCoords.agua.x} ${elementCoords.agua.y}` }, { id: 'agua-madeira', d: `M ${elementCoords.agua.x} ${elementCoords.agua.y} C 70 80, 90 65, ${elementCoords.madeira.x} ${elementCoords.madeira.y}` } ], controlo: [ { id: 'madeira-terra', d: `M ${elementCoords.madeira.x} ${elementCoords.madeira.y} L ${elementCoords.terra.x} ${elementCoords.terra.y}` }, { id: 'fogo-metal', d: `M ${elementCoords.fogo.x} ${elementCoords.fogo.y} L ${elementCoords.metal.x} ${elementCoords.metal.y}` }, { id: 'terra-agua', d: `M ${elementCoords.terra.x} ${elementCoords.terra.y} L ${elementCoords.agua.x} ${elementCoords.agua.y}` }, { id: 'metal-madeira', d: `M ${elementCoords.metal.x} ${elementCoords.metal.y} L ${elementCoords.madeira.x} ${elementCoords.madeira.y}` }, { id: 'agua-fogo', d: `M ${elementCoords.agua.x} ${elementCoords.agua.y} L ${elementCoords.fogo.x} ${elementCoords.fogo.y}` } ] };
-function setup5ElementsDiagram() { if (!spheresContainer) return; spheresContainer.innerHTML = Object.keys(fiveElementsData).map(key => { const el = fiveElementsData[key]; const { x, y } = elementCoords[key]; return `<g id="${key}" class="element-sphere"><defs><radialGradient id="grad-${key}" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="white" stop-opacity="0.5" /><stop offset="100%" stop-color="var(--el-${el.color})" stop-opacity="1" /></radialGradient></defs><circle class="sphere-circle" cx="${x}" cy="${y}" r="30" fill="url(#grad-${key})" stroke="var(--el-${el.color})" stroke-width="1.5" filter="url(#sphere-glow)"/><text class="sphere-text" x="${x}" y="${y + 5}">${el.name}</text></g>`; }).join(''); }
+function setup5ElementsDiagram() { 
+    if (!spheresContainer) return; 
+    spheresContainer.innerHTML = Object.keys(fiveElementsData).map(key => { 
+        const el = fiveElementsData[key]; 
+        const { x, y } = elementCoords[key]; 
+        return `<g id="${key}" class="element-sphere">
+            <defs>
+                <radialGradient id="grad-${key}" cx="30%" cy="30%" r="70%">
+                    <stop offset="0%" stop-color="white" stop-opacity="0.5" />
+                    <stop offset="100%" stop-color="var(--el-${el.color})" stop-opacity="1" />
+                </radialGradient>
+            </defs>
+            <circle class="sphere-shadow" cx="${x}" cy="${y}" r="30" />
+            <circle class="sphere-circle" cx="${x}" cy="${y}" r="30" fill="url(#grad-${key})" stroke="var(--el-${el.color})" stroke-width="1.5"/>
+            <text class="sphere-text" x="${x}" y="${y + 5}">${el.name}</text>
+        </g>`; 
+    }).join(''); 
+}
 function renderCyclePaths() { if(!pathsContainer) return; pathsContainer.innerHTML = cyclePaths[currentCycle].map(p => `<path id="${p.id}" class="cycle-path" d="${p.d}" stroke="${defaultColor}" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>`).join(''); }
 function update5ElementsUI() { if(!elementDiagramSVG) return; elementDiagramSVG.querySelectorAll('.element-sphere').forEach(g => g.classList.remove('active')); document.querySelectorAll('.arrow-marker').forEach(marker => marker.style.fill = defaultColor); if (pathsContainer) { pathsContainer.querySelectorAll('.cycle-path').forEach(path => { path.style.stroke = defaultColor; path.style.strokeWidth = '2.5'; path.classList.remove('draw'); }); } if (selectedElementId) { const elData = fiveElementsData[selectedElementId]; const selectedGroup = document.getElementById(selectedElementId); if (selectedGroup) selectedGroup.classList.add('active'); const targetElementId = elData.target[currentCycle]; const activePathId = `${selectedElementId}-${targetElementId}`; const activePath = document.getElementById(activePathId); if (activePath) { const color = `var(--el-${elData.color})`; activePath.style.stroke = color; activePath.style.color = color; activePath.style.strokeWidth = '4'; activePath.classList.add('draw'); const marker = document.querySelector(`#arrow path`); if (marker) marker.style.fill = color; } elementDetailsContainer.innerHTML = `<div class="text-left p-6 rounded-lg border-2" style="border-color: var(--el-${elData.color}); background-color: #fafcff;"><h3 class="text-2xl font-playfair font-bold mb-4" style="color: var(--el-${elData.color});">${elData.name}</h3><div class="card-prose"><p class="font-semibold text-gray-600 mb-2">Relações no Ciclo de ${currentCycle.charAt(0).toUpperCase() + currentCycle.slice(1)}:</p><p class="text-sm">${elData.relations[currentCycle]}</p><table class="w-full text-sm mt-4"><tbody>${elData.table}</tbody></table></div></div>`; } else { elementDetailsContainer.innerHTML = '<div class="flex items-center justify-center h-full text-center text-gray-500 p-4 bg-gray-50 rounded-lg"><p>Clique num elemento do diagrama para ver as suas correspondências detalhadas e a sua relação no ciclo atual.</p></div>'; } }
 function switchCycle(cycle) { currentCycle = cycle; const info = cycleInfo[cycle]; if(cycleInfoBox) { cycleInfoBox.className = `mb-6 p-4 rounded-lg text-center transition-colors duration-500 ${info.color} ${info.textColor}`; cycleInfoBox.innerHTML = `<h4 class="font-bold">${info.title}</h4><p class="text-sm">${info.description}</p>`; } if(btnGeracao) btnGeracao.classList.toggle('active', cycle === 'geracao'); if(btnControlo) btnControlo.classList.toggle('active', cycle === 'controlo'); renderCyclePaths(); update5ElementsUI(); }
@@ -505,7 +510,7 @@ if(btnControlo) btnControlo.addEventListener('click', () => switchCycle('control
 if (elementDiagramSVG) { elementDiagramSVG.addEventListener('click', (e) => { const sphereGroup = e.target.closest('.element-sphere'); if (sphereGroup) { selectedElementId = sphereGroup.id; update5ElementsUI(); } }); }
 
 function setupGlossary() { const glossaryContainer = document.getElementById('glossary-container'); if (!glossaryContainer) return; const categories = Object.values(glossaryData).reduce((acc, item) => { (acc[item.category] = acc[item.category] || []).push(item); return acc; }, {}); const sortedCategories = Object.keys(categories).sort(); glossaryContainer.innerHTML = sortedCategories.map(category => `<div class="floating-card mb-8"><div class="card-header"><h3 class="text-gray-700">${category}</h3></div><div class="card-content grid md:grid-cols-2 gap-x-8 gap-y-6">${categories[category].sort((a, b) => a.term.localeCompare(b.term)).map(item => `<div><h4 class="font-bold text-lg">${item.term}</h4><p class="text-gray-600">${item.definition}</p></div>`).join('')}</div></div>`).join(''); }
-function activateTooltips() { document.body.addEventListener('mouseover', e => { const term = e.target.closest('.tooltip-term'); if(term) { const existingTooltip = term.querySelector('.tooltip-box'); if (!existingTooltip) { const termKey = term.dataset.term.toLowerCase(); if (glossaryData[termKey]) { const tooltipBox = document.createElement('div'); tooltipBox.className = 'tooltip-box'; tooltipBox.textContent = glossaryData[termKey].definition; term.appendChild(tooltipBox); } } } }); }
+
 function setupDietetics() { const foodSearchInput = document.getElementById('food-search-input'); const foodResultsContainer = document.getElementById('food-results-container'); const foodAlphaNav = document.getElementById('food-alpha-nav'); function renderFoodList(foods) { const groupedFoods = foods.reduce((acc, food) => { const firstLetter = food.name.charAt(0).toUpperCase(); if (!acc[firstLetter]) acc[firstLetter] = []; acc[firstLetter].push(food); return acc; }, {}); const letters = Object.keys(groupedFoods).sort(); if (foodAlphaNav) foodAlphaNav.innerHTML = letters.map(letter => `<a href="#food-letter-${letter}">${letter}</a>`).join(''); if (foodResultsContainer) { foodResultsContainer.innerHTML = letters.map(letter => `<h3 id="food-letter-${letter}" class="food-group-header" tabindex="-1">${letter}</h3><div class="food-group-items">${groupedFoods[letter].map(food => `<div class="food-item floating-card p-4 mb-3"><h4 class="font-bold text-lg text-green-800">${food.name}</h4><div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm mt-2"><div><strong>Temp:</strong> <span class="font-semibold">${food.temp}</span></div><div><strong>Sabor:</strong> <span class="font-semibold">${food.flavor}</span></div><div class="col-span-2"><strong>Órgãos:</strong> <span class="font-semibold">${food.organs}</span></div></div><p class="text-sm mt-2"><strong>Ações:</strong> ${food.actions}</p></div>`).join('')}</div>`).join(''); } } if (foodSearchInput) { renderFoodList(foodData); foodSearchInput.addEventListener('input', (e) => { const searchTerm = e.target.value.toLowerCase().trim(); const headers = foodResultsContainer.querySelectorAll('.food-group-header'); headers.forEach(header => { const groupWrapper = header.nextElementSibling; if (!groupWrapper) return; const items = groupWrapper.querySelectorAll('.food-item'); let groupHasVisibleItems = false; items.forEach(item => { const foodName = item.querySelector('h4').textContent.toLowerCase(); const isVisible = foodName.includes(searchTerm); item.classList.toggle('hidden', !isVisible); if (isVisible) groupHasVisibleItems = true; }); header.style.display = groupHasVisibleItems ? 'block' : 'none'; groupWrapper.style.display = groupHasVisibleItems ? 'block' : 'none'; }); }); } }
 
 function generateNavLinks() {
@@ -532,9 +537,9 @@ function generateNavLinks() {
 
     const generateHtml = (item) => {
         if (item.links) {
-            return `<div class="nav-group"><button class="nav-group-header flex items-center justify-between w-full p-2 rounded-lg" aria-expanded="false"><span class="flex items-center"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${item.icon}"></use></svg><span class="font-semibold">${item.title}</span></span><svg class="w-5 h-5 shrink-0 text-gray-400 chevron"><use href="#icon-chevron-down"></use></svg></button><div class="nav-group-content pl-4 pt-1 space-y-1">${item.links.map(link => `<a href="#${link.id}" class="sidebar-link flex items-center p-2 rounded-lg"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${link.icon}"></use></svg><span>${link.title}</span></a>`).join('')}</div></div>`;
+            return `<div class="nav-group"><button class="nav-group-header flex items-center justify-between w-full" aria-expanded="false"><span class="flex items-center"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${item.icon}"></use></svg><span class="font-semibold">${item.title}</span></span><svg class="w-5 h-5 shrink-0 text-gray-400 chevron"><use href="#icon-chevron-down"></use></svg></button><div class="nav-group-content pl-4 pt-1 space-y-1">${item.links.map(link => `<a href="#${link.id}" class="sidebar-link flex items-center p-2 rounded-lg"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${link.icon}"></use></svg><span>${link.title}</span></a>`).join('')}</div></div>`;
         } else {
-            return `<a href="#${item.id}" class="sidebar-link flex items-center p-2 rounded-lg"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${item.icon}"></use></svg><span>${item.title}</span></a>`;
+            return `<a href="#${link.id}" class="sidebar-link flex items-center p-2 rounded-lg"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${item.icon}"></use></svg><span>${item.title}</span></a>`;
         }
     };
     const navHtml = navStructure.map(generateHtml).join('');
@@ -542,7 +547,7 @@ function generateNavLinks() {
 }
 
 // --- PONTO DE ENTRADA DA APLICAÇÃO ---
-document.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('load', () => {
     generateNavLinks(); 
     
     // Setup das secções
@@ -562,18 +567,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Setup da grelha com flip para os Mestres
     setupFlipGrid('masters-grid-container', greatMastersData, renderMasterFlipCard);
     
-    // Adicionar listener para o botão "Ver Detalhes" dos mestres
-    document.getElementById('masters-grid-container').addEventListener('click', (e) => {
-        const button = e.target.closest('.details-btn');
-        if (button) {
-            const masterId = button.dataset.id;
-            const masterInfo = greatMastersData.find(m => m.id === masterId);
-            if (masterInfo) {
-                openContentModal(renderMasterModalContent(masterInfo));
-            }
-        }
-    });
-
     // Setup do diagnóstico
     setupDiagnosisAccordion();
     setupDiagnosisDiagrams();
@@ -593,16 +586,11 @@ document.addEventListener('DOMContentLoaded', () => {
     contentSections = mainContent.querySelectorAll('.content-section');
     showSection('inicio', 'Início');
     updateActiveLink('inicio');
-
-    // Inicializar acordeões que estão dentro de conteúdo dinâmico (modal Zang-Fu)
-    document.body.addEventListener('click', (e) => {
-        if(e.target.closest('[data-id*="zangfu-"]')) {
-             setTimeout(() => {
-                const modalAccordion = document.querySelector('#modal-zangfu-accordion');
-                if (modalAccordion) {
-                    initializeAccordion(modalAccordion);
-                }
-            }, 100); // Pequeno delay para garantir que o modal foi renderizado
-        }
-    });
+    
+    // Esconde o ecrã de carregamento
+    if(loadingScreen) {
+        setTimeout(() => {
+            loadingScreen.classList.add('hidden');
+        }, 500); // Um pequeno atraso para garantir que tudo está pronto
+    }
 });
