@@ -23,6 +23,28 @@ export const linguaData = {
     }
 };
 
+
+// NOVO: Adicionado o pulsePositionData que estava em falta
+export const pulsePositionData = {
+    cun: {
+        title: 'Posição Cun (Polegada)',
+        left: 'Coração / Intestino Delgado',
+        right: 'Pulmão / Intestino Grosso'
+    },
+    guan: {
+        title: 'Posição Guan (Barreira)',
+        left: 'Fígado / Vesícula Biliar',
+        right: 'Baço / Estômago'
+    },
+    chi: {
+        title: 'Posição Chi (Pé)',
+        left: 'Rim (Yin)',
+        right: 'Rim (Yang) / Pericárdio'
+    }
+};
+
+
+
 // Exporta os dados sobre a Teoria do Yin-Yang
 export const yinYangData = {
     id: 'yin-yang',

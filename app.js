@@ -14,7 +14,8 @@ import {
     pulseData,
     greatMastersData,
     therapiesData,
-    linguaData 
+    linguaData,
+    pulsePositionData
 } from './data.js';
 
 // --- Seleção de Elementos DOM ---
@@ -182,6 +183,7 @@ function initializeAccordion(container) {
         const item = button.closest('.accordion-item');
         if (!item) return;
         const isExpanded = button.getAttribute('aria-expanded') === 'true';
+        
         const allItems = container.querySelectorAll('.accordion-item');
         allItems.forEach(otherItem => {
             if (otherItem !== item) {
@@ -189,6 +191,7 @@ function initializeAccordion(container) {
                 if (otherButton) otherButton.setAttribute('aria-expanded', 'false');
             }
         });
+        
         button.setAttribute('aria-expanded', !isExpanded);
     });
 }
@@ -203,7 +206,7 @@ function createAccordionHTML(data, containerIdPrefix = '') {
                     ${item.color ? `<span class="w-3 h-3 rounded-full mr-3 shrink-0" style="background-color: var(--el-${item.color});"></span>` : ''}
                     <span class="text-left">${item.title}</span>
                 </span>
-                <svg class="w-5 h-5 shrink-0 text-gray-400 chevron"><use href="#icon-chevron-down"></use></svg>
+                <svg class="w-5 h-5 shrink-0 text-gray-400 chevron transition-transform duration-300"><use href="#icon-chevron-down"></use></svg>
             </button>
             <div class="accordion-content" id="${uniqueId}-content" role="region" aria-labelledby="${uniqueId}-button">
                 <div class="accordion-content-inner">${item.content || item.functions}</div>
@@ -435,7 +438,7 @@ function setupDiagnosisDiagrams() {
                 positions.forEach(p => p.classList.remove('active'));
                 pos.classList.add('active');
                 const positionId = pos.dataset.pos;
-                const info = pulseData.find(p => p.id === positionId);
+                const info = pulsePositionData[positionId];
                  if (info) {
                     pulseInfoBox.innerHTML = `
                         <h4 class="font-playfair font-bold text-lg text-primary mb-2">${info.title}</h4>
@@ -464,7 +467,7 @@ function setupDiagnosisAccordion() {
     }
     const pulsoContainer = document.getElementById('pulse-list-container-inner');
      if(pulsoContainer) {
-        const pulseTypes = pulseData.filter(p => p.type === 'common');
+        const pulseTypes = pulseData;
         pulsoContainer.innerHTML = createAccordionHTML(pulseTypes, 'pulse-list');
         initializeAccordion(pulsoContainer);
     }
@@ -483,6 +486,7 @@ let currentCycle = 'geracao';
 let selectedElementId = null;
 const cycleInfo = { geracao: { title: 'Ciclo de Geração (Sheng)', description: 'Este ciclo representa a nutrição e o apoio. Cada elemento é a "mãe" do seguinte, nutrindo-o e promovendo o seu crescimento.', color: 'bg-green-100', textColor: 'text-green-800' }, controlo: { title: 'Ciclo de Controlo (Ke)', description: 'Este ciclo representa o controlo e a restrição, garantindo que nenhum elemento se torna excessivo e mantendo o equilíbrio do sistema.', color: 'bg-red-100', textColor: 'text-red-800' } };
 const elementCoords = { madeira: { x: 150, y: 45 }, fogo: { x: 255, y: 125 }, terra: { x: 208, y: 255 }, metal: { x: 92, y: 255 }, agua: { x: 45, y: 125 } };
+// FIX: Corrected the typo from 'madea' to 'madeira'
 const cyclePaths = { geracao: [ { id: 'madeira-fogo', d: `M ${elementCoords.madeira.x} ${elementCoords.madeira.y} C 210 65, 230 80, ${elementCoords.fogo.x} ${elementCoords.fogo.y}` }, { id: 'fogo-terra', d: `M ${elementCoords.fogo.x} ${elementCoords.fogo.y} C 250 180, 240 220, ${elementCoords.terra.x} ${elementCoords.terra.y}` }, { id: 'terra-metal', d: `M ${elementCoords.terra.x} ${elementCoords.terra.y} C 160 285, 130 285, ${elementCoords.metal.x} ${elementCoords.metal.y}` }, { id: 'metal-agua', d: `M ${elementCoords.metal.x} ${elementCoords.metal.y} C 60 220, 50 180, ${elementCoords.agua.x} ${elementCoords.agua.y}` }, { id: 'agua-madeira', d: `M ${elementCoords.agua.x} ${elementCoords.agua.y} C 70 80, 90 65, ${elementCoords.madeira.x} ${elementCoords.madeira.y}` } ], controlo: [ { id: 'madeira-terra', d: `M ${elementCoords.madeira.x} ${elementCoords.madeira.y} L ${elementCoords.terra.x} ${elementCoords.terra.y}` }, { id: 'fogo-metal', d: `M ${elementCoords.fogo.x} ${elementCoords.fogo.y} L ${elementCoords.metal.x} ${elementCoords.metal.y}` }, { id: 'terra-agua', d: `M ${elementCoords.terra.x} ${elementCoords.terra.y} L ${elementCoords.agua.x} ${elementCoords.agua.y}` }, { id: 'metal-madeira', d: `M ${elementCoords.metal.x} ${elementCoords.metal.y} L ${elementCoords.madeira.x} ${elementCoords.madeira.y}` }, { id: 'agua-fogo', d: `M ${elementCoords.agua.x} ${elementCoords.agua.y} L ${elementCoords.fogo.x} ${elementCoords.fogo.y}` } ] };
 function setup5ElementsDiagram() { 
     if (!spheresContainer) return; 
@@ -539,7 +543,7 @@ function generateNavLinks() {
         if (item.links) {
             return `<div class="nav-group"><button class="nav-group-header flex items-center justify-between w-full" aria-expanded="false"><span class="flex items-center"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${item.icon}"></use></svg><span class="font-semibold">${item.title}</span></span><svg class="w-5 h-5 shrink-0 text-gray-400 chevron"><use href="#icon-chevron-down"></use></svg></button><div class="nav-group-content pl-4 pt-1 space-y-1">${item.links.map(link => `<a href="#${link.id}" class="sidebar-link flex items-center p-2 rounded-lg"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${link.icon}"></use></svg><span>${link.title}</span></a>`).join('')}</div></div>`;
         } else {
-            return `<a href="#${link.id}" class="sidebar-link flex items-center p-2 rounded-lg"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${item.icon}"></use></svg><span>${item.title}</span></a>`;
+            return `<a href="#${item.id}" class="sidebar-link flex items-center p-2 rounded-lg"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${item.icon}"></use></svg><span>${item.title}</span></a>`;
         }
     };
     const navHtml = navStructure.map(generateHtml).join('');
@@ -587,10 +591,9 @@ document.addEventListener('DOMContentLoaded', () => {
     showSection('inicio', 'Início');
     updateActiveLink('inicio');
     
-    // Esconde o ecrã de carregamento
     if(loadingScreen) {
         setTimeout(() => {
             loadingScreen.classList.add('hidden');
-        }, 500); // Um pequeno atraso para garantir que tudo está pronto
+        }, 500);
     }
 });
