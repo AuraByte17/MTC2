@@ -18,6 +18,7 @@ import {
 } from './data.js';
 
 // --- Seleção de Elementos DOM ---
+const loadingScreen = document.getElementById('loading-screen');
 const openMenuBtn = document.getElementById('open-menu-btn');
 const closeMenuBtn = document.getElementById('close-menu-btn');
 const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
@@ -40,7 +41,7 @@ const globalSearchInput = document.getElementById('global-search-input');
 const searchResultsContainer = document.getElementById('search-results-container');
 let searchIndex = [];
 
-// [NOVO] Elementos do Modal de Conteúdo
+// Elementos do Modal de Conteúdo
 const contentModal = document.getElementById('content-modal');
 const contentModalContent = document.getElementById('content-modal-content');
 const contentModalCloseBtn = document.getElementById('content-modal-close-btn');
@@ -70,10 +71,13 @@ desktopSearchInput.addEventListener('focus', openSearchModal);
 closeSearchBtn.addEventListener('click', closeSearchModal);
 searchOverlay.addEventListener('click', closeSearchModal);
 
-// --- [NOVO] LÓGICA DO MODAL DE CONTEÚDO ---
+// --- LÓGICA DO MODAL DE CONTEÚDO ---
 function openContentModal(htmlContent) {
     contentModalContent.innerHTML = htmlContent;
     document.body.classList.add('content-modal-open');
+    
+    const modalAccordions = contentModalContent.querySelectorAll('.accordion-container');
+    modalAccordions.forEach(accordion => initializeAccordion(accordion));
 }
 function closeContentModal() {
     document.body.classList.remove('content-modal-open');
@@ -211,99 +215,19 @@ function createAccordionHTML(data, containerIdPrefix = '') {
 function setupYinYangSection() {
     const container = document.getElementById('yin-yang-container');
     if (!container) return;
-    const newSvg = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" class="w-full max-w-xs mx-auto yin-yang-svg">
-        <defs>
-            <linearGradient id="yin-grad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#4a5568" /><stop offset="100%" stop-color="#1a202c" /></linearGradient>
-            <linearGradient id="yang-grad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ffffff" /><stop offset="100%" stop-color="#e2e8f0" /></linearGradient>
-            <filter id="soft-glow" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="5" stdDeviation="8" flood-color="#000" flood-opacity="0.15"/></filter>
-        </defs>
-        <g filter="url(#soft-glow)">
-            <circle cx="100" cy="100" r="98" fill="url(#yang-grad)" stroke="#e2e8f0" stroke-width="2"/>
-            <path fill="url(#yin-grad)" d="M100,2 a98,98 0 0,0 0,196 a49,49 0 0,1 0,-98 a49,49 0 0,0 0,-98 Z"/>
-            <circle fill="url(#yin-grad)" cx="100" cy="149" r="18"/><circle fill="url(#yang-grad)" cx="100" cy="51" r="18"/>
-        </g>
-    </svg>`;
+    const svg = document.getElementById('yin-yang-loader-svg').innerHTML;
     container.innerHTML = `
         <div class="card-header"><h3>${yinYangData.title}</h3></div>
         <div class="card-content">
             <div class="grid lg:grid-cols-2 gap-8 items-center">
-                <div class="p-4">${newSvg}</div><div class="card-prose">${yinYangData.content}</div>
+                <div class="p-4"><svg viewBox="0 0 200 200" class="w-full max-w-xs mx-auto yin-yang-svg">${svg}</svg></div>
+                <div class="card-prose">${yinYangData.content}</div>
             </div>
             <div class="mt-8 grid md:grid-cols-2 gap-6">
                 <div class="yin-card"><h4 class="font-bold text-xl mb-3 text-center text-gray-100">YIN (阴)</h4><ul class="list-disc list-inside space-y-2 text-gray-300"><li>Noite, Lua, Escuro, Frio</li><li>Repouso, Passivo, Interior, Baixo</li><li>Substância, Matéria, Estrutura</li></ul></div>
                 <div class="yang-card"><h4 class="font-bold text-xl mb-3 text-center text-gray-800">YANG (阳)</h4><ul class="list-disc list-inside space-y-2 text-gray-600"><li>Dia, Sol, Luz, Calor</li><li>Atividade, Ativo, Exterior, Cima</li><li>Função, Energia, Movimento</li></ul></div>
             </div>
         </div>`;
-}
-
-function setupQiCards(containerId, data) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    container.innerHTML = data.map(item => `
-        <div class="floating-card h-full">
-            <div class="card-content">
-                <h4 class="font-bold text-lg text-primary !mt-0">${item.title}</h4>
-                <p class="text-gray-600 !mb-0 text-sm">${item.content}</p>
-            </div>
-        </div>
-    `).join('');
-}
-
-function setupTherapiesGrid() {
-    const container = document.getElementById('therapies-grid-container');
-    if (!container) return;
-    
-    container.innerHTML = `
-        <div class="text-center mb-12">
-            <h2 class="text-3xl font-playfair font-bold text-primary">Terapêuticas da MTC</h2>
-            <p class="text-gray-600 mt-2 max-w-2xl mx-auto">Explore as principais modalidades de tratamento. Clique em cada cartão para aprender mais.</p>
-        </div>
-        <div class="therapies-grid">
-            ${therapiesData.map(therapy => {
-                const regex = /(.+?)\s\((.+?)(?:\s-\s(.+?))?\)/;
-                const match = therapy.title.match(regex);
-                let titleHTML, pinyinHTML = '';
-                if (match) {
-                    const [, pt, ch, pinyin] = match;
-                    titleHTML = `<div class="text-2xl font-chinese">${ch}</div><div class="text-xl font-playfair my-1">${pt}</div>`;
-                    if (pinyin) pinyinHTML = `<div class="text-sm text-gray-500 font-mono">(${pinyin})</div>`;
-                    else if (ch === '气功' || ch === '太极拳') pinyinHTML = `<div class="text-sm text-gray-500 font-mono">(${ch === '气功' ? 'Qìgōng' : 'Tàijí quán'})</div>`;
-                } else {
-                    titleHTML = `<div class="text-xl font-playfair my-1">${therapy.title}</div>`;
-                }
-
-                return `
-                <div class="therapy-card" data-id="${therapy.id}">
-                    <div class="therapy-card-front">
-                        <div class="therapy-card-title-wrapper">
-                            ${titleHTML}
-                            ${pinyinHTML}
-                        </div>
-                    </div>
-                    <div class="therapy-card-back">
-                        <div class="therapy-content-inner card-prose">
-                            ${therapy.content}
-                        </div>
-                    </div>
-                </div>`;
-            }).join('')}
-        </div>
-    `;
-
-    const grid = container.querySelector('.therapies-grid');
-    grid.addEventListener('click', (e) => {
-        const card = e.target.closest('.therapy-card');
-        if (!card) return;
-
-        const isExpanded = card.classList.contains('expanded');
-
-        grid.querySelectorAll('.therapy-card').forEach(c => c.classList.remove('expanded'));
-        
-        if (!isExpanded) {
-            card.classList.add('expanded');
-        }
-    });
 }
 
 function createLifeCycleTimeline(containerId, data, colorClass) {
@@ -316,163 +240,172 @@ function createLifeCycleTimeline(containerId, data, colorClass) {
         </div>`).join('');
 }
 
-function setupSidebarLayout(navId, contentId, data, idPrefix = 'content-') {
-    const navContainer = document.getElementById(navId);
-    const contentContainer = document.getElementById(contentId);
-    if (!navContainer || !contentContainer) return;
+// --- SISTEMA DE GRELHAS GENÉRICO ---
 
-    navContainer.innerHTML = data.map(item => `
-        <button class="sidebar-nav-item flex items-center text-left w-full" data-id="${item.id}">
-            ${item.color ? `<span class="w-4 h-4 rounded-full mr-3 flex-shrink-0" style="background-color: var(--el-${item.color});"></span>` : ''}
-            <span class="font-semibold text-sm">${item.name || item.title}</span>
-        </button>
-    `).join('');
-    
-    if (navId === 'zangfu-navigation') {
-        contentContainer.innerHTML = setupZangFuLayout(data);
-    } else if (navId === 'masters-navigation') {
-        contentContainer.innerHTML = data.map(item => setupMasterLayout(item, idPrefix)).join('');
-    } else { 
-        contentContainer.innerHTML = data.map(item => `
-            <div class="content-card" id="${idPrefix}${item.id}">
-                <div class="pb-4 mb-4 border-b-2" style="border-color: var(--el-${item.color || 'primary'});">
-                    <h3 class="text-2xl font-playfair font-bold" style="color: var(--el-${item.color || 'primary'});">${item.name || item.title}</h3>
-                </div>
-                ${item.content ? `<div class="card-prose">${item.content}</div>` : ''}
-            </div>`).join('');
-    }
-    
-    const navItems = navContainer.querySelectorAll('.sidebar-nav-item');
-    const contentCards = contentContainer.querySelectorAll('.content-card');
-
-    navContainer.addEventListener('click', (e) => {
-        const button = e.target.closest('.sidebar-nav-item');
-        if (!button) return;
-        const targetId = button.dataset.id;
-        navItems.forEach(nav => nav.classList.remove('active'));
-        button.classList.add('active');
-        contentCards.forEach(card => card.classList.remove('active'));
-        const targetCard = contentContainer.querySelector(`#${idPrefix}${targetId}`);
-        if(targetCard) targetCard.classList.add('active');
-    });
-
-    if (navItems.length > 0) navItems[0].click();
-}
-
-function getMeridianPanelContent(item) { 
-    return `
-        <div class="card-header">
-            <span class="w-4 h-4 rounded-full mr-3 shrink-0" style="background-color: var(--el-${item.color});"></span>
-            <h3>${item.name}</h3>
-        </div>
-        <div class="card-content card-prose text-sm">
-            <div class="grid md:grid-cols-2 gap-x-8">
-                <div><h4 class="font-bold !text-base !mb-2 !mt-0">Funções Principais</h4><p class="text-gray-600">${item.functions}</p></div>
-                <div><h4 class="font-bold !text-base !mb-2 !mt-0">Sinais de Desequilíbrio</h4><p class="text-gray-600">${item.imbalances}</p></div>
-            </div>
-            <h4 class="font-bold !text-base !mb-2">Pontos Especiais</h4>
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-2 text-xs p-3 bg-gray-50 rounded-md">
-                <div><strong>Fonte (Yuan):</strong> ${item.yuan_source}</div>
-                <div><strong>Conexão (Luo):</strong> ${item.luo_connecting}</div>
-                <div><strong>Fenda (Xi):</strong> ${item.xi_cleft}</div>
-            </div>
-            <h4 class="font-bold !text-base !mb-2">Pontos Shu Antigos</h4>
-            <div class="overflow-x-auto"><table class="w-full text-left !text-xs"><thead class="bg-gray-100"><tr><th class="p-2 font-semibold">Tipo</th><th class="p-2 font-semibold">Elemento</th><th class="p-2 font-semibold">Ponto</th><th class="p-2 font-semibold">Funções</th></tr></thead><tbody>${item.five_shu.map(p => `<tr class="border-b"><td class="p-2">${p.type}</td><td class="p-2">${p.element}</td><td class="p-2 font-bold">${p.point}</td><td class="p-2">${p.functions}</td></tr>`).join('')}</tbody></table></div>
-            <h4 class="font-bold !text-base !mb-2">Lista Completa de Pontos</h4>
-            <div class="space-y-3 max-h-80 overflow-y-auto pr-2">${item.points.map(p => `<div class="p-2 border-l-2 border-gray-200 hover:bg-gray-50"><strong class="text-primary-dark">${p.id} - ${p.name} (${p.character}) - ${p.pt_name}</strong><p class="text-gray-600 !mb-0">${p.functions}</p></div>`).join('')}</div>
-        </div>`; 
-}
-
-// [NOVO] Configura a secção de Meridianos com uma grelha de cartões que abrem um modal de zoom.
-function setupMeridianGrid() {
-    const container = document.getElementById('meridian-grid-container');
+function setupZoomGrid(containerId, data, cardRenderer, modalContentRenderer) {
+    const container = document.getElementById(containerId);
     if (!container) return;
 
-    container.innerHTML = meridianData.map(meridian => `
-        <div class="meridian-card" data-meridian-id="${meridian.id}">
-            <span class="meridian-card-color-bar" style="background-color: var(--el-${meridian.color});"></span>
-            <div class="p-4">
-                <h4 class="font-playfair font-bold text-lg text-primary">${meridian.name}</h4>
-                <p class="text-xs text-gray-500">${meridian.element} / ${meridian.time}</p>
-            </div>
-        </div>
-    `).join('');
+    container.innerHTML = data.map(item => cardRenderer(item)).join('');
 
     container.addEventListener('click', (e) => {
-        const card = e.target.closest('.meridian-card');
+        const card = e.target.closest('[data-id]');
         if (!card) return;
 
-        const meridianId = card.dataset.meridianId;
-        const meridianInfo = meridianData.find(m => m.id === meridianId);
+        const itemId = card.dataset.id;
+        const itemInfo = data.find(d => d.id === itemId);
 
-        if (meridianInfo) {
-            const contentHTML = getMeridianPanelContent(meridianInfo);
+        if (itemInfo) {
+            const contentHTML = modalContentRenderer(itemInfo);
             openContentModal(contentHTML);
         }
     });
 }
 
+function setupFlipGrid(containerId, data, cardRenderer) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
 
-function setupZangFuLayout(data) {
-    return data.map((organ) => {
-        const accordionItems = organ.patterns.map((pattern, patternIndex) => {
-            const uniqueId = `zangfu-${organ.id}-pattern-${patternIndex}`;
-            return `
-            <div class="accordion-item">
-                <button class="accordion-button" aria-expanded="false" aria-controls="${uniqueId}-content" id="${uniqueId}-button">
-                    <span class="accordion-title-content">
-                        <svg class="w-5 h-5 text-gray-400 shrink-0"><use href="#icon-clipboard-heart"></use></svg>
-                        <span class="text-left">${pattern.name}</span>
-                    </span>
-                    <svg class="w-5 h-5 shrink-0 text-gray-400 chevron"><use href="#icon-chevron-down"></use></svg>
-                </button>
-                <div class="accordion-content" id="${uniqueId}-content" role="region" aria-labelledby="${uniqueId}-button">
-                    <div class="accordion-content-inner card-prose text-sm">
-                        <h4 class="font-bold text-gray-700">Manifestações Clínicas:</h4><p>${pattern.symptoms}</p>
-                        <h4 class="font-bold text-gray-700">Língua:</h4><p>${pattern.tongue}</p>
-                        <h4 class="font-bold text-gray-700">Pulso:</h4><p>${pattern.pulse}</p>
-                        <h4 class="font-bold text-gray-700">Princípio de Tratamento:</h4><p class="text-green-800 font-semibold">${pattern.treatmentPrinciple}</p>
-                    </div>
-                </div>
-            </div>`;
-        }).join('');
-        return `
-        <div class="content-card" id="zangfu-content-${organ.id}">
-            <div class="pb-4 mb-4 border-b-2" style="border-color: var(--el-${organ.color});">
-                <h3 class="text-2xl font-playfair font-bold" style="color: var(--el-${organ.color});">Padrões do ${organ.name}</h3>
-            </div>
-            <div class="space-y-3" id="zangfu-accordion-${organ.id}">${accordionItems}</div>
-        </div>`;
-    }).join('');
+    container.innerHTML = data.map(item => cardRenderer(item)).join('');
+
+    container.addEventListener('click', (e) => {
+        const card = e.target.closest('.flip-card');
+        if (!card) return;
+        
+        if (e.target.closest('.details-btn')) {
+            const masterId = e.target.closest('.details-btn').dataset.id;
+            const masterInfo = greatMastersData.find(m => m.id === masterId);
+            if (masterInfo) {
+                openContentModal(renderMasterModalContent(masterInfo));
+            }
+            return;
+        }
+        
+        card.classList.toggle('flipped');
+    });
 }
 
-function setupMasterLayout(item, idPrefix) { return `<div class="content-card" id="${idPrefix}${item.id}"><div class="pb-4 mb-4 border-b-2" style="border-color: var(--el-water);"><img src="${item.image_placeholder}" alt="Retrato de ${item.name}" class="w-full h-48 object-cover rounded-lg mb-4 shadow-md"><h3 class="text-2xl font-playfair font-bold" style="color: var(--el-water);">${item.name}</h3><p class="font-semibold text-gray-500 text-sm">${item.dynasty}</p></div><div class="card-prose">${item.content}</div></div>`; }
 
-const elementDiagramSVG = document.getElementById('element-diagram-svg');
-const elementDetailsContainer = document.getElementById('element-details-container');
-const pathsContainer = document.getElementById('cycle-paths-container');
-const spheresContainer = document.getElementById('element-spheres-container');
-const btnGeracao = document.getElementById('btn-geracao');
-const btnControlo = document.getElementById('btn-controlo');
-const cycleInfoBox = document.getElementById('cycle-info-box');
-const defaultColor = '#a8a29e';
-let currentCycle = 'geracao';
-let selectedElementId = null;
-const cycleInfo = { geracao: { title: 'Ciclo de Geração (Sheng)', description: 'Este ciclo representa a nutrição e o apoio. Cada elemento é a "mãe" do seguinte, nutrindo-o e promovendo o seu crescimento.', color: 'bg-green-100', textColor: 'text-green-800' }, controlo: { title: 'Ciclo de Controlo (Ke)', description: 'Este ciclo representa o controlo e a restrição, garantindo que nenhum elemento se torna excessivo e mantendo o equilíbrio do sistema.', color: 'bg-red-100', textColor: 'text-red-800' } };
-const elementCoords = { madeira: { x: 150, y: 45 }, fogo: { x: 255, y: 125 }, terra: { x: 208, y: 255 }, metal: { x: 92, y: 255 }, agua: { x: 45, y: 125 } };
-const cyclePaths = { geracao: [ { id: 'madeira-fogo', d: `M ${elementCoords.madeira.x} ${elementCoords.madeira.y} C 210 65, 230 80, ${elementCoords.fogo.x} ${elementCoords.fogo.y}` }, { id: 'fogo-terra', d: `M ${elementCoords.fogo.x} ${elementCoords.fogo.y} C 250 180, 240 220, ${elementCoords.terra.x} ${elementCoords.terra.y}` }, { id: 'terra-metal', d: `M ${elementCoords.terra.x} ${elementCoords.terra.y} C 160 285, 130 285, ${elementCoords.metal.x} ${elementCoords.metal.y}` }, { id: 'metal-agua', d: `M ${elementCoords.metal.x} ${elementCoords.metal.y} C 60 220, 50 180, ${elementCoords.agua.x} ${elementCoords.agua.y}` }, { id: 'agua-madeira', d: `M ${elementCoords.agua.x} ${elementCoords.agua.y} C 70 80, 90 65, ${elementCoords.madeira.x} ${elementCoords.madeira.y}` } ], controlo: [ { id: 'madeira-terra', d: `M ${elementCoords.madeira.x} ${elementCoords.madeira.y} L ${elementCoords.terra.x} ${elementCoords.terra.y}` }, { id: 'fogo-metal', d: `M ${elementCoords.fogo.x} ${elementCoords.fogo.y} L ${elementCoords.metal.x} ${elementCoords.metal.y}` }, { id: 'terra-agua', d: `M ${elementCoords.terra.x} ${elementCoords.terra.y} L ${elementCoords.agua.x} ${elementCoords.agua.y}` }, { id: 'metal-madeira', d: `M ${elementCoords.metal.x} ${elementCoords.metal.y} L ${elementCoords.madeira.x} ${elementCoords.madeira.y}` }, { id: 'agua-fogo', d: `M ${elementCoords.agua.x} ${elementCoords.agua.y} L ${elementCoords.fogo.x} ${elementCoords.fogo.y}` } ] };
-function setup5ElementsDiagram() { if (!spheresContainer) return; spheresContainer.innerHTML = Object.keys(fiveElementsData).map(key => { const el = fiveElementsData[key]; const { x, y } = elementCoords[key]; return `<g id="${key}" class="element-sphere"><defs><radialGradient id="grad-${key}" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="white" stop-opacity="0.5" /><stop offset="100%" stop-color="var(--el-${el.color})" stop-opacity="1" /></radialGradient></defs><circle class="sphere-circle" cx="${x}" cy="${y}" r="30" fill="url(#grad-${key})" stroke="var(--el-${el.color})" stroke-width="1.5" filter="url(#sphere-glow)"/><text class="sphere-text" x="${x}" y="${y + 5}">${el.name}</text></g>`; }).join(''); }
-function renderCyclePaths() { if(!pathsContainer) return; pathsContainer.innerHTML = cyclePaths[currentCycle].map(p => `<path id="${p.id}" class="cycle-path" d="${p.d}" stroke="${defaultColor}" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>`).join(''); }
-function update5ElementsUI() { if(!elementDiagramSVG) return; elementDiagramSVG.querySelectorAll('.element-sphere').forEach(g => g.classList.remove('active')); document.querySelectorAll('.arrow-marker').forEach(marker => marker.style.fill = defaultColor); if (pathsContainer) { pathsContainer.querySelectorAll('.cycle-path').forEach(path => { path.style.stroke = defaultColor; path.style.strokeWidth = '2.5'; path.classList.remove('draw'); }); } if (selectedElementId) { const elData = fiveElementsData[selectedElementId]; const selectedGroup = document.getElementById(selectedElementId); if (selectedGroup) selectedGroup.classList.add('active'); const targetElementId = elData.target[currentCycle]; const activePathId = `${selectedElementId}-${targetElementId}`; const activePath = document.getElementById(activePathId); if (activePath) { const color = `var(--el-${elData.color})`; activePath.style.stroke = color; activePath.style.color = color; activePath.style.strokeWidth = '4'; activePath.classList.add('draw'); const marker = document.querySelector(`#arrow path`); if (marker) marker.style.fill = color; } elementDetailsContainer.innerHTML = `<div class="text-left p-6 rounded-lg border-2" style="border-color: var(--el-${elData.color}); background-color: #fafcff;"><h3 class="text-2xl font-playfair font-bold mb-4" style="color: var(--el-${elData.color});">${elData.name}</h3><div class="card-prose"><p class="font-semibold text-gray-600 mb-2">Relações no Ciclo de ${currentCycle.charAt(0).toUpperCase() + currentCycle.slice(1)}:</p><p class="text-sm">${elData.relations[currentCycle]}</p><table class="w-full text-sm mt-4"><tbody>${elData.table}</tbody></table></div></div>`; } else { elementDetailsContainer.innerHTML = '<div class="flex items-center justify-center h-full text-center text-gray-500 p-4 bg-gray-50 rounded-lg"><p>Clique num elemento do diagrama para ver as suas correspondências detalhadas e a sua relação no ciclo atual.</p></div>'; } }
-function switchCycle(cycle) { currentCycle = cycle; const info = cycleInfo[cycle]; if(cycleInfoBox) { cycleInfoBox.className = `mb-6 p-4 rounded-lg text-center transition-colors duration-500 ${info.color} ${info.textColor}`; cycleInfoBox.innerHTML = `<h4 class="font-bold">${info.title}</h4><p class="text-sm">${info.description}</p>`; } if(btnGeracao) btnGeracao.classList.toggle('active', cycle === 'geracao'); if(btnControlo) btnControlo.classList.toggle('active', cycle === 'controlo'); renderCyclePaths(); update5ElementsUI(); }
-if(btnGeracao) btnGeracao.addEventListener('click', () => switchCycle('geracao'));
-if(btnControlo) btnControlo.addEventListener('click', () => switchCycle('controlo'));
-if (elementDiagramSVG) { elementDiagramSVG.addEventListener('click', (e) => { const sphereGroup = e.target.closest('.element-sphere'); if (sphereGroup) { selectedElementId = sphereGroup.id; update5ElementsUI(); } }); }
+// --- RENDERERS PARA O SISTEMA DE GRELHAS ---
 
-function setupGlossary() { const glossaryContainer = document.getElementById('glossary-container'); if (!glossaryContainer) return; const categories = Object.values(glossaryData).reduce((acc, item) => { (acc[item.category] = acc[item.category] || []).push(item); return acc; }, {}); const sortedCategories = Object.keys(categories).sort(); glossaryContainer.innerHTML = sortedCategories.map(category => `<div class="floating-card mb-8"><div class="card-header"><h3 class="text-gray-700">${category}</h3></div><div class="card-content grid md:grid-cols-2 gap-x-8 gap-y-6">${categories[category].sort((a, b) => a.term.localeCompare(b.term)).map(item => `<div><h4 class="font-bold text-lg">${item.term}</h4><p class="text-gray-600">${item.definition}</p></div>`).join('')}</div></div>`).join(''); }
-function activateTooltips() { document.body.addEventListener('mouseover', e => { const term = e.target.closest('.tooltip-term'); if(term) { const existingTooltip = term.querySelector('.tooltip-box'); if (!existingTooltip) { const termKey = term.dataset.term.toLowerCase(); if (glossaryData[termKey]) { const tooltipBox = document.createElement('div'); tooltipBox.className = 'tooltip-box'; tooltipBox.textContent = glossaryData[termKey].definition; term.appendChild(tooltipBox); } } } }); }
-function setupDietetics() { const foodSearchInput = document.getElementById('food-search-input'); const foodResultsContainer = document.getElementById('food-results-container'); const foodAlphaNav = document.getElementById('food-alpha-nav'); function renderFoodList(foods) { const groupedFoods = foods.reduce((acc, food) => { const firstLetter = food.name.charAt(0).toUpperCase(); if (!acc[firstLetter]) acc[firstLetter] = []; acc[firstLetter].push(food); return acc; }, {}); const letters = Object.keys(groupedFoods).sort(); if (foodAlphaNav) foodAlphaNav.innerHTML = letters.map(letter => `<a href="#food-letter-${letter}">${letter}</a>`).join(''); if (foodResultsContainer) { foodResultsContainer.innerHTML = letters.map(letter => `<h3 id="food-letter-${letter}" class="food-group-header" tabindex="-1">${letter}</h3><div class="food-group-items">${groupedFoods[letter].map(food => `<div class="food-item floating-card p-4 mb-3"><h4 class="font-bold text-lg text-green-800">${food.name}</h4><div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm mt-2"><div><strong>Temp:</strong> <span class="font-semibold">${food.temp}</span></div><div><strong>Sabor:</strong> <span class="font-semibold">${food.flavor}</span></div><div class="col-span-2"><strong>Órgãos:</strong> <span class="font-semibold">${food.organs}</span></div></div><p class="text-sm mt-2"><strong>Ações:</strong> ${food.actions}</p></div>`).join('')}</div>`).join(''); } } if (foodSearchInput) { renderFoodList(foodData); foodSearchInput.addEventListener('input', (e) => { const searchTerm = e.target.value.toLowerCase().trim(); const headers = foodResultsContainer.querySelectorAll('.food-group-header'); headers.forEach(header => { const groupWrapper = header.nextElementSibling; if (!groupWrapper) return; const items = groupWrapper.querySelectorAll('.food-item'); let groupHasVisibleItems = false; items.forEach(item => { const foodName = item.querySelector('h4').textContent.toLowerCase(); const isVisible = foodName.includes(searchTerm); item.classList.toggle('hidden', !isVisible); if (isVisible) groupHasVisibleItems = true; }); header.style.display = groupHasVisibleItems ? 'block' : 'none'; groupWrapper.style.display = groupHasVisibleItems ? 'block' : 'none'; }); }); } }
+const renderMeridianCard = (item) => `
+    <div class="meridian-card" data-id="${item.id}">
+        <span class="meridian-card-color-bar" style="background-color: var(--el-${item.color});"></span>
+        <div class="p-4">
+            <h4 class="font-playfair font-bold text-lg text-primary">${item.name}</h4>
+            <p class="text-xs text-gray-500">${item.element} / ${item.time}</p>
+        </div>
+    </div>`;
 
+const renderMeridianModalContent = (item) => `
+    <div class="card-header">
+        <span class="w-4 h-4 rounded-full mr-3 shrink-0" style="background-color: var(--el-${item.color});"></span>
+        <h3>${item.name}</h3>
+    </div>
+    <div class="card-content card-prose text-sm">
+        <div class="grid md:grid-cols-2 gap-x-8">
+            <div><h4 class="font-bold !text-base !mb-2 !mt-0">Funções Principais</h4><p class="text-gray-600">${item.functions}</p></div>
+            <div><h4 class="font-bold !text-base !mb-2 !mt-0">Sinais de Desequilíbrio</h4><p class="text-gray-600">${item.imbalances}</p></div>
+        </div>
+        <h4 class="font-bold !text-base !mb-2">Pontos Especiais</h4>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-2 text-xs p-3 bg-gray-50 rounded-md">
+            <div><strong>Fonte (Yuan):</strong> ${item.yuan_source}</div>
+            <div><strong>Conexão (Luo):</strong> ${item.luo_connecting}</div>
+            <div><strong>Fenda (Xi):</strong> ${item.xi_cleft}</div>
+        </div>
+        <h4 class="font-bold !text-base !mb-2">Pontos Shu Antigos</h4>
+        <div class="overflow-x-auto"><table class="w-full text-left !text-xs"><thead class="bg-gray-100"><tr><th class="p-2 font-semibold">Tipo</th><th class="p-2 font-semibold">Elemento</th><th class="p-2 font-semibold">Ponto</th><th class="p-2 font-semibold">Funções</th></tr></thead><tbody>${item.five_shu.map(p => `<tr class="border-b"><td class="p-2">${p.type}</td><td class="p-2">${p.element}</td><td class="p-2 font-bold">${p.point}</td><td class="p-2">${p.functions}</td></tr>`).join('')}</tbody></table></div>
+        <h4 class="font-bold !text-base !mb-2">Lista Completa de Pontos</h4>
+        <div class="space-y-3 max-h-80 overflow-y-auto pr-2">${item.points.map(p => `<div class="p-2 border-l-2 border-gray-200 hover:bg-gray-50"><strong class="text-primary-dark">${p.id} - ${p.name} (${p.character}) - ${p.pt_name}</strong><p class="text-gray-600 !mb-0">${p.functions}</p></div>`).join('')}</div>
+    </div>`;
+
+const renderTherapyCard = (item) => {
+    const regex = /(.+?)\s\((.+?)(?:\s-\s(.+?))?\)/;
+    const match = item.title.match(regex);
+    let titleHTML, pinyinHTML = '';
+    if (match) {
+        const [, pt, ch, pinyin] = match;
+        titleHTML = `<div class="text-2xl font-chinese">${ch}</div><div class="text-xl font-playfair my-1">${pt}</div>`;
+        if (pinyin) pinyinHTML = `<div class="text-sm text-gray-500 font-mono">(${pinyin})</div>`;
+        else if (ch === '气功' || ch === '太极拳') pinyinHTML = `<div class="text-sm text-gray-500 font-mono">(${ch === '气功' ? 'Qìgōng' : 'Tàijí quán'})</div>`;
+    } else {
+        titleHTML = `<div class="text-xl font-playfair my-1">${item.title}</div>`;
+    }
+    return `
+    <div class="meridian-card text-center p-4 flex flex-col justify-center items-center h-full" data-id="${item.id}">
+        ${titleHTML}
+        ${pinyinHTML}
+    </div>`;
+};
+
+const renderTherapyModalContent = (item) => `
+    <div class="card-header"><h3>${item.title}</h3></div>
+    <div class="card-content card-prose">${item.content}</div>`;
+
+const renderZangFuCard = (item) => `
+    <div class="meridian-card" data-id="${item.id}">
+        <span class="meridian-card-color-bar" style="background-color: var(--el-${item.color});"></span>
+        <div class="p-4">
+            <h4 class="font-playfair font-bold text-lg" style="color: var(--el-${item.color});">Padrões de ${item.name}</h4>
+        </div>
+    </div>`;
+
+const renderZangFuModalContent = (item) => `
+    <div class="card-header">
+        <span class="w-4 h-4 rounded-full mr-3 shrink-0" style="background-color: var(--el-${item.color});"></span>
+        <h3>Padrões de ${item.name}</h3>
+    </div>
+    <div class="card-content">
+        <div class="accordion-container">${createAccordionHTML(item.patterns, `modal-zangfu-${item.id}`)}</div>
+    </div>`;
+
+const renderAnatomyCard = (item) => `
+    <div class="meridian-card p-4 flex items-center justify-center text-center h-full" data-id="${item.id}">
+        <h4 class="font-playfair font-bold text-lg text-primary">${item.title}</h4>
+    </div>`;
+
+const renderAnatomyModalContent = (item) => `
+    <div class="card-header"><h3>${item.title}</h3></div>
+    <div class="card-content card-prose">${item.content}</div>`;
+
+const renderQiFlipCard = (item) => `
+    <div class="flip-card">
+        <div class="flip-card-inner">
+            <div class="flip-card-front">
+                <h4 class="font-playfair font-bold text-lg text-primary">${item.title}</h4>
+            </div>
+            <div class="flip-card-back">
+                <p class="text-sm">${item.content}</p>
+            </div>
+        </div>
+    </div>`;
+
+const renderMasterFlipCard = (item) => `
+    <div class="flip-card">
+        <div class="flip-card-inner">
+            <div class="flip-card-front" style="background-image: url('${item.image_placeholder}')">
+                <div class="master-card-overlay">
+                    <h4 class="font-playfair font-bold text-lg text-white">${item.name}</h4>
+                    <p class="text-xs text-gray-200">${item.dynasty}</p>
+                </div>
+            </div>
+            <div class="flip-card-back">
+                <p class="text-sm">${item.content.replace(/<[^>]*>/g, ' ').substring(0, 250)}...</p>
+                <button class="details-btn" data-id="${item.id}">Ver Detalhes</button>
+            </div>
+        </div>
+    </div>`;
+
+const renderMasterModalContent = (item) => `
+    <div class="card-header"><h3 class="text-2xl font-playfair font-bold">${item.name}</h3></div>
+    <div class="card-content card-prose">
+        <img src="${item.image_placeholder}" alt="Retrato de ${item.name}" class="w-full h-48 object-cover rounded-lg mb-4 shadow-md">
+        <p class="font-semibold text-gray-500 text-sm !-mt-2 !mb-4">${item.dynasty}</p>
+        ${item.content}
+    </div>`;
+
+
+// --- LÓGICA DE DIAGNÓSTICO ---
 function setupDiagnosisDiagrams() {
     const tongueSVG = document.getElementById('lingua-diagram-svg');
     const tongueInfoBox = document.getElementById('lingua-info-box');
@@ -517,8 +450,8 @@ function setupDiagnosisDiagrams() {
 function setupDiagnosisAccordion() {
     const container = document.getElementById('diagnosis-accordion-container');
     if(!container) return;
-    const perguntasContent = `<div id="perguntas-accordion-inner" class="space-y-3"></div>`;
-    const pulseTypesContent = `<div id="pulse-list-container-inner" class="space-y-3"></div>`;
+    const perguntasContent = `<div id="perguntas-accordion-inner" class="accordion-container"></div>`;
+    const pulseTypesContent = `<div id="pulse-list-container-inner" class="accordion-container"></div>`;
     const diagnosisData = [ { title: 'As 10+1 Perguntas', content: perguntasContent }, { title: 'Tipos de Pulso Comuns', content: pulseTypesContent } ];
     
     container.innerHTML = createAccordionHTML(diagnosisData, 'diagnosis-sub');
@@ -536,6 +469,49 @@ function setupDiagnosisAccordion() {
         initializeAccordion(pulsoContainer);
     }
 }
+
+// --- OUTRAS FUNÇÕES DE SETUP ---
+const elementDiagramSVG = document.getElementById('element-diagram-svg');
+const elementDetailsContainer = document.getElementById('element-details-container');
+const pathsContainer = document.getElementById('cycle-paths-container');
+const spheresContainer = document.getElementById('element-spheres-container');
+const btnGeracao = document.getElementById('btn-geracao');
+const btnControlo = document.getElementById('btn-controlo');
+const cycleInfoBox = document.getElementById('cycle-info-box');
+const defaultColor = '#a8a29e';
+let currentCycle = 'geracao';
+let selectedElementId = null;
+const cycleInfo = { geracao: { title: 'Ciclo de Geração (Sheng)', description: 'Este ciclo representa a nutrição e o apoio. Cada elemento é a "mãe" do seguinte, nutrindo-o e promovendo o seu crescimento.', color: 'bg-green-100', textColor: 'text-green-800' }, controlo: { title: 'Ciclo de Controlo (Ke)', description: 'Este ciclo representa o controlo e a restrição, garantindo que nenhum elemento se torna excessivo e mantendo o equilíbrio do sistema.', color: 'bg-red-100', textColor: 'text-red-800' } };
+const elementCoords = { madeira: { x: 150, y: 45 }, fogo: { x: 255, y: 125 }, terra: { x: 208, y: 255 }, metal: { x: 92, y: 255 }, agua: { x: 45, y: 125 } };
+const cyclePaths = { geracao: [ { id: 'madeira-fogo', d: `M ${elementCoords.madeira.x} ${elementCoords.madeira.y} C 210 65, 230 80, ${elementCoords.fogo.x} ${elementCoords.fogo.y}` }, { id: 'fogo-terra', d: `M ${elementCoords.fogo.x} ${elementCoords.fogo.y} C 250 180, 240 220, ${elementCoords.terra.x} ${elementCoords.terra.y}` }, { id: 'terra-metal', d: `M ${elementCoords.terra.x} ${elementCoords.terra.y} C 160 285, 130 285, ${elementCoords.metal.x} ${elementCoords.metal.y}` }, { id: 'metal-agua', d: `M ${elementCoords.metal.x} ${elementCoords.metal.y} C 60 220, 50 180, ${elementCoords.agua.x} ${elementCoords.agua.y}` }, { id: 'agua-madeira', d: `M ${elementCoords.agua.x} ${elementCoords.agua.y} C 70 80, 90 65, ${elementCoords.madeira.x} ${elementCoords.madeira.y}` } ], controlo: [ { id: 'madeira-terra', d: `M ${elementCoords.madeira.x} ${elementCoords.madeira.y} L ${elementCoords.terra.x} ${elementCoords.terra.y}` }, { id: 'fogo-metal', d: `M ${elementCoords.fogo.x} ${elementCoords.fogo.y} L ${elementCoords.metal.x} ${elementCoords.metal.y}` }, { id: 'terra-agua', d: `M ${elementCoords.terra.x} ${elementCoords.terra.y} L ${elementCoords.agua.x} ${elementCoords.agua.y}` }, { id: 'metal-madeira', d: `M ${elementCoords.metal.x} ${elementCoords.metal.y} L ${elementCoords.madeira.x} ${elementCoords.madeira.y}` }, { id: 'agua-fogo', d: `M ${elementCoords.agua.x} ${elementCoords.agua.y} L ${elementCoords.fogo.x} ${elementCoords.fogo.y}` } ] };
+function setup5ElementsDiagram() { 
+    if (!spheresContainer) return; 
+    spheresContainer.innerHTML = Object.keys(fiveElementsData).map(key => { 
+        const el = fiveElementsData[key]; 
+        const { x, y } = elementCoords[key]; 
+        return `<g id="${key}" class="element-sphere">
+            <defs>
+                <radialGradient id="grad-${key}" cx="30%" cy="30%" r="70%">
+                    <stop offset="0%" stop-color="white" stop-opacity="0.5" />
+                    <stop offset="100%" stop-color="var(--el-${el.color})" stop-opacity="1" />
+                </radialGradient>
+            </defs>
+            <circle class="sphere-shadow" cx="${x}" cy="${y}" r="30" />
+            <circle class="sphere-circle" cx="${x}" cy="${y}" r="30" fill="url(#grad-${key})" stroke="var(--el-${el.color})" stroke-width="1.5"/>
+            <text class="sphere-text" x="${x}" y="${y + 5}">${el.name}</text>
+        </g>`; 
+    }).join(''); 
+}
+function renderCyclePaths() { if(!pathsContainer) return; pathsContainer.innerHTML = cyclePaths[currentCycle].map(p => `<path id="${p.id}" class="cycle-path" d="${p.d}" stroke="${defaultColor}" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>`).join(''); }
+function update5ElementsUI() { if(!elementDiagramSVG) return; elementDiagramSVG.querySelectorAll('.element-sphere').forEach(g => g.classList.remove('active')); document.querySelectorAll('.arrow-marker').forEach(marker => marker.style.fill = defaultColor); if (pathsContainer) { pathsContainer.querySelectorAll('.cycle-path').forEach(path => { path.style.stroke = defaultColor; path.style.strokeWidth = '2.5'; path.classList.remove('draw'); }); } if (selectedElementId) { const elData = fiveElementsData[selectedElementId]; const selectedGroup = document.getElementById(selectedElementId); if (selectedGroup) selectedGroup.classList.add('active'); const targetElementId = elData.target[currentCycle]; const activePathId = `${selectedElementId}-${targetElementId}`; const activePath = document.getElementById(activePathId); if (activePath) { const color = `var(--el-${elData.color})`; activePath.style.stroke = color; activePath.style.color = color; activePath.style.strokeWidth = '4'; activePath.classList.add('draw'); const marker = document.querySelector(`#arrow path`); if (marker) marker.style.fill = color; } elementDetailsContainer.innerHTML = `<div class="text-left p-6 rounded-lg border-2" style="border-color: var(--el-${elData.color}); background-color: #fafcff;"><h3 class="text-2xl font-playfair font-bold mb-4" style="color: var(--el-${elData.color});">${elData.name}</h3><div class="card-prose"><p class="font-semibold text-gray-600 mb-2">Relações no Ciclo de ${currentCycle.charAt(0).toUpperCase() + currentCycle.slice(1)}:</p><p class="text-sm">${elData.relations[currentCycle]}</p><table class="w-full text-sm mt-4"><tbody>${elData.table}</tbody></table></div></div>`; } else { elementDetailsContainer.innerHTML = '<div class="flex items-center justify-center h-full text-center text-gray-500 p-4 bg-gray-50 rounded-lg"><p>Clique num elemento do diagrama para ver as suas correspondências detalhadas e a sua relação no ciclo atual.</p></div>'; } }
+function switchCycle(cycle) { currentCycle = cycle; const info = cycleInfo[cycle]; if(cycleInfoBox) { cycleInfoBox.className = `mb-6 p-4 rounded-lg text-center transition-colors duration-500 ${info.color} ${info.textColor}`; cycleInfoBox.innerHTML = `<h4 class="font-bold">${info.title}</h4><p class="text-sm">${info.description}</p>`; } if(btnGeracao) btnGeracao.classList.toggle('active', cycle === 'geracao'); if(btnControlo) btnControlo.classList.toggle('active', cycle === 'controlo'); renderCyclePaths(); update5ElementsUI(); }
+if(btnGeracao) btnGeracao.addEventListener('click', () => switchCycle('geracao'));
+if(btnControlo) btnControlo.addEventListener('click', () => switchCycle('controlo'));
+if (elementDiagramSVG) { elementDiagramSVG.addEventListener('click', (e) => { const sphereGroup = e.target.closest('.element-sphere'); if (sphereGroup) { selectedElementId = sphereGroup.id; update5ElementsUI(); } }); }
+
+function setupGlossary() { const glossaryContainer = document.getElementById('glossary-container'); if (!glossaryContainer) return; const categories = Object.values(glossaryData).reduce((acc, item) => { (acc[item.category] = acc[item.category] || []).push(item); return acc; }, {}); const sortedCategories = Object.keys(categories).sort(); glossaryContainer.innerHTML = sortedCategories.map(category => `<div class="floating-card mb-8"><div class="card-header"><h3 class="text-gray-700">${category}</h3></div><div class="card-content grid md:grid-cols-2 gap-x-8 gap-y-6">${categories[category].sort((a, b) => a.term.localeCompare(b.term)).map(item => `<div><h4 class="font-bold text-lg">${item.term}</h4><p class="text-gray-600">${item.definition}</p></div>`).join('')}</div></div>`).join(''); }
+
+function setupDietetics() { const foodSearchInput = document.getElementById('food-search-input'); const foodResultsContainer = document.getElementById('food-results-container'); const foodAlphaNav = document.getElementById('food-alpha-nav'); function renderFoodList(foods) { const groupedFoods = foods.reduce((acc, food) => { const firstLetter = food.name.charAt(0).toUpperCase(); if (!acc[firstLetter]) acc[firstLetter] = []; acc[firstLetter].push(food); return acc; }, {}); const letters = Object.keys(groupedFoods).sort(); if (foodAlphaNav) foodAlphaNav.innerHTML = letters.map(letter => `<a href="#food-letter-${letter}">${letter}</a>`).join(''); if (foodResultsContainer) { foodResultsContainer.innerHTML = letters.map(letter => `<h3 id="food-letter-${letter}" class="food-group-header" tabindex="-1">${letter}</h3><div class="food-group-items">${groupedFoods[letter].map(food => `<div class="food-item floating-card p-4 mb-3"><h4 class="font-bold text-lg text-green-800">${food.name}</h4><div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm mt-2"><div><strong>Temp:</strong> <span class="font-semibold">${food.temp}</span></div><div><strong>Sabor:</strong> <span class="font-semibold">${food.flavor}</span></div><div class="col-span-2"><strong>Órgãos:</strong> <span class="font-semibold">${food.organs}</span></div></div><p class="text-sm mt-2"><strong>Ações:</strong> ${food.actions}</p></div>`).join('')}</div>`).join(''); } } if (foodSearchInput) { renderFoodList(foodData); foodSearchInput.addEventListener('input', (e) => { const searchTerm = e.target.value.toLowerCase().trim(); const headers = foodResultsContainer.querySelectorAll('.food-group-header'); headers.forEach(header => { const groupWrapper = header.nextElementSibling; if (!groupWrapper) return; const items = groupWrapper.querySelectorAll('.food-item'); let groupHasVisibleItems = false; items.forEach(item => { const foodName = item.querySelector('h4').textContent.toLowerCase(); const isVisible = foodName.includes(searchTerm); item.classList.toggle('hidden', !isVisible); if (isVisible) groupHasVisibleItems = true; }); header.style.display = groupHasVisibleItems ? 'block' : 'none'; groupWrapper.style.display = groupHasVisibleItems ? 'block' : 'none'; }); }); } }
 
 function generateNavLinks() {
     const navStructure = [
@@ -561,9 +537,9 @@ function generateNavLinks() {
 
     const generateHtml = (item) => {
         if (item.links) {
-            return `<div class="nav-group"><button class="nav-group-header flex items-center justify-between w-full p-2 rounded-lg" aria-expanded="false"><span class="flex items-center"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${item.icon}"></use></svg><span class="font-semibold">${item.title}</span></span><svg class="w-5 h-5 shrink-0 text-gray-400 chevron"><use href="#icon-chevron-down"></use></svg></button><div class="nav-group-content pl-4 pt-1 space-y-1">${item.links.map(link => `<a href="#${link.id}" class="sidebar-link flex items-center p-2 rounded-lg"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${link.icon}"></use></svg><span>${link.title}</span></a>`).join('')}</div></div>`;
+            return `<div class="nav-group"><button class="nav-group-header flex items-center justify-between w-full" aria-expanded="false"><span class="flex items-center"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${item.icon}"></use></svg><span class="font-semibold">${item.title}</span></span><svg class="w-5 h-5 shrink-0 text-gray-400 chevron"><use href="#icon-chevron-down"></use></svg></button><div class="nav-group-content pl-4 pt-1 space-y-1">${item.links.map(link => `<a href="#${link.id}" class="sidebar-link flex items-center p-2 rounded-lg"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${link.icon}"></use></svg><span>${link.title}</span></a>`).join('')}</div></div>`;
         } else {
-            return `<a href="#${item.id}" class="sidebar-link flex items-center p-2 rounded-lg"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${item.icon}"></use></svg><span>${item.title}</span></a>`;
+            return `<a href="#${link.id}" class="sidebar-link flex items-center p-2 rounded-lg"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${item.icon}"></use></svg><span>${item.title}</span></a>`;
         }
     };
     const navHtml = navStructure.map(generateHtml).join('');
@@ -574,33 +550,34 @@ function generateNavLinks() {
 document.addEventListener('DOMContentLoaded', () => {
     generateNavLinks(); 
     
+    // Setup das secções
     setupYinYangSection();
-    setupQiCards('qi-cards-container', qiData);
+    setupFlipGrid('qi-cards-container', qiData, renderQiFlipCard);
     createLifeCycleTimeline('female-cycles-timeline', lifeCyclesFemaleData, 'bg-pink-500');
     createLifeCycleTimeline('male-cycles-timeline', lifeCyclesMaleData, 'bg-blue-500');
     setupGlossary();
     setupDietetics();
-    setupTherapiesGrid();
     
-    setupMeridianGrid(); // [NOVO]
+    // Setup das grelhas com zoom
+    setupZoomGrid('meridian-grid-container', meridianData, renderMeridianCard, renderMeridianModalContent);
+    setupZoomGrid('therapies-grid-container', therapiesData, renderTherapyCard, renderTherapyModalContent);
+    setupZoomGrid('zangfu-grid-container', zangFuPatternsData, renderZangFuCard, renderZangFuModalContent);
+    setupZoomGrid('anatomy-grid-container', anatomyData, renderAnatomyCard, renderAnatomyModalContent);
+
+    // Setup da grelha com flip para os Mestres
+    setupFlipGrid('masters-grid-container', greatMastersData, renderMasterFlipCard);
+    
+    // Setup do diagnóstico
     setupDiagnosisAccordion();
-    
-    setupSidebarLayout('anatomy-navigation', 'anatomy-content-area', anatomyData, 'anatomy-content-');
-    setupSidebarLayout('zangfu-navigation', 'zangfu-content-area', zangFuPatternsData, 'zangfu-content-');
-    setupSidebarLayout('masters-navigation', 'masters-content-area', greatMastersData, 'master-content-');
-
-    document.querySelectorAll('[id^="zangfu-accordion-"]').forEach(container => {
-        initializeAccordion(container);
-    });
-
-    activateTooltips();
     setupDiagnosisDiagrams();
     
+    // Setup dos 5 Elementos
     if (document.getElementById('cinco-elementos')) {
         setup5ElementsDiagram();
         switchCycle('geracao');
     }
 
+    // Animações e inicialização
     document.querySelectorAll('aside .sidebar-link, aside .nav-group').forEach((el, index) => {
         el.style.animationDelay = `${index * 0.07}s`;
     });
@@ -609,4 +586,11 @@ document.addEventListener('DOMContentLoaded', () => {
     contentSections = mainContent.querySelectorAll('.content-section');
     showSection('inicio', 'Início');
     updateActiveLink('inicio');
+    
+    // Esconde o ecrã de carregamento
+    if(loadingScreen) {
+        setTimeout(() => {
+            loadingScreen.classList.add('hidden');
+        }, 500); // Um pequeno atraso para garantir que tudo está pronto
+    }
 });
