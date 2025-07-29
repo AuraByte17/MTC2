@@ -77,6 +77,7 @@ function openContentModal(htmlContent) {
     contentModalContent.innerHTML = htmlContent;
     document.body.classList.add('content-modal-open');
     
+    // RE-INITIALIZE any accordions loaded into the modal
     const modalAccordions = contentModalContent.querySelectorAll('.accordion-container');
     modalAccordions.forEach(accordion => initializeAccordion(accordion));
 }
@@ -175,17 +176,22 @@ searchResultsContainer.addEventListener('click', (e) => {
 
 // --- FUNÇÕES DE GERAÇÃO DE CONTEÚDO ---
 
+// FIX: Improved accordion logic to handle nested accordions correctly.
 function initializeAccordion(container) {
     if (!container) return;
     container.addEventListener('click', (e) => {
         const button = e.target.closest('.accordion-button');
         if (!button) return;
+
+        // Ensure the button belongs to an item that is a direct child of this container
         const item = button.closest('.accordion-item');
-        if (!item) return;
-        const isExpanded = button.getAttribute('aria-expanded') === 'true';
+        if (!item || item.parentElement !== container) return;
         
-        const allItems = container.querySelectorAll('.accordion-item');
-        allItems.forEach(otherItem => {
+        const isExpanded = button.getAttribute('aria-expanded') === 'true';
+
+        // Close sibling items only
+        const siblingItems = Array.from(container.children).filter(child => child.classList.contains('accordion-item'));
+        siblingItems.forEach(otherItem => {
             if (otherItem !== item) {
                 const otherButton = otherItem.querySelector('.accordion-button');
                 if (otherButton) otherButton.setAttribute('aria-expanded', 'false');
@@ -195,6 +201,7 @@ function initializeAccordion(container) {
         button.setAttribute('aria-expanded', !isExpanded);
     });
 }
+
 
 function createAccordionHTML(data, containerIdPrefix = '') {
     return data.map((item, index) => {
@@ -353,14 +360,29 @@ const renderZangFuCard = (item) => `
         </div>
     </div>`;
 
-const renderZangFuModalContent = (item) => `
+// FIX: Correctly render Zang-Fu pattern details in the modal accordion.
+const renderZangFuModalContent = (item) => {
+    const patternsWithContent = item.patterns.map(p => ({
+        title: p.name,
+        content: `
+            <div class="space-y-3 text-sm">
+                <div><strong class="text-primary-dark">Sintomas Chave:</strong><p class="text-gray-600 !mb-0">${p.symptoms}</p></div>
+                <div><strong class="text-primary-dark">Língua:</strong><p class="text-gray-600 !mb-0">${p.tongue}</p></div>
+                <div><strong class="text-primary-dark">Pulso:</strong><p class="text-gray-600 !mb-0">${p.pulse}</p></div>
+                <div><strong class="text-primary-dark">Princípio de Tratamento:</strong><p class="text-gray-600 !mb-0">${p.treatmentPrinciple}</p></div>
+            </div>
+        `
+    }));
+
+    return `
     <div class="card-header">
         <span class="w-4 h-4 rounded-full mr-3 shrink-0" style="background-color: var(--el-${item.color});"></span>
         <h3>Padrões de ${item.name}</h3>
     </div>
     <div class="card-content">
-        <div class="accordion-container">${createAccordionHTML(item.patterns, `modal-zangfu-${item.id}`)}</div>
+        <div class="accordion-container">${createAccordionHTML(patternsWithContent, `modal-zangfu-${item.id}`)}</div>
     </div>`;
+};
 
 const renderAnatomyCard = (item) => `
     <div class="meridian-card p-4 flex items-center justify-center text-center h-full" data-id="${item.id}">
@@ -417,13 +439,17 @@ function setupDiagnosisDiagrams() {
         areas.forEach(area => {
             area.addEventListener('click', () => {
                 areas.forEach(a => a.classList.remove('active'));
-                area.classList.add('active');
-                const areaId = area.dataset.area;
-                const info = linguaData[areaId];
+                const currentAreaId = area.dataset.area;
+                // Highlight all parts of a multi-part area (like 'laterais')
+                tongueSVG.querySelectorAll(`[data-area="${currentAreaId}"]`).forEach(part => part.classList.add('active'));
+                
+                const info = linguaData[currentAreaId];
                 if (info) {
                     tongueInfoBox.innerHTML = `
-                        <h4 class="font-playfair font-bold text-lg text-primary mb-2">${info.title}</h4>
-                        <p class="text-sm text-gray-600">${info.info}</p>`;
+                        <div class="text-left">
+                            <h4 class="font-playfair font-bold text-lg text-primary mb-2">${info.title}</h4>
+                            <p class="text-sm text-gray-600">${info.info}</p>
+                        </div>`;
                 }
             });
         });
@@ -441,35 +467,56 @@ function setupDiagnosisDiagrams() {
                 const info = pulsePositionData[positionId];
                  if (info) {
                     pulseInfoBox.innerHTML = `
-                        <h4 class="font-playfair font-bold text-lg text-primary mb-2">${info.title}</h4>
-                        <p class="text-sm text-gray-600"><strong>Pulso Esquerdo:</strong> ${info.left}</p>
-                        <p class="text-sm text-gray-600"><strong>Pulso Direito:</strong> ${info.right}</p>`;
+                        <div class="text-left w-full">
+                            <h4 class="font-playfair font-bold text-lg text-primary mb-3">${info.title}</h4>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <strong class="font-semibold text-gray-700">Pulso Esquerdo:</strong>
+                                    <p class="text-gray-600">${info.left}</p>
+                                </div>
+                                <div>
+                                    <strong class="font-semibold text-gray-700">Pulso Direito:</strong>
+                                    <p class="text-gray-600">${info.right}</p>
+                                </div>
+                            </div>
+                        </div>`;
                 }
             });
         });
     }
 }
 
+// FIX: Correctly initialize nested accordions for diagnosis section.
 function setupDiagnosisAccordion() {
     const container = document.getElementById('diagnosis-accordion-container');
     if(!container) return;
+    
+    // Create placeholders for the inner content
     const perguntasContent = `<div id="perguntas-accordion-inner" class="accordion-container"></div>`;
     const pulseTypesContent = `<div id="pulse-list-container-inner" class="accordion-container"></div>`;
-    const diagnosisData = [ { title: 'As 10+1 Perguntas', content: perguntasContent }, { title: 'Tipos de Pulso Comuns', content: pulseTypesContent } ];
     
+    // Data for the main accordion
+    const diagnosisData = [ 
+        { title: 'As 10+1 Perguntas', content: perguntasContent }, 
+        { title: 'Tipos de Pulso Comuns', content: pulseTypesContent } 
+    ];
+    
+    // Build and initialize the main accordion
     container.innerHTML = createAccordionHTML(diagnosisData, 'diagnosis-sub');
     initializeAccordion(container);
 
+    // Now, find the inner containers and populate them
     const perguntasContainer = document.getElementById('perguntas-accordion-inner');
     if(perguntasContainer) {
         perguntasContainer.innerHTML = createAccordionHTML(dezPerguntasData, 'perguntas');
-        initializeAccordion(perguntasContainer);
+        initializeAccordion(perguntasContainer); // Initialize the nested accordion
     }
+    
     const pulsoContainer = document.getElementById('pulse-list-container-inner');
-     if(pulsoContainer) {
+    if(pulsoContainer) {
         const pulseTypes = pulseData;
         pulsoContainer.innerHTML = createAccordionHTML(pulseTypes, 'pulse-list');
-        initializeAccordion(pulsoContainer);
+        initializeAccordion(pulsoContainer); // Initialize the nested accordion
     }
 }
 
@@ -486,7 +533,6 @@ let currentCycle = 'geracao';
 let selectedElementId = null;
 const cycleInfo = { geracao: { title: 'Ciclo de Geração (Sheng)', description: 'Este ciclo representa a nutrição e o apoio. Cada elemento é a "mãe" do seguinte, nutrindo-o e promovendo o seu crescimento.', color: 'bg-green-100', textColor: 'text-green-800' }, controlo: { title: 'Ciclo de Controlo (Ke)', description: 'Este ciclo representa o controlo e a restrição, garantindo que nenhum elemento se torna excessivo e mantendo o equilíbrio do sistema.', color: 'bg-red-100', textColor: 'text-red-800' } };
 const elementCoords = { madeira: { x: 150, y: 45 }, fogo: { x: 255, y: 125 }, terra: { x: 208, y: 255 }, metal: { x: 92, y: 255 }, agua: { x: 45, y: 125 } };
-// FIX: Corrected the typo from 'madea' to 'madeira'
 const cyclePaths = { geracao: [ { id: 'madeira-fogo', d: `M ${elementCoords.madeira.x} ${elementCoords.madeira.y} C 210 65, 230 80, ${elementCoords.fogo.x} ${elementCoords.fogo.y}` }, { id: 'fogo-terra', d: `M ${elementCoords.fogo.x} ${elementCoords.fogo.y} C 250 180, 240 220, ${elementCoords.terra.x} ${elementCoords.terra.y}` }, { id: 'terra-metal', d: `M ${elementCoords.terra.x} ${elementCoords.terra.y} C 160 285, 130 285, ${elementCoords.metal.x} ${elementCoords.metal.y}` }, { id: 'metal-agua', d: `M ${elementCoords.metal.x} ${elementCoords.metal.y} C 60 220, 50 180, ${elementCoords.agua.x} ${elementCoords.agua.y}` }, { id: 'agua-madeira', d: `M ${elementCoords.agua.x} ${elementCoords.agua.y} C 70 80, 90 65, ${elementCoords.madeira.x} ${elementCoords.madeira.y}` } ], controlo: [ { id: 'madeira-terra', d: `M ${elementCoords.madeira.x} ${elementCoords.madeira.y} L ${elementCoords.terra.x} ${elementCoords.terra.y}` }, { id: 'fogo-metal', d: `M ${elementCoords.fogo.x} ${elementCoords.fogo.y} L ${elementCoords.metal.x} ${elementCoords.metal.y}` }, { id: 'terra-agua', d: `M ${elementCoords.terra.x} ${elementCoords.terra.y} L ${elementCoords.agua.x} ${elementCoords.agua.y}` }, { id: 'metal-madeira', d: `M ${elementCoords.metal.x} ${elementCoords.metal.y} L ${elementCoords.madeira.x} ${elementCoords.madeira.y}` }, { id: 'agua-fogo', d: `M ${elementCoords.agua.x} ${elementCoords.agua.y} L ${elementCoords.fogo.x} ${elementCoords.fogo.y}` } ] };
 function setup5ElementsDiagram() { 
     if (!spheresContainer) return; 
