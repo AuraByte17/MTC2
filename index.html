@@ -42,7 +42,6 @@
         
         <!-- Marcador de Seta para Diagramas -->
         <defs>
-            <!-- NOVO: Seta mais estética -->
             <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
                 <path d="M 0 0 L 10 5 L 0 10 L 2 5 Z" class="arrow-marker" fill="currentColor"/>
             </marker>
@@ -166,7 +165,6 @@
                                <div class="grid md:grid-cols-2 gap-8 items-center">
                                   <div id="element-diagram-container" class="relative w-full max-w-xs mx-auto aspect-square">
                                       <svg id="element-diagram-svg" class="absolute inset-0 w-full h-full" viewBox="0 0 300 300">
-                                          <!-- REMOVED: O anel de fundo será removido via CSS para um look mais limpo -->
                                           <g id="cycle-paths-container"></g>
                                           <g id="element-spheres-container"></g>
                                       </svg>
@@ -252,18 +250,26 @@
                             <div class="card-header"><h3>Diagnóstico do Pulso</h3></div>
                             <div class="card-content grid md:grid-cols-2 gap-8 items-center diagnosis-grid">
                                 <div id="pulso-diagram-container" class="relative w-64 mx-auto">
-                                     <!-- NOVO SVG DO PULSO (MAIS GROSSO) -->
+                                     <!-- NOVO SVG DO PULSO (REFORMULADO) -->
                                      <svg id="pulso-diagram-svg" viewBox="0 0 150 200">
-                                        <path d="M 50,200 L 50,105 C 50,80 60,70 75,70 C 90,70 100,80 100,105 L 100,200" fill="#F0D4B3" stroke="#E6BE99" stroke-width="2"/>
-                                        <path d="M 100,130 C 120,130 135,110 135,85 C 135,45 115,5 75,5 C 35,5 15,45 15,85 C 15,110 30,130 50,130 Z" fill="#F0D4B3" stroke="#E6BE99" stroke-width="2"/>
-                                        <path d="M 50,105 C 60,110 90,110 100,105" fill="none" stroke="#E6BE99" stroke-width="1"/>
+                                        <defs>
+                                            <linearGradient id="wrist-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                <stop offset="0%" stop-color="#F0D4B3"/>
+                                                <stop offset="100%" stop-color="#E6BE99"/>
+                                            </linearGradient>
+                                        </defs>
+                                        <!-- Braço -->
+                                        <path d="M 55,200 L 55,80 Q 50,70 60,70 L 90,70 Q 100,70 95,80 L 95,200 Z" fill="url(#wrist-grad)" stroke="#D1A377" stroke-width="1.5"/>
+                                        <!-- Mão -->
+                                        <path d="M 90,70 C 120,70 145,40 125,10 C 105,-20 45,-20 25,10 C 5,40 30,70 60,70 Z" fill="url(#wrist-grad)" stroke="#D1A377" stroke-width="1.5"/>
+                                        <!-- Posições do Pulso -->
                                         <g>
-                                            <circle data-pos="cun" class="pulse-pos-circle" cx="75" cy="95" r="10"/>
-                                            <circle data-pos="guan" class="pulse-pos-circle" cx="75" cy="120" r="10"/>
-                                            <circle data-pos="chi" class="pulse-pos-circle" cx="75" cy="145" r="10"/>
-                                            <text x="95" y="100" class="pulse-pos-label font-bold">Cun</text>
-                                            <text x="95" y="125" class="pulse-pos-label font-bold">Guan</text>
-                                            <text x="95" y="150" class="pulse-pos-label font-bold">Chi</text>
+                                            <circle data-pos="chi" class="pulse-pos-circle" cx="75" cy="115" r="12"/>
+                                            <circle data-pos="guan" class="pulse-pos-circle" cx="75" cy="85" r="12"/>
+                                            <circle data-pos="cun" class="pulse-pos-circle" cx="75" cy="55" r="12"/>
+                                            <text x="98" y="120" class="pulse-pos-label font-bold">Chi</text>
+                                            <text x="98" y="90" class="pulse-pos-label font-bold">Guan</text>
+                                            <text x="98" y="60" class="pulse-pos-label font-bold">Cun</text>
                                         </g>
                                      </svg>
                                 </div>

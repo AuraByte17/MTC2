@@ -77,7 +77,6 @@ function openContentModal(htmlContent) {
     contentModalContent.innerHTML = htmlContent;
     document.body.classList.add('content-modal-open');
     
-    // RE-INITIALIZE any accordions loaded into the modal
     const modalAccordions = contentModalContent.querySelectorAll('.accordion-container');
     modalAccordions.forEach(accordion => initializeAccordion(accordion));
 }
@@ -436,7 +435,6 @@ function setupDiagnosisDiagrams() {
             area.addEventListener('click', () => {
                 areas.forEach(a => a.classList.remove('active'));
                 const currentAreaId = area.dataset.area;
-                // Highlight all parts of a multi-part area (like 'laterais')
                 tongueSVG.querySelectorAll(`[data-area="${currentAreaId}"]`).forEach(part => part.classList.add('active'));
                 
                 const info = linguaData[currentAreaId];
@@ -526,7 +524,7 @@ const cycleInfo = { geracao: { title: 'Ciclo de Geração (Sheng)', description:
 const elementCoords = { madeira: { x: 150, y: 45 }, fogo: { x: 255, y: 125 }, terra: { x: 208, y: 255 }, metal: { x: 92, y: 255 }, agua: { x: 45, y: 125 } };
 const SPHERE_RADIUS = 32;
 
-// Função utilitária para calcular pontos na borda das esferas
+// NOVO: Função para calcular pontos na borda das esferas
 function getArrowPoints(el1, el2, radius) {
     const p1 = elementCoords[el1];
     const p2 = elementCoords[el2];
@@ -543,7 +541,7 @@ function getArrowPoints(el1, el2, radius) {
     };
 }
 
-// Função para gerar o atributo 'd' de uma curva de Bézier
+// NOVO: Função para gerar o atributo 'd' de uma curva de Bézier para o ciclo de geração
 function getCurvePath(el1, el2, radius, bend = 0.5) {
     const points = getArrowPoints(el1, el2, radius);
     const midX = (points.start.x + points.end.x) / 2;
@@ -551,13 +549,13 @@ function getCurvePath(el1, el2, radius, bend = 0.5) {
     const dx = points.end.x - points.start.x;
     const dy = points.end.y - points.start.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
-    // O ponto de controlo é perpendicular ao centro da linha
+    // O ponto de controlo é perpendicular ao centro da linha, criando a curva
     const controlX = midX - bend * dy * (distance / 200);
     const controlY = midY + bend * dx * (distance / 200);
     return `M ${points.start.x},${points.start.y} Q ${controlX},${controlY} ${points.end.x},${points.end.y}`;
 }
 
-// Recalcula os caminhos das setas
+// NOVO: Recalcula os caminhos das setas para tocar nas bordas
 const cyclePaths = {
     geracao: [
         { id: 'agua-madeira', d: getCurvePath('agua', 'madeira', SPHERE_RADIUS) },
