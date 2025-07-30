@@ -77,6 +77,7 @@ function openContentModal(htmlContent) {
     contentModalContent.innerHTML = htmlContent;
     document.body.classList.add('content-modal-open');
     
+    // RE-INITIALIZE any accordions loaded into the modal
     const modalAccordions = contentModalContent.querySelectorAll('.accordion-container');
     modalAccordions.forEach(accordion => initializeAccordion(accordion));
 }
@@ -180,12 +181,14 @@ function initializeAccordion(container) {
     container.addEventListener('click', (e) => {
         const button = e.target.closest('.accordion-button');
         if (!button) return;
+
         const item = button.closest('.accordion-item');
-        if (!item) return;
-        const isExpanded = button.getAttribute('aria-expanded') === 'true';
+        if (!item || item.parentElement !== container) return;
         
-        const allItems = container.querySelectorAll('.accordion-item');
-        allItems.forEach(otherItem => {
+        const isExpanded = button.getAttribute('aria-expanded') === 'true';
+
+        const siblingItems = Array.from(container.children).filter(child => child.classList.contains('accordion-item'));
+        siblingItems.forEach(otherItem => {
             if (otherItem !== item) {
                 const otherButton = otherItem.querySelector('.accordion-button');
                 if (otherButton) otherButton.setAttribute('aria-expanded', 'false');
@@ -195,6 +198,7 @@ function initializeAccordion(container) {
         button.setAttribute('aria-expanded', !isExpanded);
     });
 }
+
 
 function createAccordionHTML(data, containerIdPrefix = '') {
     return data.map((item, index) => {
@@ -353,14 +357,28 @@ const renderZangFuCard = (item) => `
         </div>
     </div>`;
 
-const renderZangFuModalContent = (item) => `
+const renderZangFuModalContent = (item) => {
+    const patternsWithContent = item.patterns.map(p => ({
+        title: p.name,
+        content: `
+            <div class="space-y-3 text-sm">
+                <div><strong class="text-primary-dark">Sintomas Chave:</strong><p class="text-gray-600 !mb-0">${p.symptoms}</p></div>
+                <div><strong class="text-primary-dark">Língua:</strong><p class="text-gray-600 !mb-0">${p.tongue}</p></div>
+                <div><strong class="text-primary-dark">Pulso:</strong><p class="text-gray-600 !mb-0">${p.pulse}</p></div>
+                <div><strong class="text-primary-dark">Princípio de Tratamento:</strong><p class="text-gray-600 !mb-0">${p.treatmentPrinciple}</p></div>
+            </div>
+        `
+    }));
+
+    return `
     <div class="card-header">
         <span class="w-4 h-4 rounded-full mr-3 shrink-0" style="background-color: var(--el-${item.color});"></span>
         <h3>Padrões de ${item.name}</h3>
     </div>
     <div class="card-content">
-        <div class="accordion-container">${createAccordionHTML(item.patterns, `modal-zangfu-${item.id}`)}</div>
+        <div class="accordion-container">${createAccordionHTML(patternsWithContent, `modal-zangfu-${item.id}`)}</div>
     </div>`;
+};
 
 const renderAnatomyCard = (item) => `
     <div class="meridian-card p-4 flex items-center justify-center text-center h-full" data-id="${item.id}">
@@ -417,13 +435,17 @@ function setupDiagnosisDiagrams() {
         areas.forEach(area => {
             area.addEventListener('click', () => {
                 areas.forEach(a => a.classList.remove('active'));
-                area.classList.add('active');
-                const areaId = area.dataset.area;
-                const info = linguaData[areaId];
+                const currentAreaId = area.dataset.area;
+                // Highlight all parts of a multi-part area (like 'laterais')
+                tongueSVG.querySelectorAll(`[data-area="${currentAreaId}"]`).forEach(part => part.classList.add('active'));
+                
+                const info = linguaData[currentAreaId];
                 if (info) {
                     tongueInfoBox.innerHTML = `
-                        <h4 class="font-playfair font-bold text-lg text-primary mb-2">${info.title}</h4>
-                        <p class="text-sm text-gray-600">${info.info}</p>`;
+                        <div class="text-left">
+                            <h4 class="font-playfair font-bold text-lg text-primary mb-2">${info.title}</h4>
+                            <p class="text-sm text-gray-600">${info.info}</p>
+                        </div>`;
                 }
             });
         });
@@ -441,9 +463,19 @@ function setupDiagnosisDiagrams() {
                 const info = pulsePositionData[positionId];
                  if (info) {
                     pulseInfoBox.innerHTML = `
-                        <h4 class="font-playfair font-bold text-lg text-primary mb-2">${info.title}</h4>
-                        <p class="text-sm text-gray-600"><strong>Pulso Esquerdo:</strong> ${info.left}</p>
-                        <p class="text-sm text-gray-600"><strong>Pulso Direito:</strong> ${info.right}</p>`;
+                        <div class="text-left w-full">
+                            <h4 class="font-playfair font-bold text-lg text-primary mb-3">${info.title}</h4>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <strong class="font-semibold text-gray-700">Pulso Esquerdo:</strong>
+                                    <p class="text-gray-600">${info.left}</p>
+                                </div>
+                                <div>
+                                    <strong class="font-semibold text-gray-700">Pulso Direito:</strong>
+                                    <p class="text-gray-600">${info.right}</p>
+                                </div>
+                            </div>
+                        </div>`;
                 }
             });
         });
@@ -453,9 +485,14 @@ function setupDiagnosisDiagrams() {
 function setupDiagnosisAccordion() {
     const container = document.getElementById('diagnosis-accordion-container');
     if(!container) return;
+    
     const perguntasContent = `<div id="perguntas-accordion-inner" class="accordion-container"></div>`;
     const pulseTypesContent = `<div id="pulse-list-container-inner" class="accordion-container"></div>`;
-    const diagnosisData = [ { title: 'As 10+1 Perguntas', content: perguntasContent }, { title: 'Tipos de Pulso Comuns', content: pulseTypesContent } ];
+    
+    const diagnosisData = [ 
+        { title: 'As 10+1 Perguntas', content: perguntasContent }, 
+        { title: 'Tipos de Pulso Comuns', content: pulseTypesContent } 
+    ];
     
     container.innerHTML = createAccordionHTML(diagnosisData, 'diagnosis-sub');
     initializeAccordion(container);
@@ -465,15 +502,16 @@ function setupDiagnosisAccordion() {
         perguntasContainer.innerHTML = createAccordionHTML(dezPerguntasData, 'perguntas');
         initializeAccordion(perguntasContainer);
     }
+    
     const pulsoContainer = document.getElementById('pulse-list-container-inner');
-     if(pulsoContainer) {
+    if(pulsoContainer) {
         const pulseTypes = pulseData;
         pulsoContainer.innerHTML = createAccordionHTML(pulseTypes, 'pulse-list');
         initializeAccordion(pulsoContainer);
     }
 }
 
-// --- OUTRAS FUNÇÕES DE SETUP ---
+// --- LÓGICA DOS 5 ELEMENTOS (REFINADA) ---
 const elementDiagramSVG = document.getElementById('element-diagram-svg');
 const elementDetailsContainer = document.getElementById('element-details-container');
 const pathsContainer = document.getElementById('cycle-paths-container');
@@ -486,22 +524,65 @@ let currentCycle = 'geracao';
 let selectedElementId = null;
 const cycleInfo = { geracao: { title: 'Ciclo de Geração (Sheng)', description: 'Este ciclo representa a nutrição e o apoio. Cada elemento é a "mãe" do seguinte, nutrindo-o e promovendo o seu crescimento.', color: 'bg-green-100', textColor: 'text-green-800' }, controlo: { title: 'Ciclo de Controlo (Ke)', description: 'Este ciclo representa o controlo e a restrição, garantindo que nenhum elemento se torna excessivo e mantendo o equilíbrio do sistema.', color: 'bg-red-100', textColor: 'text-red-800' } };
 const elementCoords = { madeira: { x: 150, y: 45 }, fogo: { x: 255, y: 125 }, terra: { x: 208, y: 255 }, metal: { x: 92, y: 255 }, agua: { x: 45, y: 125 } };
-// FIX: Corrected the typo from 'madea' to 'madeira'
-const cyclePaths = { geracao: [ { id: 'madeira-fogo', d: `M ${elementCoords.madeira.x} ${elementCoords.madeira.y} C 210 65, 230 80, ${elementCoords.fogo.x} ${elementCoords.fogo.y}` }, { id: 'fogo-terra', d: `M ${elementCoords.fogo.x} ${elementCoords.fogo.y} C 250 180, 240 220, ${elementCoords.terra.x} ${elementCoords.terra.y}` }, { id: 'terra-metal', d: `M ${elementCoords.terra.x} ${elementCoords.terra.y} C 160 285, 130 285, ${elementCoords.metal.x} ${elementCoords.metal.y}` }, { id: 'metal-agua', d: `M ${elementCoords.metal.x} ${elementCoords.metal.y} C 60 220, 50 180, ${elementCoords.agua.x} ${elementCoords.agua.y}` }, { id: 'agua-madeira', d: `M ${elementCoords.agua.x} ${elementCoords.agua.y} C 70 80, 90 65, ${elementCoords.madeira.x} ${elementCoords.madeira.y}` } ], controlo: [ { id: 'madeira-terra', d: `M ${elementCoords.madeira.x} ${elementCoords.madeira.y} L ${elementCoords.terra.x} ${elementCoords.terra.y}` }, { id: 'fogo-metal', d: `M ${elementCoords.fogo.x} ${elementCoords.fogo.y} L ${elementCoords.metal.x} ${elementCoords.metal.y}` }, { id: 'terra-agua', d: `M ${elementCoords.terra.x} ${elementCoords.terra.y} L ${elementCoords.agua.x} ${elementCoords.agua.y}` }, { id: 'metal-madeira', d: `M ${elementCoords.metal.x} ${elementCoords.metal.y} L ${elementCoords.madeira.x} ${elementCoords.madeira.y}` }, { id: 'agua-fogo', d: `M ${elementCoords.agua.x} ${elementCoords.agua.y} L ${elementCoords.fogo.x} ${elementCoords.fogo.y}` } ] };
+const SPHERE_RADIUS = 32;
+
+// Função utilitária para calcular pontos na borda das esferas
+function getArrowPoints(el1, el2, radius) {
+    const p1 = elementCoords[el1];
+    const p2 = elementCoords[el2];
+    const angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+    return {
+        start: {
+            x: p1.x + radius * Math.cos(angle),
+            y: p1.y + radius * Math.sin(angle)
+        },
+        end: {
+            x: p2.x - radius * Math.cos(angle),
+            y: p2.y - radius * Math.sin(angle)
+        }
+    };
+}
+
+// Função para gerar o atributo 'd' de uma curva de Bézier
+function getCurvePath(el1, el2, radius, bend = 0.5) {
+    const points = getArrowPoints(el1, el2, radius);
+    const midX = (points.start.x + points.end.x) / 2;
+    const midY = (points.start.y + points.end.y) / 2;
+    const dx = points.end.x - points.start.x;
+    const dy = points.end.y - points.start.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    // O ponto de controlo é perpendicular ao centro da linha
+    const controlX = midX - bend * dy * (distance / 200);
+    const controlY = midY + bend * dx * (distance / 200);
+    return `M ${points.start.x},${points.start.y} Q ${controlX},${controlY} ${points.end.x},${points.end.y}`;
+}
+
+// Recalcula os caminhos das setas
+const cyclePaths = {
+    geracao: [
+        { id: 'agua-madeira', d: getCurvePath('agua', 'madeira', SPHERE_RADIUS) },
+        { id: 'madeira-fogo', d: getCurvePath('madeira', 'fogo', SPHERE_RADIUS) },
+        { id: 'fogo-terra', d: getCurvePath('fogo', 'terra', SPHERE_RADIUS) },
+        { id: 'terra-metal', d: getCurvePath('terra', 'metal', SPHERE_RADIUS) },
+        { id: 'metal-agua', d: getCurvePath('metal', 'agua', SPHERE_RADIUS) }
+    ],
+    controlo: [
+        { id: 'madeira-terra', d: `M ${getArrowPoints('madeira', 'terra', SPHERE_RADIUS).start.x},${getArrowPoints('madeira', 'terra', SPHERE_RADIUS).start.y} L ${getArrowPoints('madeira', 'terra', SPHERE_RADIUS).end.x},${getArrowPoints('madeira', 'terra', SPHERE_RADIUS).end.y}` },
+        { id: 'terra-agua', d: `M ${getArrowPoints('terra', 'agua', SPHERE_RADIUS).start.x},${getArrowPoints('terra', 'agua', SPHERE_RADIUS).start.y} L ${getArrowPoints('terra', 'agua', SPHERE_RADIUS).end.x},${getArrowPoints('terra', 'agua', SPHERE_RADIUS).end.y}` },
+        { id: 'agua-fogo', d: `M ${getArrowPoints('agua', 'fogo', SPHERE_RADIUS).start.x},${getArrowPoints('agua', 'fogo', SPHERE_RADIUS).start.y} L ${getArrowPoints('agua', 'fogo', SPHERE_RADIUS).end.x},${getArrowPoints('agua', 'fogo', SPHERE_RADIUS).end.y}` },
+        { id: 'fogo-metal', d: `M ${getArrowPoints('fogo', 'metal', SPHERE_RADIUS).start.x},${getArrowPoints('fogo', 'metal', SPHERE_RADIUS).start.y} L ${getArrowPoints('fogo', 'metal', SPHERE_RADIUS).end.x},${getArrowPoints('fogo', 'metal', SPHERE_RADIUS).end.y}` },
+        { id: 'metal-madeira', d: `M ${getArrowPoints('metal', 'madeira', SPHERE_RADIUS).start.x},${getArrowPoints('metal', 'madeira', SPHERE_RADIUS).start.y} L ${getArrowPoints('metal', 'madeira', SPHERE_RADIUS).end.x},${getArrowPoints('metal', 'madeira', SPHERE_RADIUS).end.y}` }
+    ]
+};
+
 function setup5ElementsDiagram() { 
     if (!spheresContainer) return; 
     spheresContainer.innerHTML = Object.keys(fiveElementsData).map(key => { 
         const el = fiveElementsData[key]; 
         const { x, y } = elementCoords[key]; 
         return `<g id="${key}" class="element-sphere">
-            <defs>
-                <radialGradient id="grad-${key}" cx="30%" cy="30%" r="70%">
-                    <stop offset="0%" stop-color="white" stop-opacity="0.5" />
-                    <stop offset="100%" stop-color="var(--el-${el.color})" stop-opacity="1" />
-                </radialGradient>
-            </defs>
-            <circle class="sphere-shadow" cx="${x}" cy="${y}" r="30" />
-            <circle class="sphere-circle" cx="${x}" cy="${y}" r="30" fill="url(#grad-${key})" stroke="var(--el-${el.color})" stroke-width="1.5"/>
+            <circle class="sphere-shadow" cx="${x}" cy="${y}" r="${SPHERE_RADIUS}" />
+            <circle class="sphere-circle" cx="${x}" cy="${y}" r="${SPHERE_RADIUS}" fill="var(--el-${el.color})"/>
             <text class="sphere-text" x="${x}" y="${y + 5}">${el.name}</text>
         </g>`; 
     }).join(''); 
