@@ -25,25 +25,24 @@ export const linguaData = {
 
 
 // NOVO: Adicionado o pulsePositionData que estava em falta
-export const pulsePositionData = {
-    cun: {
-        title: 'Posição Cun (Polegada)',
-        left: 'Coração / Intestino Delgado',
-        right: 'Pulmão / Intestino Grosso'
-    },
-    guan: {
-        title: 'Posição Guan (Barreira)',
-        left: 'Fígado / Vesícula Biliar',
-        right: 'Baço / Estômago'
-    },
-    chi: {
-        title: 'Posição Chi (Pé)',
-        left: 'Rim (Yin)',
-        right: 'Rim (Yang) / Pericárdio'
-    }
-};
+export const pulseData = [
+    // --- FIX: Adicionados os dados das posições que estavam em falta ---
+    { id: 'cun', type: 'position', title: 'Posição Cun (Polegada)', left: 'Coração, Pericárdio', right: 'Pulmão' },
+    { id: 'guan', type: 'position', title: 'Posição Guan (Barreira)', left: 'Fígado, Vesícula Biliar', right: 'Baço, Estômago' },
+    { id: 'chi', type: 'position', title: 'Posição Chi (Pé)', left: 'Rim Yin', right: 'Rim Yang, Bexiga' },
 
-
+    // --- Dados dos tipos de pulso comuns (adicionada a propriedade 'type') ---
+    { id: 'flutuante', type: 'common', title: 'Flutuante (Fu)', content: 'Sentido com uma leve pressão, como madeira a flutuar na água. Indica um padrão exterior (ex: invasão de Vento-Frio ou Vento-Calor).' },
+    { id: 'profundo', type: 'common', title: 'Profundo (Chen)', content: 'Só pode ser sentido com pressão forte, perto do osso. Indica um padrão interior (nos órgãos Zang-Fu).' },
+    { id: 'lento', type: 'common', title: 'Lento (Chi)', content: 'Menos de 4 batidas por ciclo respiratório do terapeuta. Indica um padrão de Frio.' },
+    { id: 'rapido', type: 'common', title: 'Rápido (Shu)', content: 'Mais de 5 batidas por ciclo respiratório. Indica um padrão de Calor.' },
+    { id: 'vazio', type: 'common', title: 'Vazio (Xu)', content: 'Grande, mas sem força, fraco. Indica Deficiência de Qi.' },
+    { id: 'cheio', type: 'common', title: 'Cheio (Shi)', content: 'Largo, forte e longo, sentido com força em todas as profundidades. Indica um padrão de Excesso (ex: excesso de Calor ou Frio).' },
+    { id: 'escorregadio', type: 'common', title: 'Escorregadio (Hua)', content: 'Flui suavemente, como pérolas a rolar num prato. Indica Fleuma, Humidade, retenção de alimentos ou gravidez.' },
+    { id: 'agitado', type: 'common', title: 'Agitado (Se)', content: 'Áspero e irregular, como raspar bambu com uma faca. Indica Estagnação de Sangue ou deficiência de Jing/Sangue.' },
+    { id: 'em-corda', type: 'common', title: 'Em Corda (Xian)', content: 'Tenso e fino, como uma corda de guitarra. É o pulso característico da desarmonia do Fígado (ex: Estagnação de Qi do Fígado).' },
+    { id: 'tenso', type: 'common', title: 'Tenso (Jin)', content: 'Mais forte e vibrante que o pulso em corda, como uma corda esticada. Indica Frio, dor ou retenção de alimentos.' },
+];
 
 // Exporta os dados sobre a Teoria do Yin-Yang
 export const yinYangData = {
