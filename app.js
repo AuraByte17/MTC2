@@ -11,13 +11,15 @@ import {
     foodData, 
     zangFuPatternsData, 
     dezPerguntasData, 
-    pulseData,
     greatMastersData,
     therapiesData,
-    linguaData 
+    linguaData,
+    pulsePositionData,
+    pulseTypeData // ALTERAÇÃO: Importa 'pulseTypeData' em vez de 'pulseData'
 } from './data.js';
 
 // --- Seleção de Elementos DOM ---
+const loadingScreen = document.getElementById('loading-screen');
 const openMenuBtn = document.getElementById('open-menu-btn');
 const closeMenuBtn = document.getElementById('close-menu-btn');
 const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
@@ -75,7 +77,6 @@ function openContentModal(htmlContent) {
     contentModalContent.innerHTML = htmlContent;
     document.body.classList.add('content-modal-open');
     
-    // Inicializa qualquer acordeão que possa estar dentro do novo conteúdo do modal
     const modalAccordions = contentModalContent.querySelectorAll('.accordion-container');
     modalAccordions.forEach(accordion => initializeAccordion(accordion));
 }
@@ -179,19 +180,24 @@ function initializeAccordion(container) {
     container.addEventListener('click', (e) => {
         const button = e.target.closest('.accordion-button');
         if (!button) return;
+
         const item = button.closest('.accordion-item');
-        if (!item) return;
+        if (!item || item.parentElement !== container) return;
+        
         const isExpanded = button.getAttribute('aria-expanded') === 'true';
-        const allItems = container.querySelectorAll('.accordion-item');
-        allItems.forEach(otherItem => {
+
+        const siblingItems = Array.from(container.children).filter(child => child.classList.contains('accordion-item'));
+        siblingItems.forEach(otherItem => {
             if (otherItem !== item) {
                 const otherButton = otherItem.querySelector('.accordion-button');
                 if (otherButton) otherButton.setAttribute('aria-expanded', 'false');
             }
         });
+        
         button.setAttribute('aria-expanded', !isExpanded);
     });
 }
+
 
 function createAccordionHTML(data, containerIdPrefix = '') {
     return data.map((item, index) => {
@@ -203,7 +209,7 @@ function createAccordionHTML(data, containerIdPrefix = '') {
                     ${item.color ? `<span class="w-3 h-3 rounded-full mr-3 shrink-0" style="background-color: var(--el-${item.color});"></span>` : ''}
                     <span class="text-left">${item.title}</span>
                 </span>
-                <svg class="w-5 h-5 shrink-0 text-gray-400 chevron"><use href="#icon-chevron-down"></use></svg>
+                <svg class="w-5 h-5 shrink-0 text-gray-400 chevron transition-transform duration-300"><use href="#icon-chevron-down"></use></svg>
             </button>
             <div class="accordion-content" id="${uniqueId}-content" role="region" aria-labelledby="${uniqueId}-button">
                 <div class="accordion-content-inner">${item.content || item.functions}</div>
@@ -215,24 +221,13 @@ function createAccordionHTML(data, containerIdPrefix = '') {
 function setupYinYangSection() {
     const container = document.getElementById('yin-yang-container');
     if (!container) return;
-    const newSvg = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" class="w-full max-w-xs mx-auto yin-yang-svg">
-        <defs>
-            <linearGradient id="yin-grad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#4a5568" /><stop offset="100%" stop-color="#1a202c" /></linearGradient>
-            <linearGradient id="yang-grad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ffffff" /><stop offset="100%" stop-color="#e2e8f0" /></linearGradient>
-            <filter id="soft-glow" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="5" stdDeviation="8" flood-color="#000" flood-opacity="0.15"/></filter>
-        </defs>
-        <g filter="url(#soft-glow)">
-            <circle cx="100" cy="100" r="98" fill="url(#yang-grad)" stroke="#e2e8f0" stroke-width="2"/>
-            <path fill="url(#yin-grad)" d="M100,2 a98,98 0 0,0 0,196 a49,49 0 0,1 0,-98 a49,49 0 0,0 0,-98 Z"/>
-            <circle fill="url(#yin-grad)" cx="100" cy="149" r="18"/><circle fill="url(#yang-grad)" cx="100" cy="51" r="18"/>
-        </g>
-    </svg>`;
+    const svg = document.getElementById('yin-yang-loader-svg').innerHTML;
     container.innerHTML = `
         <div class="card-header"><h3>${yinYangData.title}</h3></div>
         <div class="card-content">
             <div class="grid lg:grid-cols-2 gap-8 items-center">
-                <div class="p-4">${newSvg}</div><div class="card-prose">${yinYangData.content}</div>
+                <div class="p-4"><svg viewBox="0 0 200 200" class="w-full max-w-xs mx-auto yin-yang-svg">${svg}</svg></div>
+                <div class="card-prose">${yinYangData.content}</div>
             </div>
             <div class="mt-8 grid md:grid-cols-2 gap-6">
                 <div class="yin-card"><h4 class="font-bold text-xl mb-3 text-center text-gray-100">YIN (阴)</h4><ul class="list-disc list-inside space-y-2 text-gray-300"><li>Noite, Lua, Escuro, Frio</li><li>Repouso, Passivo, Interior, Baixo</li><li>Substância, Matéria, Estrutura</li></ul></div>
@@ -361,14 +356,28 @@ const renderZangFuCard = (item) => `
         </div>
     </div>`;
 
-const renderZangFuModalContent = (item) => `
+const renderZangFuModalContent = (item) => {
+    const patternsWithContent = item.patterns.map(p => ({
+        title: p.name,
+        content: `
+            <div class="space-y-3 text-sm">
+                <div><strong class="text-primary-dark">Sintomas Chave:</strong><p class="text-gray-600 !mb-0">${p.symptoms}</p></div>
+                <div><strong class="text-primary-dark">Língua:</strong><p class="text-gray-600 !mb-0">${p.tongue}</p></div>
+                <div><strong class="text-primary-dark">Pulso:</strong><p class="text-gray-600 !mb-0">${p.pulse}</p></div>
+                <div><strong class="text-primary-dark">Princípio de Tratamento:</strong><p class="text-gray-600 !mb-0">${p.treatmentPrinciple}</p></div>
+            </div>
+        `
+    }));
+
+    return `
     <div class="card-header">
         <span class="w-4 h-4 rounded-full mr-3 shrink-0" style="background-color: var(--el-${item.color});"></span>
         <h3>Padrões de ${item.name}</h3>
     </div>
     <div class="card-content">
-        <div class="accordion-container">${createAccordionHTML(item.patterns, `modal-zangfu-${item.id}`)}</div>
+        <div class="accordion-container">${createAccordionHTML(patternsWithContent, `modal-zangfu-${item.id}`)}</div>
     </div>`;
+};
 
 const renderAnatomyCard = (item) => `
     <div class="meridian-card p-4 flex items-center justify-center text-center h-full" data-id="${item.id}">
@@ -425,13 +434,16 @@ function setupDiagnosisDiagrams() {
         areas.forEach(area => {
             area.addEventListener('click', () => {
                 areas.forEach(a => a.classList.remove('active'));
-                area.classList.add('active');
-                const areaId = area.dataset.area;
-                const info = linguaData[areaId];
+                const currentAreaId = area.dataset.area;
+                tongueSVG.querySelectorAll(`[data-area="${currentAreaId}"]`).forEach(part => part.classList.add('active'));
+                
+                const info = linguaData[currentAreaId];
                 if (info) {
                     tongueInfoBox.innerHTML = `
-                        <h4 class="font-playfair font-bold text-lg text-primary mb-2">${info.title}</h4>
-                        <p class="text-sm text-gray-600">${info.info}</p>`;
+                        <div class="text-left">
+                            <h4 class="font-playfair font-bold text-lg text-primary mb-2">${info.title}</h4>
+                            <p class="text-sm text-gray-600">${info.info}</p>
+                        </div>`;
                 }
             });
         });
@@ -446,12 +458,22 @@ function setupDiagnosisDiagrams() {
                 positions.forEach(p => p.classList.remove('active'));
                 pos.classList.add('active');
                 const positionId = pos.dataset.pos;
-                const info = pulseData.find(p => p.id === positionId);
+                const info = pulsePositionData[positionId];
                  if (info) {
                     pulseInfoBox.innerHTML = `
-                        <h4 class="font-playfair font-bold text-lg text-primary mb-2">${info.title}</h4>
-                        <p class="text-sm text-gray-600"><strong>Pulso Esquerdo:</strong> ${info.left}</p>
-                        <p class="text-sm text-gray-600"><strong>Pulso Direito:</strong> ${info.right}</p>`;
+                        <div class="text-left w-full">
+                            <h4 class="font-playfair font-bold text-lg text-primary mb-3">${info.title}</h4>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <strong class="font-semibold text-gray-700">Pulso Esquerdo:</strong>
+                                    <p class="text-gray-600">${info.left}</p>
+                                </div>
+                                <div>
+                                    <strong class="font-semibold text-gray-700">Pulso Direito:</strong>
+                                    <p class="text-gray-600">${info.right}</p>
+                                </div>
+                            </div>
+                        </div>`;
                 }
             });
         });
@@ -461,9 +483,14 @@ function setupDiagnosisDiagrams() {
 function setupDiagnosisAccordion() {
     const container = document.getElementById('diagnosis-accordion-container');
     if(!container) return;
+    
     const perguntasContent = `<div id="perguntas-accordion-inner" class="accordion-container"></div>`;
     const pulseTypesContent = `<div id="pulse-list-container-inner" class="accordion-container"></div>`;
-    const diagnosisData = [ { title: 'As 10+1 Perguntas', content: perguntasContent }, { title: 'Tipos de Pulso Comuns', content: pulseTypesContent } ];
+    
+    const diagnosisData = [ 
+        { title: 'As 10+1 Perguntas', content: perguntasContent }, 
+        { title: 'Tipos de Pulso Comuns', content: pulseTypesContent } 
+    ];
     
     container.innerHTML = createAccordionHTML(diagnosisData, 'diagnosis-sub');
     initializeAccordion(container);
@@ -473,15 +500,17 @@ function setupDiagnosisAccordion() {
         perguntasContainer.innerHTML = createAccordionHTML(dezPerguntasData, 'perguntas');
         initializeAccordion(perguntasContainer);
     }
+    
     const pulsoContainer = document.getElementById('pulse-list-container-inner');
-     if(pulsoContainer) {
-        const pulseTypes = pulseData.filter(p => p.type === 'common');
+    if(pulsoContainer) {
+        // ALTERAÇÃO: Usa 'pulseTypeData' para preencher a lista de tipos de pulso.
+        const pulseTypes = pulseTypeData;
         pulsoContainer.innerHTML = createAccordionHTML(pulseTypes, 'pulse-list');
         initializeAccordion(pulsoContainer);
     }
 }
 
-// --- OUTRAS FUNÇÕES DE SETUP ---
+// --- LÓGICA DOS 5 ELEMENTOS (REFINADA) ---
 const elementDiagramSVG = document.getElementById('element-diagram-svg');
 const elementDetailsContainer = document.getElementById('element-details-container');
 const pathsContainer = document.getElementById('cycle-paths-container');
@@ -494,21 +523,61 @@ let currentCycle = 'geracao';
 let selectedElementId = null;
 const cycleInfo = { geracao: { title: 'Ciclo de Geração (Sheng)', description: 'Este ciclo representa a nutrição e o apoio. Cada elemento é a "mãe" do seguinte, nutrindo-o e promovendo o seu crescimento.', color: 'bg-green-100', textColor: 'text-green-800' }, controlo: { title: 'Ciclo de Controlo (Ke)', description: 'Este ciclo representa o controlo e a restrição, garantindo que nenhum elemento se torna excessivo e mantendo o equilíbrio do sistema.', color: 'bg-red-100', textColor: 'text-red-800' } };
 const elementCoords = { madeira: { x: 150, y: 45 }, fogo: { x: 255, y: 125 }, terra: { x: 208, y: 255 }, metal: { x: 92, y: 255 }, agua: { x: 45, y: 125 } };
-const cyclePaths = { geracao: [ { id: 'madeira-fogo', d: `M ${elementCoords.madeira.x} ${elementCoords.madeira.y} C 210 65, 230 80, ${elementCoords.fogo.x} ${elementCoords.fogo.y}` }, { id: 'fogo-terra', d: `M ${elementCoords.fogo.x} ${elementCoords.fogo.y} C 250 180, 240 220, ${elementCoords.terra.x} ${elementCoords.terra.y}` }, { id: 'terra-metal', d: `M ${elementCoords.terra.x} ${elementCoords.terra.y} C 160 285, 130 285, ${elementCoords.metal.x} ${elementCoords.metal.y}` }, { id: 'metal-agua', d: `M ${elementCoords.metal.x} ${elementCoords.metal.y} C 60 220, 50 180, ${elementCoords.agua.x} ${elementCoords.agua.y}` }, { id: 'agua-madeira', d: `M ${elementCoords.agua.x} ${elementCoords.agua.y} C 70 80, 90 65, ${elementCoords.madeira.x} ${elementCoords.madeira.y}` } ], controlo: [ { id: 'madeira-terra', d: `M ${elementCoords.madeira.x} ${elementCoords.madeira.y} L ${elementCoords.terra.x} ${elementCoords.terra.y}` }, { id: 'fogo-metal', d: `M ${elementCoords.fogo.x} ${elementCoords.fogo.y} L ${elementCoords.metal.x} ${elementCoords.metal.y}` }, { id: 'terra-agua', d: `M ${elementCoords.terra.x} ${elementCoords.terra.y} L ${elementCoords.agua.x} ${elementCoords.agua.y}` }, { id: 'metal-madeira', d: `M ${elementCoords.metal.x} ${elementCoords.metal.y} L ${elementCoords.madeira.x} ${elementCoords.madeira.y}` }, { id: 'agua-fogo', d: `M ${elementCoords.agua.x} ${elementCoords.agua.y} L ${elementCoords.fogo.x} ${elementCoords.fogo.y}` } ] };
+const SPHERE_RADIUS = 32;
+
+function getArrowPoints(el1, el2, radius) {
+    const p1 = elementCoords[el1];
+    const p2 = elementCoords[el2];
+    const angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+    return {
+        start: {
+            x: p1.x + radius * Math.cos(angle),
+            y: p1.y + radius * Math.sin(angle)
+        },
+        end: {
+            x: p2.x - radius * Math.cos(angle),
+            y: p2.y - radius * Math.sin(angle)
+        }
+    };
+}
+
+function getCurvePath(el1, el2, radius, bend = 0.5) {
+    const points = getArrowPoints(el1, el2, radius);
+    const midX = (points.start.x + points.end.x) / 2;
+    const midY = (points.start.y + points.end.y) / 2;
+    const dx = points.end.x - points.start.x;
+    const dy = points.end.y - points.start.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const controlX = midX - bend * dy * (distance / 200);
+    const controlY = midY + bend * dx * (distance / 200);
+    return `M ${points.start.x},${points.start.y} Q ${controlX},${controlY} ${points.end.x},${points.end.y}`;
+}
+
+const cyclePaths = {
+    geracao: [
+        { id: 'agua-madeira', d: getCurvePath('agua', 'madeira', SPHERE_RADIUS) },
+        { id: 'madeira-fogo', d: getCurvePath('madeira', 'fogo', SPHERE_RADIUS) },
+        { id: 'fogo-terra', d: getCurvePath('fogo', 'terra', SPHERE_RADIUS) },
+        { id: 'terra-metal', d: getCurvePath('terra', 'metal', SPHERE_RADIUS) },
+        { id: 'metal-agua', d: getCurvePath('metal', 'agua', SPHERE_RADIUS) }
+    ],
+    controlo: [
+        { id: 'madeira-terra', d: `M ${getArrowPoints('madeira', 'terra', SPHERE_RADIUS).start.x},${getArrowPoints('madeira', 'terra', SPHERE_RADIUS).start.y} L ${getArrowPoints('madeira', 'terra', SPHERE_RADIUS).end.x},${getArrowPoints('madeira', 'terra', SPHERE_RADIUS).end.y}` },
+        { id: 'terra-agua', d: `M ${getArrowPoints('terra', 'agua', SPHERE_RADIUS).start.x},${getArrowPoints('terra', 'agua', SPHERE_RADIUS).start.y} L ${getArrowPoints('terra', 'agua', SPHERE_RADIUS).end.x},${getArrowPoints('terra', 'agua', SPHERE_RADIUS).end.y}` },
+        { id: 'agua-fogo', d: `M ${getArrowPoints('agua', 'fogo', SPHERE_RADIUS).start.x},${getArrowPoints('agua', 'fogo', SPHERE_RADIUS).start.y} L ${getArrowPoints('agua', 'fogo', SPHERE_RADIUS).end.x},${getArrowPoints('agua', 'fogo', SPHERE_RADIUS).end.y}` },
+        { id: 'fogo-metal', d: `M ${getArrowPoints('fogo', 'metal', SPHERE_RADIUS).start.x},${getArrowPoints('fogo', 'metal', SPHERE_RADIUS).start.y} L ${getArrowPoints('fogo', 'metal', SPHERE_RADIUS).end.x},${getArrowPoints('fogo', 'metal', SPHERE_RADIUS).end.y}` },
+        { id: 'metal-madeira', d: `M ${getArrowPoints('metal', 'madeira', SPHERE_RADIUS).start.x},${getArrowPoints('metal', 'madeira', SPHERE_RADIUS).start.y} L ${getArrowPoints('metal', 'madeira', SPHERE_RADIUS).end.x},${getArrowPoints('metal', 'madeira', SPHERE_RADIUS).end.y}` }
+    ]
+};
+
 function setup5ElementsDiagram() { 
     if (!spheresContainer) return; 
     spheresContainer.innerHTML = Object.keys(fiveElementsData).map(key => { 
         const el = fiveElementsData[key]; 
         const { x, y } = elementCoords[key]; 
         return `<g id="${key}" class="element-sphere">
-            <defs>
-                <radialGradient id="grad-${key}" cx="30%" cy="30%" r="70%">
-                    <stop offset="0%" stop-color="white" stop-opacity="0.5" />
-                    <stop offset="100%" stop-color="var(--el-${el.color})" stop-opacity="1" />
-                </radialGradient>
-            </defs>
-            <circle class="sphere-shadow" cx="${x}" cy="${y}" r="30" />
-            <circle class="sphere-circle" cx="${x}" cy="${y}" r="30" fill="url(#grad-${key})" stroke="var(--el-${el.color})" stroke-width="1.5"/>
+            <circle class="sphere-shadow" cx="${x}" cy="${y}" r="${SPHERE_RADIUS}" />
+            <circle class="sphere-circle" cx="${x}" cy="${y}" r="${SPHERE_RADIUS}" fill="var(--el-${el.color})"/>
             <text class="sphere-text" x="${x}" y="${y + 5}">${el.name}</text>
         </g>`; 
     }).join(''); 
@@ -548,9 +617,8 @@ function generateNavLinks() {
 
     const generateHtml = (item) => {
         if (item.links) {
-            return `<div class="nav-group"><button class="nav-group-header flex items-center justify-between w-full p-2 rounded-lg" aria-expanded="false"><span class="flex items-center"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${item.icon}"></use></svg><span class="font-semibold">${item.title}</span></span><svg class="w-5 h-5 shrink-0 text-gray-400 chevron"><use href="#icon-chevron-down"></use></svg></button><div class="nav-group-content pl-4 pt-1 space-y-1">${item.links.map(link => `<a href="#${link.id}" class="sidebar-link flex items-center p-2 rounded-lg"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${link.icon}"></use></svg><span>${link.title}</span></a>`).join('')}</div></div>`;
+            return `<div class="nav-group"><button class="nav-group-header flex items-center justify-between w-full" aria-expanded="false"><span class="flex items-center"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${item.icon}"></use></svg><span class="font-semibold">${item.title}</span></span><svg class="w-5 h-5 shrink-0 text-gray-400 chevron"><use href="#icon-chevron-down"></use></svg></button><div class="nav-group-content pl-4 pt-1 space-y-1">${item.links.map(link => `<a href="#${link.id}" class="sidebar-link flex items-center p-2 rounded-lg"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${link.icon}"></use></svg><span>${link.title}</span></a>`).join('')}</div></div>`;
         } else {
-            // FIX: Changed link.id to item.id
             return `<a href="#${item.id}" class="sidebar-link flex items-center p-2 rounded-lg"><svg class="w-5 h-5 mr-3 text-gray-500"><use href="#${item.icon}"></use></svg><span>${item.title}</span></a>`;
         }
     };
@@ -598,4 +666,10 @@ document.addEventListener('DOMContentLoaded', () => {
     contentSections = mainContent.querySelectorAll('.content-section');
     showSection('inicio', 'Início');
     updateActiveLink('inicio');
+    
+    if(loadingScreen) {
+        setTimeout(() => {
+            loadingScreen.classList.add('hidden');
+        }, 1500);
+    }
 });

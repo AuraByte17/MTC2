@@ -983,19 +983,22 @@ export const dezPerguntasData = [
     { title: '+1. Ginecologia (para mulheres)', content: 'Ciclo menstrual, cor e quantidade do fluxo, e sintomas associados (TPM) dão informações vitais sobre o estado do Qi, Sangue, e dos Vasos Maravilhosos (Ren Mai, Chong Mai).' }
 ];
 
-// Exporta os dados sobre o pulso
-export const pulseData = [
-    // --- Dados das posições ---
-    { id: 'cun', type: 'position', title: 'Posição Cun (Polegada)', left: 'Coração, Pericárdio', right: 'Pulmão' },
-    { id: 'guan', type: 'position', title: 'Posição Guan (Barreira)', left: 'Fígado, Vesícula Biliar', right: 'Baço, Estômago' },
-    { id: 'chi', type: 'position', title: 'Posição Chi (Pé)', left: 'Rim Yin', right: 'Rim Yang, Bexiga' },
+// ############### INÍCIO DA ALTERAÇÃO ###############
 
-    // --- Dados dos tipos de pulso comuns ---
+// Exporta os dados sobre as posições do pulso (formato corrigido para o diagrama)
+export const pulsePositionData = {
+    cun: { title: 'Posição Cun (Polegada)', left: 'Coração, Pericárdio', right: 'Pulmão' },
+    guan: { title: 'Posição Guan (Barreira)', left: 'Fígado, Vesícula Biliar', right: 'Baço, Estômago' },
+    chi: { title: 'Posição Chi (Pé)', left: 'Rim Yin', right: 'Rim Yang, Bexiga' }
+};
+
+// Exporta os dados sobre os tipos de pulso (para a lista no acordeão)
+export const pulseTypeData = [
     { id: 'flutuante', type: 'common', title: 'Flutuante (Fu)', content: 'Indica um padrão exterior.' },
     { id: 'profundo', type: 'common', title: 'Profundo (Chen)', content: 'Indica um padrão interior.' },
     { id: 'lento', type: 'common', title: 'Lento (Chi)', content: 'Indica um padrão de Frio.' },
     { id: 'rapido', type: 'common', title: 'Rápido (Shu)', content: 'Indica um padrão de Calor.' },
-    { id: 'em-corda', type: 'common', title: 'Em Corda (Xian)', content: 'É o pulso característico da desarmonia do Fígado.' },
+    { id: 'em-corda', type: 'common', title: 'Em Corda (Xian)', content: 'É o pulso característico da desarmonia do Fígado.' }
 ];
 
 // NOVO: Exporta os dados sobre os Grandes Mestres da MTC (Versão Final e Expandida)
