@@ -29,7 +29,6 @@
                 <circle fill="url(#yin-grad-loader)" cx="100" cy="149" r="18"/><circle fill="url(#yang-grad-loader)" cx="100" cy="51" r="18"/>
             </g>
         </svg>
-        <!-- FIX: Updated loading text -->
         <p id="loading-text" class="mt-4 text-lg text-primary-dark font-semibold">Bem-vindo ao Guia de MTC</p>
     </div>
 
@@ -40,13 +39,6 @@
         <symbol id="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></symbol>
         <symbol id="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></symbol>
         <symbol id="icon-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></symbol>
-        
-        <!-- Marcador de Seta para Diagramas -->
-        <defs>
-            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-                <path d="M 0 0 L 10 5 L 0 10 L 2 5 Z" class="arrow-marker" fill="currentColor"/>
-            </marker>
-        </defs>
         
         <!-- Logótipo Yin Yang Estático -->
         <symbol id="icon-app-logo" viewBox="0 0 24 24">
@@ -164,10 +156,49 @@
                                   <button id="btn-controlo" class="tab-button">Controlo (Ke)</button>
                                </div>
                                <div class="grid md:grid-cols-2 gap-8 items-center">
-                                  <div id="element-diagram-container" class="relative w-full max-w-xs mx-auto aspect-square">
-                                      <svg id="element-diagram-svg" class="absolute inset-0 w-full h-full" viewBox="0 0 300 300">
-                                          <g id="cycle-paths-container"></g>
-                                          <g id="element-spheres-container"></g>
+                                  <div id="five-elements-svg-container" class="relative w-full max-w-sm mx-auto aspect-square">
+                                      <!-- SVG dos 5 Elementos foi movido para cá -->
+                                      <svg id="five-elements-svg" viewBox="0 0 400 400">
+                                          <defs>
+                                              <marker id="arrow-head" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                                  <path d="M 0 0 L 10 5 L 0 10 z" />
+                                              </marker>
+                                               <filter id="glow-filter" x="-50%" y="-50%" width="200%" height="200%">
+                                                  <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+                                                  <feMerge>
+                                                      <feMergeNode in="coloredBlur"/>
+                                                      <feMergeNode in="SourceGraphic"/>
+                                                  </feMerge>
+                                              </filter>
+                                          </defs>
+                                          
+                                          <!-- Linha de Relação Dinâmica -->
+                                          <g id="relationship-lines">
+                                              <path id="relationship-line" class="relationship-line" marker-end="url(#arrow-head)" />
+                                          </g>
+
+                                          <g class="element-nodes">
+                                              <g class="element-node-svg" data-id="madeira" transform="translate(70 150)">
+                                                  <circle r="35" fill="var(--el-wood)"/>
+                                                  <text y="5">Madeira</text>
+                                              </g>
+                                              <g class="element-node-svg" data-id="fogo" transform="translate(200 60)">
+                                                  <circle r="35" fill="var(--el-fire)"/>
+                                                  <text y="5">Fogo</text>
+                                              </g>
+                                              <g class="element-node-svg" data-id="terra" transform="translate(330 150)">
+                                                  <circle r="35" fill="var(--el-earth)"/>
+                                                  <text y="5">Terra</text>
+                                              </g>
+                                              <g class="element-node-svg" data-id="metal" transform="translate(250 270)">
+                                                  <circle r="35" fill="var(--el-metal)"/>
+                                                  <text y="5">Metal</text>
+                                              </g>
+                                              <g class="element-node-svg" data-id="agua" transform="translate(110 270)">
+                                                  <circle r="35" fill="var(--el-water)"/>
+                                                  <text y="5">Água</text>
+                                              </g>
+                                          </g>
                                       </svg>
                                   </div>
                                   <div id="element-details-container"></div>
@@ -192,7 +223,7 @@
                     <section id="meridianos" class="content-section">
                         <div class="text-center mb-12">
                             <h2 class="text-3xl font-playfair font-bold text-primary">Os 12 Meridianos Principais</h2>
-                            <p class="text-gray-600 mt-2 max-w-2xl mx-auto">Clique num meridiano para explorar os seus detalhes.</p>
+                            <p class="text-gray-600 mt-2 max-w-2xl mx-auto">Clique num meridiano para ver os seus pontos e funções.</p>
                         </div>
                         <div id="meridian-grid-container" class="zoom-grid"></div>
                     </section>
@@ -218,27 +249,18 @@
                             <div class="card-header"><h3>Diagnóstico da Língua</h3></div>
                             <div class="card-content grid md:grid-cols-2 gap-8 items-center diagnosis-grid">
                                 <div id="lingua-diagram-container" class="relative max-w-xs mx-auto">
-                                    <svg id="lingua-diagram-svg" viewBox="0 0 200 280" class="w-full h-auto">
-                                        <defs>
-                                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-                                                <feGaussianBlur stdDeviation="3.5" result="coloredBlur"></feGaussianBlur>
-                                                <feMerge>
-                                                    <feMergeNode in="coloredBlur"></feMergeNode>
-                                                    <feMergeNode in="SourceGraphic"></feMergeNode>
-                                                </feMerge>
-                                            </filter>
-                                        </defs>
-                                        <!-- Base da Língua -->
-                                        <path d="M100 275 C 40 220, 20 150, 100 10 C 180 150, 160 220, 100 275 Z" fill="#F8B4C4" stroke="#D17C90" stroke-width="1.5"/>
-                                        <path d="M100 275 C 98 240, 98 180, 100 100 C 102 180, 102 240, 100 275 Z" fill="#D17C90" opacity="0.3"/>
-                                        <!-- Áreas Interativas -->
-                                        <g>
-                                            <path class="diagram-area-svg" data-area="raiz" d="M100 60 C 65 65, 50 25, 100 10 C 150 25, 135 65, 100 60 Z"/>
-                                            <path class="diagram-area-svg" data-area="centro" d="M100 130 C 70 130, 65 60, 100 60 C 135 60, 130 130, 100 130 Z"/>
-                                            <path class="diagram-area-svg" data-area="laterais" d="M65 130 C 40 130, 28 100, 50 60 L 65 60 V 130 Z"/>
-                                            <path class="diagram-area-svg" data-area="laterais" d="M135 130 C 160 130, 172 100, 150 60 L 135 60 V 130 Z"/>
-                                            <path class="diagram-area-svg" data-area="pre-ponta" d="M100 195 C 70 195, 65 130, 100 130 C 135 130, 130 195, 100 195 Z"/>
-                                            <path class="diagram-area-svg" data-area="ponta" d="M100 275 C 70 230, 70 195, 100 195 C 130 195, 130 230, 100 275 Z"/>
+                                    <!-- O SVG da língua foi inserido aqui -->
+                                    <svg id="lingua-diagram-svg" viewBox="0 0 2048 2048" class="w-full h-auto">
+                                        <g class="tongue-body">
+                                            <path style="fill:#e69a9a;fill-opacity:1;stroke:#000000;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1" d="m 1024,2028.2289 c -162.242,-125.131 -311.087,-275.952 -430.34,-441.59 -119.253,-165.638 -204.42,-346.095 -247.164,-536.378 -42.744,-190.283 -41.332,-388.943 -14.688,-581.479 25.29,-182.729 74.072,-356.126 142.125,-514.805 C 551.98, -115.7031 690.814,-211.3931 848.06,-280.9311 c 50.893,-22.52 103.992,-40.091 158.438,-52.344 14.73,-3.31 29.69,-6.2 44.75,-8.625 29.5,-4.75 59.4,-7.125 89.5,-7.125 91.5,0 181.4,11.25 266.5,32.5 85.1,21.25 164.1,51.25 234.5,88.75 122.5,65.1 228.4,152.1 311.1,255.4 53.3,67 96.6,141.1 128.6,220.3 32,79.2 52.1,163.4 59.6,249.9 7.5,86.5 2.1,174.4 -16.1,259.1 -18.2,84.7 -50.1,165.7 -93.8,239.5 -43.7,73.8 -98.1,139.1 -161.3,193.5 -63.2,54.4 -134.1,97.5 -210.5,127.8 -50.5,20 -102.7,35.6 -156.1,46.5 -26.7,5.5 -53.8,9.2 -81.2,11.2 z" />
+                                        </g>
+                                        <g class="interactive-areas">
+                                            <ellipse class="diagram-area-svg" data-area="ponta" cx="1024" cy="1700" rx="190" ry="180" />
+                                            <ellipse class="diagram-area-svg" data-area="pre-ponta" cx="1024" cy="1400" rx="280" ry="150" />
+                                            <ellipse class="diagram-area-svg" data-area="centro" cx="1024" cy="1050" rx="350" ry="200" />
+                                            <ellipse class="diagram-area-svg" data-area="raiz" cx="1024" cy="650" rx="400" ry="180" />
+                                            <path class="diagram-area-svg" data-area="laterais" d="M 650,1400 C 450,1300 400,900 650,600 L 650,1400 Z" />
+                                            <path class="diagram-area-svg" data-area="laterais" d="M 1400,1400 C 1600,1300 1650,900 1400,600 L 1400,1400 Z" />
                                         </g>
                                     </svg>
                                 </div>
@@ -251,7 +273,6 @@
                             <div class="card-header"><h3>Diagnóstico do Pulso</h3></div>
                             <div class="card-content grid md:grid-cols-2 gap-8 items-center diagnosis-grid">
                                 <div id="pulso-diagram-container" class="relative w-64 mx-auto">
-                                     <!-- NOVO SVG DO PULSO (REFORMULADO) -->
                                      <svg id="pulso-diagram-svg" viewBox="0 0 150 200">
                                         <defs>
                                             <linearGradient id="wrist-grad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -348,7 +369,9 @@
             </div>
         </div>
     </div>
-
+    
+    <!-- Fuse.js for fuzzy searching -->
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
     <script type="module" src="app.js"></script>
 </body>
 </html>

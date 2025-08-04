@@ -229,79 +229,61 @@ aside {
 .yin-card { background: linear-gradient(145deg, #2d3748, #1a202c); color: #e2e8f0; }
 .yang-card { background: linear-gradient(145deg, #ffffff, #f7fafc); color: #4a5568; }
 
-/* --- 5 ELEMENTOS (ESTILO FINAL) --- */
-#element-diagram-container {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+/* --- 5 ELEMENTOS (SVG Interativo Profissional) --- */
+#five-elements-svg-container {
+    min-height: 350px;
 }
-#element-diagram-svg {
-    overflow: visible;
+.element-node-svg {
+    cursor: pointer;
+    transition: transform 0.3s ease;
 }
-.element-sphere .sphere-shadow {
-    fill: var(--color-subtle-gray);
-    filter: blur(5px);
-    opacity: 0.6;
-    transition: all 0.3s ease;
-}
-.element-sphere { 
-    cursor: pointer; 
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-}
-.element-sphere:hover {
-    transform: scale(1.08);
-}
-.element-sphere .sphere-circle { 
-    transition: all 0.3s ease; 
+.element-node-svg circle {
     stroke: rgba(0,0,0,0.1);
-    stroke-width: 1px;
+    stroke-width: 2px;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-.element-sphere .sphere-text { 
-    font-size: 14px; 
-    font-weight: 600; 
-    fill: white; 
-    text-anchor: middle; 
-    pointer-events: none; 
-}
-.element-sphere.active { 
-    transform: scale(1.1); 
-}
-.element-sphere.active .sphere-circle { 
-    stroke: white; 
-    stroke-width: 3px; 
-    filter: drop-shadow(0 0 10px rgba(0,0,0,0.3));
-}
-.cycle-path { 
-    stroke-dasharray: 1000; 
-    stroke-dashoffset: 1000; 
-    transition: stroke 0.4s ease-in-out, stroke-width 0.4s ease-in-out, opacity 0.4s ease-in-out; 
-    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.1));
-}
-.cycle-path.draw { 
-    animation: draw-line 1s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards; 
-}
-@keyframes draw-line { to { stroke-dashoffset: 0; } }
-.arrow-marker { transition: fill 0.4s ease-in-out; }
-
-.tab-button {
-    padding: 0.5rem 1.25rem;
-    border-radius: 9999px;
+.element-node-svg text {
+    font-family: 'Inter', sans-serif;
     font-weight: 600;
-    color: var(--color-text-muted);
-    background-color: var(--color-background-end);
-    border: 2px solid transparent;
-    transition: all 0.3s ease;
+    font-size: 16px;
+    fill: white;
+    text-anchor: middle;
+    pointer-events: none;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
 }
-.tab-button:hover {
-    color: var(--color-primary);
-    background-color: var(--color-accent-light);
+.element-node-svg:hover circle {
+    transform: scale(1.1);
+    stroke: var(--color-accent);
+    stroke-width: 4px;
 }
-.tab-button.active {
-    color: var(--color-primary-dark);
-    background-color: white;
-    border-color: var(--color-secondary);
-    box-shadow: 0 4px 10px -2px rgba(58, 163, 148, 0.2);
+.element-node-svg.active circle {
+    transform: scale(1.15);
+    stroke: var(--color-primary-dark);
+    stroke-width: 5px;
+    filter: url(#glow-filter);
+}
+
+.relationship-line {
+    stroke-width: 3;
+    fill: none;
+    opacity: 0;
+    transition: opacity 0.3s, stroke 0.3s;
+    stroke-dasharray: 300;
+    stroke-dashoffset: 300;
+}
+.relationship-line.active {
+    opacity: 1;
+    animation: draw-line 0.8s ease-out forwards;
+}
+.relationship-line.geracao { stroke: var(--color-secondary); }
+.relationship-line.geracao marker { fill: var(--color-secondary); }
+.relationship-line.controlo { stroke: var(--color-accent); }
+.relationship-line.controlo marker { fill: var(--color-accent); }
+
+@keyframes draw-line {
+    to {
+        stroke-dashoffset: 0;
+    }
 }
 
 /* --- Timeline --- */
@@ -311,25 +293,23 @@ aside {
 .timeline-container > .timeline-item:last-child::before { display: none; }
 .timeline-marker { position: absolute; left: 0; top: 0; }
 
-/* --- DIAGRAMAS DE DIAGNÓSTICO (ESTILO PROFISSIONAL) --- */
-.diagram-area-svg { 
-    fill: var(--color-secondary); 
-    opacity: 0.1; 
-    stroke: var(--color-secondary); 
-    stroke-width: 2px; 
-    cursor: pointer; 
-    transition: all 0.3s ease; 
+/* --- DIAGRAMAS DE DIAGNÓSTICO (ESTILO PROFISSIONAL SVG) --- */
+#lingua-diagram-svg .interactive-areas .diagram-area-svg {
+    fill: transparent;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
 }
-.diagram-area-svg:hover { 
-    opacity: 0.35; 
-    stroke: var(--color-accent); 
+#lingua-diagram-svg .diagram-area-svg:hover {
+    fill: var(--color-secondary);
+    opacity: 0.3;
 }
-.diagram-area-svg.active { 
-    opacity: 0.5; 
-    stroke: var(--color-accent); 
-    stroke-width: 3px; 
-    filter: url(#glow); 
+#lingua-diagram-svg .diagram-area-svg.active {
+    fill: var(--color-accent);
+    opacity: 0.5;
+    stroke: var(--color-primary-dark);
+    stroke-width: 20px; /* Aumentado para ser visível no novo viewBox */
 }
+
 .pulse-pos-circle { 
     fill: #fff; 
     stroke: var(--color-secondary); 
